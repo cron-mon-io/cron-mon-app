@@ -10,6 +10,8 @@
 Allows users to create an manage their monitors, and observe the performance of their jobs as
 they're monitored.
 
+![Monitor creation](.github/create-monitor.gif)
+
 ## Getting started
 
 All you need to setup a development environment for the Cron-Mon app is Docker and your IDE of
