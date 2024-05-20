@@ -1,0 +1,42 @@
+{
+  "name": "CronMon App Dev Container",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "runArgs": [
+    "--name",
+    "cron-mon-app-dev",
+    "--add-host",
+    "host.docker.internal:host-gateway"
+  ],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "[typescript]": {
+          "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit"
+          },
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[vue]": {
+          "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit"
+          },
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker",
+        "tamasfe.even-better-toml",
+        "Vue.volar",
+        "ms-vscode.makefile-tools",
+        "tamasfe.even-better-toml"
+      ]
+    }
+  }
+}

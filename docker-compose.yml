@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+
+  app:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    container_name: cron-mon-app
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./app:/usr/cron-mon/app
+    ports:
+      - 3000:3000
+    command: npm run dev
+    networks:
+      - default
+      - cron-mon-network
+
+networks:
+  cron-mon-network:
+    driver: bridge
+    name: cron-mon-network
