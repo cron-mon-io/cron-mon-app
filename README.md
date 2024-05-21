@@ -2,6 +2,7 @@
 
 # The frontend application for [_CronMon_](https://github.com/cron-mon-io/cron-mon)
 
+![Beta](https://img.shields.io/badge/Status-beta-blue)
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?logo=docker&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![Vue.js](https://img.shields.io/badge/Vue%20js-35495E?logo=vuedotjs&logoColor=4FC08D)
@@ -11,6 +12,10 @@ Allows users to create an manage their monitors, and observe the performance of 
 they're monitored.
 
 ![Monitor creation](.github/create-monitor.gif)
+
+## Current status
+
+CronMon is currently still under development, but it does support basic usage.
 
 ## Getting started
 
@@ -34,3 +39,7 @@ your IDE can use your local container's environment.
 - `build-app`: Builds a production build of the Cron-Mon frontend (Vue application).
 - `run`: Run the Cron-Mon API and frontend (Vue application).
 - `test`: Run all units tests.
+
+## Deployment
+
+CronMon currently isn't deployed anywhere, but this may change in the future.
