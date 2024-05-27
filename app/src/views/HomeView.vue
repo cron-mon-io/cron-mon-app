@@ -46,7 +46,7 @@
           </v-card>
         </v-timeline-item>
 
-        <v-timeline-item icon="mdi-run" dot-color="primary" fill-dot>
+        <v-timeline-item icon="mdi-run" dot-color="primary" fill-dot width="100%">
           <v-card class="elevation-2">
             <v-card-title class="text-h5">Go go go!</v-card-title>
             <v-card-text>
