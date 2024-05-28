@@ -14,11 +14,14 @@
         <v-divider></v-divider>
 
         <v-list density="compact" nav v-model:opened="opened">
-          <v-list-item link prepend-icon="mdi-home" :to="{ name: 'home' }">
-            <v-list-item-title class="text-body-1">Home</v-list-item-title>
-          </v-list-item>
-          <v-list-item link prepend-icon="mdi-monitor-eye" :to="{ name: 'monitors' }">
-            <v-list-item-title class="text-body-1">Monitors</v-list-item-title>
+          <v-list-item
+            v-for="link in topLevelLinks"
+            :key="link.target"
+            link
+            :prepend-icon="link.icon"
+            :to="{ name: link.target }"
+          >
+            <v-list-item-title class="text-body-1">{{ link.name }}</v-list-item-title>
           </v-list-item>
           <v-list-group value="docs">
             <template v-slot:activator="{ props }">
@@ -26,21 +29,14 @@
                 <v-list-item-title class="text-body-1">Docs</v-list-item-title>
               </v-list-item>
             </template>
-            <v-list-item link prepend-icon="mdi-math-compass" :to="{ name: 'docs-summary' }">
-              <v-list-item-title class="text-body-1">Summary</v-list-item-title>
-            </v-list-item>
-            <v-list-item link prepend-icon="mdi-server-plus" :to="{ name: 'docs-hosting' }">
-              <v-list-item-title class="text-body-1">Hosting</v-list-item-title>
-            </v-list-item>
             <v-list-item
+              v-for="link in docLinks"
+              :key="link.target"
               link
-              prepend-icon="mdi-application-braces"
-              :to="{ name: 'docs-integration' }"
+              :prepend-icon="link.icon"
+              :to="{ name: link.target }"
             >
-              <v-list-item-title class="text-body-1">Integration</v-list-item-title>
-            </v-list-item>
-            <v-list-item link prepend-icon="mdi-test-tube" :to="{ name: 'docs-api' }">
-              <v-list-item-title class="text-body-1">API</v-list-item-title>
+              <v-list-item-title class="text-body-1">{{ link.name }}</v-list-item-title>
             </v-list-item>
           </v-list-group>
         </v-list>
@@ -76,9 +72,19 @@ import ThemePicker from '@/components/ThemePicker.vue'
 import { ref } from 'vue'
 
 const rail = ref(false)
-const themeName = ref('')
+const themeName = ref('') // This will be set by the ThemePicker during setup/initialisation.
 const themeIsDark = ref(true)
 const opened = ref(['docs'])
+const topLevelLinks = ref([
+  { icon: 'mdi-home', target: 'home', name: 'Home' },
+  { icon: 'mdi-monitor-eye', target: 'monitors', name: 'Monitors' }
+])
+const docLinks = ref([
+  { icon: 'mdi-math-compass', target: 'docs-summary', name: 'Summary' },
+  { icon: 'mdi-server-plus', target: 'docs-hosting', name: 'Hosting' },
+  { icon: 'mdi-application-braces', target: 'docs-integration', name: 'Integration' },
+  { icon: 'mdi-test-tube', target: 'docs-api', name: 'API' }
+])
 
 function updateTheme(name: string, isDark: boolean): void {
   themeName.value = name
