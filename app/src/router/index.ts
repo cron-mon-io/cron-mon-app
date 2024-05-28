@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import MonitorsView from '@/views/MonitorsView.vue'
 import MonitorView from '@/views/MonitorView.vue'
+import SummaryView from '@/views/docs/SummaryView.vue'
+import HostingView from '@/views/docs/HostingView.vue'
+import IntegrationView from '@/views/docs/IntegrationView.vue'
+import ApiView from '@/views/docs/ApiView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,11 +17,28 @@ const router = createRouter({
     },
     {
       path: '/docs',
-      name: 'docs',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/DocsView.vue')
+      children: [
+        {
+          path: 'summary',
+          name: 'docs-summary',
+          component: SummaryView
+        },
+        {
+          path: 'hosting',
+          name: 'docs-hosting',
+          component: HostingView
+        },
+        {
+          path: 'integration',
+          name: 'docs-integration',
+          component: IntegrationView
+        },
+        {
+          path: 'api',
+          name: 'docs-api',
+          component: ApiView
+        }
+      ]
     },
     {
       path: '/monitors',
