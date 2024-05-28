@@ -14,13 +14,13 @@
         <v-divider></v-divider>
 
         <v-list density="compact" class="" nav>
-          <v-list-item link prepend-icon="mdi-home" to="/">
+          <v-list-item link prepend-icon="mdi-home" :to="{ name: 'home' }">
             <v-list-item-title class="text-body-1">Home</v-list-item-title>
           </v-list-item>
-          <v-list-item link prepend-icon="mdi-monitor-eye" to="/monitors">
+          <v-list-item link prepend-icon="mdi-monitor-eye" :to="{ name: 'monitors' }">
             <v-list-item-title class="text-body-1">Monitors</v-list-item-title>
           </v-list-item>
-          <v-list-item link prepend-icon="mdi-bookshelf" to="/docs">
+          <v-list-item link prepend-icon="mdi-bookshelf" :to="{name: 'docs'}">
             <v-list-item-title class="text-body-1">Docs</v-list-item-title>
           </v-list-item>
         </v-list>
