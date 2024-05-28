@@ -1,7 +1,7 @@
 <template>
   <v-card variant="elevated" class="mx-6 mt-13">
     <template v-slot:title>
-      <div class="title">
+      <div class="d-flex">
         <v-icon>
           <v-img :width="40" :height="40" aspect-ratio="16/9" :src="CronMonIcon"></v-img>
         </v-icon>
@@ -62,9 +62,3 @@
 <script setup lang="ts">
 import CronMonIcon from '@/assets/icon.svg'
 </script>
-
-<style scoped>
-.title {
-  display: flex;
-}
-</style>

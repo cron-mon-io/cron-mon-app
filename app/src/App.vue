@@ -2,7 +2,7 @@
   <v-theme-provider class="app-container" :theme="themeName" with-background>
     <v-app>
       <v-navigation-drawer :rail="rail">
-        <v-list-item class="logo pa-0" :height="80">
+        <v-list-item class="d-flex justify-center pa-0" :height="80">
           <v-img
             :width="rail ? 40 : 230"
             :height="rail ? 40 : 45"
@@ -64,10 +64,3 @@ function updateTheme(name: string, isDark: boolean): void {
   themeIsDark.value = isDark
 }
 </script>
-
-<style scoped>
-.logo {
-  display: flex;
-  justify-content: center;
-}
-</style>
