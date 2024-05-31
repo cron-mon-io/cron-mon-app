@@ -5,7 +5,6 @@ import MonitorView from '@/views/MonitorView.vue'
 import SummaryView from '@/views/docs/SummaryView.vue'
 import HostingView from '@/views/docs/HostingView.vue'
 import IntegrationView from '@/views/docs/IntegrationView.vue'
-import ApiView from '@/views/docs/ApiView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,7 +35,9 @@ const router = createRouter({
         {
           path: 'api',
           name: 'docs-api',
-          component: ApiView
+          // Lazy load the API docs since we use https://github.com/scalar/scalar/tree/main
+          // which is a large dependency.
+          component: () => import('@/views/docs/ApiView.vue')
         }
       ]
     },
