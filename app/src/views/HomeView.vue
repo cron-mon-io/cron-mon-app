@@ -5,7 +5,10 @@
         <v-icon>
           <v-img :width="40" :height="40" aspect-ratio="16/9" :src="CronMonIcon"></v-img>
         </v-icon>
-        <span class="font-weight-black ml-4">Welcome to CronMon</span>
+        <span class="font-weight-black ml-4">
+          Welcome to CronMon
+          <v-chip class="ml-4 font-weight-bold" color="primary" variant="flat" label>BETA</v-chip>
+        </span>
       </div>
     </template>
     <v-card-text class="text-body-1">
