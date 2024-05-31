@@ -23,11 +23,6 @@ const router = createRouter({
           component: SetupView
         },
         {
-          path: 'hosting',
-          name: 'docs-hosting',
-          component: HostingView
-        },
-        {
           path: 'integration',
           name: 'docs-integration',
           component: IntegrationView
@@ -38,6 +33,11 @@ const router = createRouter({
           // Lazy load the API docs since we use https://github.com/scalar/scalar/tree/main
           // which is a large dependency.
           component: () => import('@/views/docs/ApiView.vue')
+        },
+        {
+          path: 'hosting',
+          name: 'docs-hosting',
+          component: HostingView
         }
       ]
     },

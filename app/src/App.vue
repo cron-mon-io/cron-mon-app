@@ -77,9 +77,9 @@ const topLevelLinks = ref([
 ])
 const docLinks = ref([
   { icon: 'mdi-math-compass', target: 'docs-setup', name: 'Setup' },
-  { icon: 'mdi-server-plus', target: 'docs-hosting', name: 'Hosting' },
   { icon: 'mdi-application-braces', target: 'docs-integration', name: 'Integration' },
-  { icon: 'mdi-test-tube', target: 'docs-api', name: 'API' }
+  { icon: 'mdi-test-tube', target: 'docs-api', name: 'API' },
+  { icon: 'mdi-server-plus', target: 'docs-hosting', name: 'Hosting' }
 ])
 
 function updateTheme(name: string, isDark: boolean): void {
