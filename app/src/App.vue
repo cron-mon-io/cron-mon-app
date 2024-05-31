@@ -51,11 +51,7 @@
         <RouterView class="mb-3" />
         <v-footer app absolute class="text-center d-flex flex-column">
           <a href="https://github.com/howamith/cron-mon" target="_blank" rel="noopener noreferrer">
-            <v-btn flat density="comfortable" icon>
-              <template v-slot:default>
-                <GitHubIcon :dark="themeIsDark" />
-              </template>
-            </v-btn>
+            <v-btn flat density="comfortable" :icon="GitHubIcon"></v-btn>
           </a>
           <div>&copy; {{ new Date().getFullYear() }} — <strong>CronMon</strong></div>
         </v-footer>
