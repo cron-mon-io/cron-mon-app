@@ -80,7 +80,7 @@ const topLevelLinks = ref([
   { icon: 'mdi-monitor-eye', target: 'monitors', name: 'Monitors' }
 ])
 const docLinks = ref([
-  { icon: 'mdi-math-compass', target: 'docs-summary', name: 'Summary' },
+  { icon: 'mdi-math-compass', target: 'docs-setup', name: 'Setup' },
   { icon: 'mdi-server-plus', target: 'docs-hosting', name: 'Hosting' },
   { icon: 'mdi-application-braces', target: 'docs-integration', name: 'Integration' },
   { icon: 'mdi-test-tube', target: 'docs-api', name: 'API' }

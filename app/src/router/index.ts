@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import MonitorsView from '@/views/MonitorsView.vue'
 import MonitorView from '@/views/MonitorView.vue'
-import SummaryView from '@/views/docs/SummaryView.vue'
+import SetupView from '@/views/docs/SetupView.vue'
 import HostingView from '@/views/docs/HostingView.vue'
 import IntegrationView from '@/views/docs/IntegrationView.vue'
 
@@ -18,9 +18,9 @@ const router = createRouter({
       path: '/docs',
       children: [
         {
-          path: 'summary',
-          name: 'docs-summary',
-          component: SummaryView
+          path: 'setup',
+          name: 'docs-setup',
+          component: SetupView
         },
         {
           path: 'hosting',
