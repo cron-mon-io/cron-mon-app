@@ -19,7 +19,7 @@
         color="primary"
         variant="elevated"
         append-icon="mdi-open-in-app"
-        :to="`/monitors/${monitor.monitor_id}`"
+        :to="{ name: 'monitor', params: { id: monitor.monitor_id } }"
       >
         View
       </v-btn>

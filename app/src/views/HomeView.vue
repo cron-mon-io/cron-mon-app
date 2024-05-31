@@ -1,11 +1,14 @@
 <template>
   <v-card variant="elevated" class="mx-6 mt-13">
     <template v-slot:title>
-      <div class="title">
+      <div class="d-flex">
         <v-icon>
           <v-img :width="40" :height="40" aspect-ratio="16/9" :src="CronMonIcon"></v-img>
         </v-icon>
-        <span class="font-weight-black ml-4">Welcome to CronMon</span>
+        <span class="font-weight-black ml-4">
+          Welcome to CronMon
+          <v-chip class="ml-4 font-weight-bold" color="primary" variant="flat" label>BETA</v-chip>
+        </span>
       </div>
     </template>
     <v-card-text class="text-body-1">
@@ -46,7 +49,7 @@
           </v-card>
         </v-timeline-item>
 
-        <v-timeline-item icon="mdi-run" dot-color="primary" fill-dot>
+        <v-timeline-item icon="mdi-run" dot-color="primary" fill-dot width="100%">
           <v-card class="elevation-2">
             <v-card-title class="text-h5">Go go go!</v-card-title>
             <v-card-text>
@@ -62,9 +65,3 @@
 <script setup lang="ts">
 import CronMonIcon from '@/assets/icon.svg'
 </script>
-
-<style scoped>
-.title {
-  display: flex;
-}
-</style>

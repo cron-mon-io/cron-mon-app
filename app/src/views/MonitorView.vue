@@ -98,8 +98,8 @@ function closeEditDialog() {
 async function deleteDialogComplete(confirmed: boolean) {
   if (confirmed) {
     await monitorRepo.deleteMonitor(monitor.value)
-    router.push('/monitors')
   }
+
   closeDeleteDialog()
 
   // We want to close the dialog first before we navigate back to the monitors page,
