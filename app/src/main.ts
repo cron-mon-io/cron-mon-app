@@ -1,7 +1,10 @@
 import '@mdi/font/css/materialdesignicons.css'
+import 'highlight.js/styles/atom-one-dark.css'
+import 'highlight.js/lib/common'
 
 import { createApp } from 'vue'
 import VueCookies from 'vue-cookies'
+import hljsVuePlugin from '@highlightjs/vue-plugin'
 
 // Vuetify
 import 'vuetify/styles'
@@ -25,4 +28,4 @@ const vuetify = createVuetify({
   }
 })
 
-createApp(App).use(router).use(vuetify).use(VueCookies).mount('#app')
+createApp(App).use(router).use(vuetify).use(VueCookies).use(hljsVuePlugin).mount('#app')
