@@ -9,8 +9,11 @@
       <br />
       In order to use your Monitor in your cronjob or application, you'll need the ID of your
       Monitor. You can get this from your Monitor here in the CronMon app - simply go to
-      <router-link :to="{ name: 'monitors' }" target="_blank">the Monitors page</router-link>, find
-      your Monitor and <i>view</i> it, then click on the Monitor ID to copy it to your clipboard.
+      <router-link :to="{ name: 'monitors' }" target="_blank" rel="noreferrer noopener">
+        the Monitors page
+      </router-link>
+      , find your Monitor and <i>view</i> it, then click on the Monitor ID to copy it to your
+      clipboard.
       <br />
       <br />
       <v-img class="mx-auto" max-width="800px" src="/src/assets/monitor-id.gif" alt="Monitor ID" />

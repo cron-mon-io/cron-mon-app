@@ -18,10 +18,12 @@
       <br />
       <br />
       To create a Monitor, go to
-      <router-link :to="{ name: 'monitors' }" target="_blank">Monitors</router-link> and click the
-      "Add Monitor" button. You'll be asked to provide some basic information about the monitor,
-      such as its name, how long you expect its jobs to run for, and how much grace to give the jobs
-      before considering them late.
+      <router-link :to="{ name: 'monitors' }" target="_blank" rel="noreferrer noopener">
+        Monitors
+      </router-link>
+      and click the "Add Monitor" button. You'll be asked to provide some basic information about
+      the monitor, such as its name, how long you expect its jobs to run for, and how much grace to
+      give the jobs before considering them late.
       <br />
       <br />
       <v-img
