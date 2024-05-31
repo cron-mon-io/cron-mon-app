@@ -11,7 +11,7 @@
 Allows users to create an manage their monitors, and observe the performance of their jobs as
 they're monitored.
 
-![Monitor creation](.github/create-monitor.gif)
+![Monitor creation](.github/monitor.gif)
 
 ## Current status
 
