@@ -2,11 +2,12 @@
 
 # The frontend application for [_CronMon_](https://github.com/cron-mon-io/cron-mon)
 
-![Beta](https://img.shields.io/badge/Status-beta-blue)
+[![CI](https://github.com/howamith/cron-mon-app/actions/workflows/ci.yml/badge.svg)](https://github.com/howamith/cron-mon-app/actions/workflows/ci.yml)
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?logo=docker&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![Vue.js](https://img.shields.io/badge/Vue%20js-35495E?logo=vuedotjs&logoColor=4FC08D)
 ![Vuetify](https://img.shields.io/badge/Vuetify-1867C0?logo=vuetify&logoColor=white)
+![Beta](https://img.shields.io/badge/Status-beta-blue)
 
 Allows users to create an manage their monitors, and observe the performance of their jobs as
 they're monitored.
