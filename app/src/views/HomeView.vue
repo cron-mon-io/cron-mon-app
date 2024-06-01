@@ -27,9 +27,19 @@
           <v-card class="elevation-2">
             <v-card-title class="text-h5">Setup</v-card-title>
             <v-card-text>
-              Go to the <v-icon to="/monitors">mdi-monitor-eye</v-icon> in the sidebar to view your
-              monitored cron jobs. From here, you can add new monitors for you cron jobs - which is
-              a simple as giving the monitor a name, an expected duration and a grace period.
+              Go to
+              <router-link :to="{ name: 'monitors' }" target="_blank" rel="noopener noreferrer">
+                <v-icon>mdi-monitor-eye</v-icon>Monitors
+              </router-link>
+              in the sidebar to view your Monitors. From here, you can add new monitors for you cron
+              jobs - which is a simple as giving the monitor a name, an expected duration and a
+              grace period.
+              <br />
+              <br />
+              For more information on setting up Monitors, take a look at
+              <router-link :to="{ name: 'docs-setup' }" target="_blank" rel="noopener noreferrer">
+                the setup docs </router-link
+              >.
             </v-card-text>
           </v-card>
         </v-timeline-item>
@@ -45,6 +55,15 @@
                 In the future, CronMon will also provide libraries in various programming languages
                 to make integration even simpler.
               </v-alert>
+              <br />
+              For more information on integrating with CronMon, take a look at
+              <router-link
+                :to="{ name: 'docs-integration' }"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                the integration docs </router-link
+              >.
             </v-card-text>
           </v-card>
         </v-timeline-item>

@@ -10,6 +10,11 @@
       are invoked adhoc, rather than on a schedule.
       <br />
       <br />
+      <v-alert type="info" dense variant="tonal">
+        CronMon is currently in beta. Notifying users when their jobs fail, or are late, hasn't been
+        implemented yet, but it is on the roadmap and coming soon.
+      </v-alert>
+      <br />
       To get started with CronMon, you need to set up a <i>Monitor</i>. A Monitor is responsible for
       monitoring the execution of a specific cronjob or task that you want to track, and reporting
       any issues or failures that occur when it runs. A Monitor <i>contains</i> Jobs, which are a
