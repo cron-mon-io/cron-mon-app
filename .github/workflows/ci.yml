@@ -9,7 +9,6 @@ name: CI
 jobs:
   test:
     name: Test
-    runs-on: "non-prod-amd64"
     defaults:
       run:
         working-directory: ./app
