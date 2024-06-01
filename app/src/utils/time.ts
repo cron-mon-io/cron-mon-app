@@ -1,4 +1,8 @@
 export function formatDuration(seconds: number): string {
+  if (seconds < 0) {
+    throw new Error('Invalid duration')
+  }
+
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor(seconds / 60) % 60
   seconds = seconds % 60
