@@ -1,11 +1,12 @@
 import { setupServer } from 'msw/node'
 import type { SetupServer } from 'msw/node'
 import { HttpResponse, http } from 'msw'
+import { v4 as uuidv4 } from 'uuid'
 
 import type { MonitorSummary } from '@/models/monitor'
 
 export function setupTestAPI(): SetupServer {
-  const MONITORS = [
+  let monitors = [
     {
       monitor_id: 'cfe88463-5c04-4b43-b10f-1f508963cc5d',
       name: 'foo-backup.sh',
@@ -108,7 +109,7 @@ export function setupTestAPI(): SetupServer {
     ...[
       http.get('http://127.0.0.1:8000/api/v1/monitors', () => {
         return HttpResponse.json({
-          data: MONITORS.map((monitor) => {
+          data: monitors.map((monitor) => {
             return {
               monitor_id: monitor.monitor_id,
               name: monitor.name,
@@ -118,12 +119,12 @@ export function setupTestAPI(): SetupServer {
               last_finished_job: monitor.last_finished_job
             }
           }),
-          paging: { total: MONITORS.length }
+          paging: { total: monitors.length }
         })
       }),
       http.get('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ params }) => {
         const { monitorId } = params
-        const monitor = MONITORS.find((m) => m.monitor_id === monitorId)
+        const monitor = monitors.find((m) => m.monitor_id === monitorId)
 
         if (!monitor) {
           return HttpResponse.json(
@@ -151,13 +152,24 @@ export function setupTestAPI(): SetupServer {
       http.post('http://127.0.0.1:8000/api/v1/monitors', async ({ request }) => {
         const body = (await request.json()) as MonitorSummary
 
+        const monitor = {
+          monitor_id: uuidv4(),
+          name: body.name,
+          expected_duration: body.expected_duration,
+          grace_duration: body.grace_duration,
+          last_started_job: null,
+          last_finished_job: null,
+          jobs: []
+        }
+        monitors.push(monitor)
+
         return HttpResponse.json({
           data: {
-            monitor_id: '6d7897e3-720a-4602-b5ee-116e752e6b63',
-            name: body.name,
-            expected_duration: body.expected_duration,
-            grace_duration: body.grace_duration,
-            jobs: []
+            monitor_id: monitor.monitor_id,
+            name: monitor.name,
+            expected_duration: monitor.expected_duration,
+            grace_duration: monitor.grace_duration,
+            jobs: monitor.jobs
           }
         })
       }),
@@ -165,7 +177,7 @@ export function setupTestAPI(): SetupServer {
         'http://127.0.0.1:8000/api/v1/monitors/:monitorId',
         async ({ params, request }) => {
           const { monitorId } = params
-          const monitor = MONITORS.find((m) => m.monitor_id === monitorId)
+          const monitor = monitors.find((m) => m.monitor_id === monitorId)
 
           if (!monitor) {
             return HttpResponse.json(
@@ -195,7 +207,7 @@ export function setupTestAPI(): SetupServer {
       ),
       http.delete('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ params }) => {
         const { monitorId } = params
-        const monitor = MONITORS.find((m) => m.monitor_id === monitorId)
+        const monitor = monitors.find((m) => m.monitor_id === monitorId)
 
         if (!monitor) {
           return HttpResponse.json(
@@ -209,6 +221,8 @@ export function setupTestAPI(): SetupServer {
             { status: 404 }
           )
         }
+
+        monitors = monitors.filter((m) => m.monitor_id !== monitorId)
 
         return new HttpResponse(null, { status: 200 })
       })
