@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import type { BasicMonitorInformation, Monitor } from '@/models/monitor'
+import type { MonitorSummary, Monitor } from '@/models/monitor'
 import { durationFromString, formatDuration } from '@/utils/time'
 
 const props = defineProps<{
@@ -68,7 +68,7 @@ const props = defineProps<{
   monitor?: Monitor | null
 }>()
 const emit = defineEmits<{
-  (e: 'dialog-complete', monitorInfo: BasicMonitorInformation): void
+  (e: 'dialog-complete', monitorInfo: MonitorSummary): void
   (e: 'dialog-aborted'): void
 }>()
 
@@ -92,7 +92,7 @@ const monitorInfo = computed(
       name: name.value,
       expected_duration: durationFromString(expectedDuration.value),
       grace_duration: durationFromString(graceDuration.value)
-    }) as BasicMonitorInformation
+    }) as MonitorSummary
 )
 
 // When the parent component closes the dialog, we want to set loading back to false.

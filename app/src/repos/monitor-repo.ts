@@ -1,9 +1,14 @@
-import type { BasicMonitorInformation, Monitor, MonitorInformation } from '../models/monitor'
+import type {
+  MonitorSummary,
+  MonitorIdentity,
+  Monitor,
+  MonitorInformation
+} from '../models/monitor'
 
 export interface MonitorRepoInterface {
   getMonitorInfos(): Promise<Array<MonitorInformation>>
   getMonitor(monitorId: string): Promise<Monitor>
-  addMonitor(monitor: BasicMonitorInformation): Promise<Monitor>
+  addMonitor(monitor: MonitorSummary): Promise<Monitor>
   updateMonitor(monitor: MonitorInformation): Promise<Monitor>
   deleteMonitor(monitor: MonitorInformation): Promise<void>
 }
@@ -33,11 +38,11 @@ export class MonitorRepository implements MonitorRepoInterface {
     return resp.data
   }
 
-  async addMonitor(monitor: BasicMonitorInformation): Promise<Monitor> {
+  async addMonitor(monitor: MonitorSummary): Promise<Monitor> {
     return await this.postMonitorInfo('http://127.0.0.1:8000/api/v1/monitors', 'POST', monitor)
   }
 
-  async updateMonitor(monitor: MonitorInformation): Promise<Monitor> {
+  async updateMonitor(monitor: MonitorIdentity): Promise<Monitor> {
     return await this.postMonitorInfo(
       `http://127.0.0.1:8000/api/v1/monitors/${monitor.monitor_id}`,
       'PATCH',
@@ -45,14 +50,14 @@ export class MonitorRepository implements MonitorRepoInterface {
     )
   }
 
-  async deleteMonitor(monitor: MonitorInformation): Promise<void> {
+  async deleteMonitor(monitor: MonitorIdentity): Promise<void> {
     await fetch(`http://127.0.0.1:8000/api/v1/monitors/${monitor.monitor_id}`, { method: 'DELETE' })
   }
 
   private async postMonitorInfo(
     url: string,
     method: string,
-    monitor: BasicMonitorInformation
+    monitor: MonitorSummary
   ): Promise<Monitor> {
     const rawResp = await fetch(url, {
       method: method,

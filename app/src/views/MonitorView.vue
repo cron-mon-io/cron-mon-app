@@ -59,7 +59,7 @@ import JobInfo from '@/components/JobInfo.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import MonitorSummary from '@/components/MonitorSummary.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
-import type { BasicMonitorInformation, MonitorInformation } from '@/models/monitor'
+import type { MonitorSummary as MonitorSummaryType, MonitorInformation } from '@/models/monitor'
 import { MonitorRepository } from '@/repos/monitor-repo'
 import router from '@/router'
 
@@ -77,7 +77,7 @@ function copyMonitorId() {
   navigator.clipboard.writeText(monitor.value.monitor_id)
 }
 
-async function editDialogComplete(monitorInfo: BasicMonitorInformation) {
+async function editDialogComplete(monitorInfo: MonitorSummaryType) {
   const newMonitor = {
     monitor_id: monitor.value.monitor_id,
     ...monitorInfo

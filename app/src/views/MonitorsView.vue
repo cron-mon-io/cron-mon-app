@@ -25,7 +25,7 @@ import type { VueCookies } from 'vue-cookies'
 import MonitorInfo from '@/components/MonitorInfo.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import { MonitorRepository } from '@/repos/monitor-repo'
-import type { BasicMonitorInformation } from '@/models/monitor'
+import type { MonitorSummary } from '@/models/monitor'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
@@ -34,7 +34,7 @@ const monitorRepo = new MonitorRepository()
 const monitors = ref(await monitorRepo.getMonitorInfos())
 const dialogActive = ref(false)
 
-async function dialogComplete(monitorInfo: BasicMonitorInformation) {
+async function dialogComplete(monitorInfo: MonitorSummary) {
   const monitor = await monitorRepo.addMonitor(monitorInfo)
   cookies?.set(monitor.monitor_id, 'new', '5min')
 

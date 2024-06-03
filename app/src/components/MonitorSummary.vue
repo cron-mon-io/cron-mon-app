@@ -10,11 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import type { MonitorInformation } from '@/models/monitor'
+import type { MonitorSummary } from '@/models/monitor'
 import { formatDuration } from '@/utils/time'
 
 defineProps<{
-  monitor: MonitorInformation
+  monitor: MonitorSummary
   isNew: boolean
 }>()
 </script>
