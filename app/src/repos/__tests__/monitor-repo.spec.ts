@@ -1,7 +1,8 @@
 import { afterAll, afterEach, beforeAll, describe, it, expect } from 'vitest'
 import { HttpResponse, http } from 'msw'
 
-import { MonitorRepository } from '../monitor-repo'
+import type { MonitorSummary } from '@/models/monitor'
+import { MonitorRepository } from '@/repos/monitor-repo'
 
 import { setupTestAPI } from './test-api'
 
@@ -90,7 +91,7 @@ describe('MonitorRepository', () => {
     expect(monitorInfos.length).toEqual(0)
   })
 
-  it('getMonitorInfo', async () => {
+  it('getMonitor', async () => {
     const monitor = await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
     expect(monitor).toEqual({
       monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
@@ -130,5 +131,45 @@ describe('MonitorRepository', () => {
         }
       ]
     })
+  })
+
+  it('addMonitor', async () => {
+    const newMonitor: MonitorSummary = {
+      name: 'new-monitor.sh',
+      expected_duration: 300,
+      grace_duration: 60
+    }
+
+    const monitor = await repo.addMonitor(newMonitor)
+    expect(monitor).toMatchObject({
+      name: 'new-monitor.sh',
+      expected_duration: 300,
+      grace_duration: 60,
+      jobs: []
+    })
+    expect(monitor).toHaveProperty('monitor_id')
+  })
+
+  it('updateMonitor', async () => {
+    const originalMonitor = await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
+
+    const monitor = {
+      monitor_id: originalMonitor.monitor_id,
+      name: 'new-name.sh',
+      expected_duration: originalMonitor.expected_duration + 1,
+      grace_duration: originalMonitor.grace_duration + 1,
+      jobs: originalMonitor.jobs
+    }
+
+    const updatedMonitor = await repo.updateMonitor(monitor)
+    expect(updatedMonitor).toEqual(monitor)
+    expect(updatedMonitor).not.toEqual(originalMonitor)
+  })
+
+  it('deleteMonitor', async () => {
+    const monitor = await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
+    await repo.deleteMonitor(monitor)
+    const deletedMonitor = await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
+    expect(deletedMonitor).toBeUndefined()
   })
 })
