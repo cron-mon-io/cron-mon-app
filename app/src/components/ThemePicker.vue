@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 
 enum ThemeName {
   Dark = 'dark',
@@ -31,8 +31,10 @@ const THEMES: Record<string, Theme> = {
   }
 }
 
+const localStore = inject<Storage>('$localStorage')
+
 function getThemeName(): ThemeName {
-  const persisted = localStorage.getItem('theme')
+  const persisted = localStore.getItem('theme')
   const themeName = persisted as ThemeName
   return persisted === null || ![ThemeName.Dark, ThemeName.Light].includes(themeName)
     ? ThemeName.Dark
@@ -48,7 +50,7 @@ const appliedTheme = computed(() => THEMES[themeName.value])
 
 function toggleTheme() {
   themeName.value = themeName.value === ThemeName.Dark ? ThemeName.Light : ThemeName.Dark
-  localStorage.setItem('theme', themeName.value)
+  localStore.setItem('theme', themeName.value)
   emit('theme-changed', themeName.value, themeName.value === ThemeName.Dark)
 }
 

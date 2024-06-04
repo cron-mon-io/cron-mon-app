@@ -28,4 +28,10 @@ const vuetify = createVuetify({
   }
 })
 
-createApp(App).use(router).use(vuetify).use(VueCookies).use(hljsVuePlugin).mount('#app')
+createApp(App)
+  .use(router)
+  .use(vuetify)
+  .use(VueCookies)
+  .use(hljsVuePlugin)
+  .provide('$localStorage', localStorage)
+  .mount('#app')
