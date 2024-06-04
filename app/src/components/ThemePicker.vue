@@ -34,7 +34,7 @@ const THEMES: Record<string, Theme> = {
 const localStore = inject<Storage>('$localStorage')
 
 function getThemeName(): ThemeName {
-  const persisted = localStore.getItem('theme')
+  const persisted = localStore?.getItem('theme')
   const themeName = persisted as ThemeName
   return persisted === null || ![ThemeName.Dark, ThemeName.Light].includes(themeName)
     ? ThemeName.Dark
@@ -50,7 +50,7 @@ const appliedTheme = computed(() => THEMES[themeName.value])
 
 function toggleTheme() {
   themeName.value = themeName.value === ThemeName.Dark ? ThemeName.Light : ThemeName.Dark
-  localStore.setItem('theme', themeName.value)
+  localStore?.setItem('theme', themeName.value)
   emit('theme-changed', themeName.value, themeName.value === ThemeName.Dark)
 }
 
