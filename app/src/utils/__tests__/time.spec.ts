@@ -25,9 +25,13 @@ describe('formatDuration', () => {
 
 describe('durationFromString', () => {
   it.each([
+    { duration: '00', expected: 0 },
+    { duration: '00:00', expected: 0 },
     { duration: '00:00:00', expected: 0 },
+    { duration: '01', expected: 1 },
     { duration: '00:00:01', expected: 1 },
     { duration: '00:00:59', expected: 59 },
+    { duration: '01:00', expected: 60 },
     { duration: '00:01:00', expected: 60 },
     { duration: '00:01:01', expected: 61 },
     { duration: '00:59:59', expected: 3599 },
@@ -41,8 +45,15 @@ describe('durationFromString', () => {
 
   it.each([
     { duration: '00:00:00:00', expected: 'Invalid duration' },
-    { duration: '00:00:00:00:00', expected: 'Invalid duration' },
-    { duration: '00:00:00:00:00:00', expected: 'Invalid duration' }
+    { duration: '-1', expected: 'Invalid seconds' },
+    { duration: '60', expected: 'Invalid seconds' },
+    { duration: '-1:00', expected: 'Invalid minutes' },
+    { duration: '60:00', expected: 'Invalid minutes' },
+    { duration: '-1:00:00', expected: 'Invalid hours' },
+    { duration: '60:00:00', expected: 'Invalid hours' },
+    { duration: 'abc', expected: 'Invalid seconds' },
+    { duration: 'abc:00', expected: 'Invalid minutes' },
+    { duration: 'abc:00:00', expected: 'Invalid hours' }
   ])('durationFromString($duration) throws an error', ({ duration, expected }) => {
     expect(() => durationFromString(duration)).toThrow(expected)
   })

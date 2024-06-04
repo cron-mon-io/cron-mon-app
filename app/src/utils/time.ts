@@ -16,7 +16,7 @@ export function durationFromString(duration: string): number {
     .split(':')
     .reverse()
     .map((value: string, _index: number, array: string[]) => {
-      if (array.length < 1 || array.length > 3) {
+      if (array.length > 3) {
         throw new Error('Invalid duration')
       }
       const name = chunkNames.pop()
