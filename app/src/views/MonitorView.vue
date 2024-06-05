@@ -5,7 +5,7 @@
       <v-chip
         append-icon="mdi-content-copy"
         color="teal-accent-4"
-        @click="copyMonitorId"
+        @click="copyToClipboard(monitor.monitor_id)"
         class="text-body-1 font-weight-bold ma-2"
         variant="tonal"
         label
@@ -62,6 +62,7 @@ import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorSummary as MonitorSummaryType, MonitorInformation } from '@/models/monitor'
 import { MonitorRepository } from '@/repos/monitor-repo'
 import router from '@/router'
+import { copyToClipboard } from '@/utils/copy'
 
 const ONE_MINUTE_MS = 60 * 1000
 
@@ -72,10 +73,6 @@ const monitorRepo = new MonitorRepository()
 const monitor = ref(await monitorRepo.getMonitor(route.params.id as string))
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
-
-function copyMonitorId() {
-  navigator.clipboard.writeText(monitor.value.monitor_id)
-}
 
 async function editDialogComplete(monitorInfo: MonitorSummaryType) {
   const newMonitor = {

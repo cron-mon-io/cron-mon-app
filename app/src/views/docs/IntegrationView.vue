@@ -39,7 +39,12 @@
             More
           </v-tab>
           <v-spacer />
-          <v-btn class="mr-2 my-auto" density="comfortable" icon="" @click="copyToClipboard">
+          <v-btn
+            class="mr-2 my-auto"
+            density="comfortable"
+            icon=""
+            @click="copyToClipboard(examples[tab])"
+          >
             <v-icon>mdi-content-copy</v-icon>
             <v-tooltip activator="parent">Copy example to clipboard</v-tooltip>
           </v-btn>
@@ -77,6 +82,7 @@
 import { ref } from 'vue'
 
 import PythonIcon from '@/assets/python.svg'
+import { copyToClipboard } from '@/utils/copy'
 
 const pythonExample = `from cron_mon import monitor
 
@@ -109,8 +115,4 @@ const examples = ref<{
   python: pythonExample,
   shell: shellExample
 })
-
-function copyToClipboard() {
-  navigator.clipboard.writeText(examples.value[tab.value])
-}
 </script>
