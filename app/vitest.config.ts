@@ -15,6 +15,7 @@ export default mergeConfig(
           'src/main.ts', // Main is just bootstrapping, no logic.
           'src/router/**', // Router is just configuration, no logic.
           'src/views/docs/**', // Docs are just content, no logic.
+          'src/views/NotFoundView.vue', // 404 is just a placeholder, no logic.
           ...coverageConfigDefaults.exclude
         ]
       }

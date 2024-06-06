@@ -55,6 +55,10 @@ const router = createRouter({
           component: MonitorView
         }
       ]
+    },
+    {
+      path: '/:pathMatch(.*)*', // Catch all 404
+      component: () => import('@/views/NotFoundView.vue')
     }
   ]
 })
