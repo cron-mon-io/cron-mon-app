@@ -1,5 +1,11 @@
 <template>
-  <v-dialog v-model="active" width="auto" @keyup.esc="abort" @keyup.enter="confirm">
+  <v-dialog
+    :model-value="active"
+    width="auto"
+    :attach="attach"
+    @keyup.esc="abort"
+    @keyup.enter="confirm"
+  >
     <v-card max-width="500">
       <v-card-title :prepend-icon="icon">{{ title }}</v-card-title>
       <v-card-text>{{ question }}</v-card-text>
@@ -32,10 +38,13 @@ const props = defineProps<{
   title: string
   icon: string
   question: string
+  noTeleport?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'dialog-complete', confirmed: boolean): void
 }>()
+
+const attach = props.noTeleport !== undefined ? props.noTeleport : false
 
 const loading = ref(false)
 const active = computed(() => props.dialogActive)
