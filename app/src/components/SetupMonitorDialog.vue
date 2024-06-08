@@ -1,5 +1,11 @@
 <template>
-  <v-dialog v-model="active" width="auto" @keyup.esc="exit" @keyup.enter="saveAndExit">
+  <v-dialog
+    v-model="active"
+    :attach="attach"
+    width="auto"
+    @keyup.esc="exit"
+    @keyup.enter="saveAndExit"
+  >
     <v-card min-width="500">
       <v-card-title prepend-icon="mdi-update">Create new Monitor</v-card-title>
       <v-card-text>
@@ -60,17 +66,20 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import type { MonitorSummary, Monitor } from '@/models/monitor'
+import type { MonitorSummary } from '@/models/monitor'
 import { durationFromString, formatDuration } from '@/utils/time'
 
 const props = defineProps<{
   dialogActive: boolean
-  monitor?: Monitor | null
+  monitor?: MonitorSummary | null
+  noTeleport?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'dialog-complete', monitorInfo: MonitorSummary): void
   (e: 'dialog-aborted'): void
 }>()
+
+const attach = props.noTeleport !== undefined ? props.noTeleport : false
 
 const name = ref(props.monitor ? props.monitor.name : '')
 const expectedDuration = ref(props.monitor ? formatDuration(props.monitor.expected_duration) : '')
