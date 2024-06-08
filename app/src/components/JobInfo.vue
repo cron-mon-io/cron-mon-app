@@ -15,7 +15,7 @@
           Late
         </v-chip>
       </span>
-      <div class="mt-3 d-flex flex-column text-body-1">
+      <div class="job-stats mt-3 d-flex flex-column text-body-1">
         <span>Started at: {{ job.start_time }}</span>
         <span v-if="job.end_time !== null">Ended at: {{ job.end_time }}</span>
         <span v-if="job.duration !== null">Duration: {{ formatDuration(job.duration) }}</span>
