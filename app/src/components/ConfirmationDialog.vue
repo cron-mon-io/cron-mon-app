@@ -60,7 +60,7 @@ function abort() {
   emit('dialog-complete', false)
 }
 
-async function confirm() {
+function confirm() {
   loading.value = true
   emit('dialog-complete', true)
 }
