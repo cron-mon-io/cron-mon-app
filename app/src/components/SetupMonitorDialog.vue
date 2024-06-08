@@ -121,7 +121,11 @@ async function saveAndExit() {
   emit('dialog-complete', monitorInfo.value)
 }
 
-function validateDuration(duration: string): boolean | string {
+function validateDuration(duration?: string): boolean | string {
+  if (!duration) {
+    return 'Duration is required'
+  }
+
   try {
     durationFromString(duration)
     return true
