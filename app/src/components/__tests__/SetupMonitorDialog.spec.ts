@@ -109,8 +109,7 @@ describe('SetupMonitorDialog component', () => {
 
     expect(wrapper.html()).toBeTruthy()
 
-    // TODO: Check the title and icon.
-    // expect(wrapper.find('.v-card-title').text()).toBe('Edit Monitor')
+    expect(wrapper.find('.v-card-title').text()).toBe('Edit Monitor')
 
     const fields = wrapper.findAll('.v-field')
     expect(fields).toHaveLength(3)

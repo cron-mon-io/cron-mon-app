@@ -7,7 +7,7 @@
     @keyup.enter="saveAndExit"
   >
     <v-card min-width="500">
-      <v-card-title prepend-icon="mdi-update">Create new Monitor</v-card-title>
+      <v-card-title prepend-icon="mdi-update">{{ title }}</v-card-title>
       <v-card-text>
         <v-form v-model="formValid">
           <v-text-field
@@ -81,6 +81,7 @@ const emit = defineEmits<{
 
 const attach = props.noTeleport !== undefined ? props.noTeleport : false
 
+const title = props.monitor ? 'Edit Monitor' : 'Create new Monitor'
 const name = ref(props.monitor ? props.monitor.name : '')
 const expectedDuration = ref(props.monitor ? formatDuration(props.monitor.expected_duration) : '')
 const graceDuration = ref(props.monitor ? formatDuration(props.monitor.grace_duration) : '')
