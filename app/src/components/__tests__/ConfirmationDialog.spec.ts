@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { VueWrapper, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -54,18 +54,29 @@ describe('ConfirmationDialog component', () => {
     // Check the buttons.
     const buttons = wrapper.findAll('.v-card-actions > .v-btn')
     expect(buttons).toHaveLength(2)
-    expect(buttons.map((button) => button.find('.v-btn__content').text())).toEqual(['No', 'Yes'])
-    expect(
-      buttons.map((button) =>
-        button
+    const buttonDetails = buttons.map((button) => {
+      return {
+        text: button.find('.v-btn__content').text(),
+        icon: button
           .find('.v-icon')
           .classes()
           .find((cls) => cls.startsWith('mdi-'))
-      )
-    ).toEqual(['mdi-close-circle', 'mdi-check-circle'])
+      }
+    })
+    expect(buttonDetails).toEqual([
+      { text: 'No', icon: 'mdi-close-circle' },
+      { text: 'Yes', icon: 'mdi-check-circle' }
+    ])
   })
 
-  it.each(['click', 'keyup.enter'])('emits the correct event when confirmed', async (trigger) => {
+  it.each([
+    async (wrapper: VueWrapper) => {
+      await wrapper.find('.v-card-actions > .v-btn:last-child').trigger('click')
+    },
+    async (wrapper: VueWrapper) => {
+      await wrapper.find('.v-dialog').trigger('keyup.enter')
+    }
+  ])('emits the correct event when confirmed', async (action) => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
         plugins: [vuetify]
@@ -79,12 +90,19 @@ describe('ConfirmationDialog component', () => {
       }
     })
 
-    await wrapper.find('.v-card-actions > .v-btn:last-child').trigger(trigger)
+    await action(wrapper)
 
     expect(wrapper.emitted('dialog-complete')).toEqual([[true]])
   })
 
-  it.each(['click', 'keyup.esc'])('emits the correct event when aborted', async (trigger) => {
+  it.each([
+    async (wrapper: VueWrapper) => {
+      await wrapper.find('.v-card-actions > .v-btn:first-child').trigger('click')
+    },
+    async (wrapper: VueWrapper) => {
+      await wrapper.find('.v-dialog').trigger('keyup.esc')
+    }
+  ])('emits the correct event when aborted', async (action) => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
         plugins: [vuetify]
@@ -98,7 +116,7 @@ describe('ConfirmationDialog component', () => {
       }
     })
 
-    await wrapper.find('.v-card-actions > .v-btn:first-child').trigger(trigger)
+    await action(wrapper)
 
     expect(wrapper.emitted('dialog-complete')).toEqual([[false]])
   })
