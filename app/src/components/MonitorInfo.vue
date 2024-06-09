@@ -19,7 +19,7 @@
         color="primary"
         variant="elevated"
         append-icon="mdi-open-in-app"
-        :to="{ name: 'monitor', params: { id: monitor.monitor_id } }"
+        @click="navigateToMonitor"
       >
         View
       </v-btn>
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import type { MonitorInformation } from '@/models/monitor'
 import MonitorSummary from '@/components/MonitorSummary.vue'
@@ -37,6 +38,7 @@ const props = defineProps<{
   monitor: MonitorInformation
   isNew: boolean
 }>()
+const router = useRouter()
 
 const lastFinishedJob = props.monitor.last_finished_job
 const lastStartedJob = props.monitor.last_started_job
@@ -58,4 +60,11 @@ const lastFinish = ref({
 })
 const lastJobWasLate = ref(lastFinishedJob === null ? false : lastFinishedJob.late)
 const jobInProgress = ref(lastStartedJob === null ? false : lastFinishedJob?.in_progress)
+
+// We should be able to use `:to={name: 'monitor', params: { id: monitor.monitor_id } }`
+// on the v-btn using this function, but it made mocking the navigation in the tests
+// difficult so we're using the router directly.
+function navigateToMonitor() {
+  router.push({ name: 'monitor', params: { id: props.monitor.monitor_id } })
+}
 </script>
