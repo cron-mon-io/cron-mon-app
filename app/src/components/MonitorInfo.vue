@@ -58,8 +58,11 @@ const lastFinish = ref({
         ? 'Succeeded'
         : 'Failed'
 })
-const lastJobWasLate = ref(lastFinishedJob === null ? false : lastFinishedJob.late)
-const jobInProgress = ref(lastStartedJob === null ? false : lastFinishedJob?.in_progress)
+const lastJobWasLate = ref(
+  (lastStartedJob === null ? false : lastStartedJob.late) ||
+    (lastFinishedJob === null ? false : lastFinishedJob.late)
+)
+const jobInProgress = ref(lastStartedJob === null ? false : lastStartedJob.in_progress)
 
 // We should be able to use `:to={name: 'monitor', params: { id: monitor.monitor_id } }`
 // on the v-btn using this function, but it made mocking the navigation in the tests
