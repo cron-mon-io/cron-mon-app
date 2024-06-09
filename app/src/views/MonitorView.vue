@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { ref, inject } from 'vue'
 import type { VueCookies } from 'vue-cookies'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import JobInfo from '@/components/JobInfo.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
@@ -61,12 +61,12 @@ import MonitorSummary from '@/components/MonitorSummary.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorSummary as MonitorSummaryType, MonitorInformation } from '@/models/monitor'
 import { MonitorRepository } from '@/repos/monitor-repo'
-import router from '@/router'
 import { copyToClipboard } from '@/utils/copy'
 
 const ONE_MINUTE_MS = 60 * 1000
 
 const route = useRoute()
+const router = useRouter()
 const cookies = inject<VueCookies>('$cookies')
 
 const monitorRepo = new MonitorRepository()
