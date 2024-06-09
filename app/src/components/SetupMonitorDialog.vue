@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="active"
+    :model-value="active"
     :attach="attach"
     width="auto"
     @keyup.esc="exit"
