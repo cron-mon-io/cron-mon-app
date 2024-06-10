@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { formatDuration, durationFromString } from '../time'
+import { formatDuration, durationFromString } from '@/utils/time'
 
 describe('formatDuration', () => {
   it.each([
