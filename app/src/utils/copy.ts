@@ -1,3 +1,3 @@
-export function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text)
+export async function copyToClipboard(text: string, clipboard: Clipboard = navigator.clipboard) {
+  await clipboard.writeText(text)
 }
