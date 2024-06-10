@@ -9,7 +9,7 @@ import ThemePicker from '@/components/ThemePicker.vue'
 const LIGHT_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-white-balance-sunny'
 const DARK_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-weather-night'
 
-class LocalStorageMock {
+class FakeLocalStorage {
   private data: Record<string, any> = {}
 
   constructor(data: Record<string, any> = {}) {
@@ -37,7 +37,7 @@ describe('ThemePicker component', () => {
       global: {
         plugins: [vuetify],
         provide: {
-          $localStorage: new LocalStorageMock()
+          $localStorage: new FakeLocalStorage()
         }
       }
     })
@@ -57,7 +57,7 @@ describe('ThemePicker component', () => {
       global: {
         plugins: [vuetify],
         provide: {
-          $localStorage: new LocalStorageMock({ theme: 'light' })
+          $localStorage: new FakeLocalStorage({ theme: 'light' })
         }
       }
     })
@@ -77,7 +77,7 @@ describe('ThemePicker component', () => {
       global: {
         plugins: [vuetify],
         provide: {
-          $localStorage: new LocalStorageMock()
+          $localStorage: new FakeLocalStorage()
         }
       }
     })
@@ -114,7 +114,7 @@ describe('ThemePicker component', () => {
         global: {
           plugins: [vuetify],
           provide: {
-            $localStorage: new LocalStorageMock({ theme: choice })
+            $localStorage: new FakeLocalStorage({ theme: choice })
           }
         }
       })
