@@ -13,8 +13,9 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
-import App from './App.vue'
-import router from './router'
+import App from '@/App.vue'
+import { MonitorRepository } from '@/repos/monitor-repo'
+import router from '@/router'
 
 const vuetify = createVuetify({
   components,
@@ -34,4 +35,5 @@ createApp(App)
   .use(VueCookies)
   .use(hljsVuePlugin)
   .provide('$localStorage', localStorage)
+  .provide('$monitorRepo', new MonitorRepository())
   .mount('#app')

@@ -24,13 +24,13 @@ import type { VueCookies } from 'vue-cookies'
 
 import MonitorInfo from '@/components/MonitorInfo.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
-import { MonitorRepository } from '@/repos/monitor-repo'
+import type { MonitorRepoInterface } from '@/repos/monitor-repo'
 import type { MonitorSummary } from '@/models/monitor'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
 const cookies = inject<VueCookies>('$cookies')
-const monitorRepo = new MonitorRepository()
+const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
 const monitors = ref(await monitorRepo.getMonitorInfos())
 const dialogActive = ref(false)
 
