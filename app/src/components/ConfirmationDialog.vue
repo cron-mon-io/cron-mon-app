@@ -31,20 +31,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, inject } from 'vue'
 
 const props = defineProps<{
   dialogActive: boolean
   title: string
   icon: string
   question: string
-  noTeleport?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'dialog-complete', confirmed: boolean): void
 }>()
 
-const attach = props.noTeleport !== undefined ? props.noTeleport : false
+const attach = inject<boolean>('noTeleport', false)
 
 const loading = ref(false)
 const active = computed(() => props.dialogActive)

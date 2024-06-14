@@ -13,14 +13,16 @@ describe('ConfirmationDialog component', () => {
   it('is not rendered when not active', () => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
         dialogActive: false,
         title: 'Foo',
         icon: 'mdi-alert',
-        question: 'Are you sure?',
-        noTeleport: true
+        question: 'Are you sure?'
       }
     })
 
@@ -30,14 +32,16 @@ describe('ConfirmationDialog component', () => {
   it('is rendered when active', () => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
         dialogActive: true,
         title: 'Foo',
         icon: 'mdi-alert',
-        question: 'Are you sure?',
-        noTeleport: true
+        question: 'Are you sure?'
       }
     })
 
@@ -79,14 +83,16 @@ describe('ConfirmationDialog component', () => {
   ])('emits the correct event when confirmed', async (action) => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
         dialogActive: true,
         title: 'Foo',
         icon: 'mdi-alert',
-        question: 'Are you sure?',
-        noTeleport: true
+        question: 'Are you sure?'
       }
     })
 
@@ -105,14 +111,16 @@ describe('ConfirmationDialog component', () => {
   ])('emits the correct event when aborted', async (action) => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
         dialogActive: true,
         title: 'Foo',
         icon: 'mdi-alert',
-        question: 'Are you sure?',
-        noTeleport: true
+        question: 'Are you sure?'
       }
     })
 
@@ -124,14 +132,16 @@ describe('ConfirmationDialog component', () => {
   it('indicates loading when confirmed until dialog is closed', async () => {
     const wrapper = mount(ConfirmationDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
         dialogActive: true,
         title: 'Foo',
         icon: 'mdi-alert',
-        question: 'Are you sure?',
-        noTeleport: true
+        question: 'Are you sure?'
       }
     })
 
@@ -156,14 +166,16 @@ describe('ConfirmationDialog component', () => {
     (noTeleport) => {
       const wrapper = mount(ConfirmationDialog, {
         global: {
-          plugins: [vuetify]
+          plugins: [vuetify],
+          provide: {
+            noTeleport: noTeleport
+          }
         },
         props: {
           dialogActive: true,
           title: 'Foo',
           icon: 'mdi-alert',
-          question: 'Are you sure?',
-          noTeleport: noTeleport
+          question: 'Are you sure?'
         }
       })
 

@@ -13,11 +13,13 @@ describe('SetupMonitorDialog component', () => {
   it('is not rendered when not active', () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: false,
-        noTeleport: true
+        dialogActive: false
       }
     })
 
@@ -27,11 +29,13 @@ describe('SetupMonitorDialog component', () => {
   it('is rendered when active', () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: true,
-        noTeleport: true
+        dialogActive: true
       }
     })
 
@@ -92,7 +96,10 @@ describe('SetupMonitorDialog component', () => {
   it('renders with existing monitor', () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
         dialogActive: true,
@@ -100,8 +107,7 @@ describe('SetupMonitorDialog component', () => {
           name: 'Test Monitor',
           expected_duration: 5430,
           grace_duration: 600
-        },
-        noTeleport: true
+        }
       },
       // We need to attach to the document body so we can use document.getElementById.
       attachTo: document.body
@@ -134,11 +140,13 @@ describe('SetupMonitorDialog component', () => {
   ])('emits the correct event when aborted', async (action) => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: true,
-        noTeleport: true
+        dialogActive: true
       }
     })
 
@@ -150,11 +158,13 @@ describe('SetupMonitorDialog component', () => {
   it('flags up validation errors', async () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: true,
-        noTeleport: true
+        dialogActive: true
       }
     })
 
@@ -184,11 +194,13 @@ describe('SetupMonitorDialog component', () => {
   it('only allows setup to be confirmed with all fields supplied', async () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: true,
-        noTeleport: true
+        dialogActive: true
       }
     })
 
@@ -222,11 +234,13 @@ describe('SetupMonitorDialog component', () => {
   ])('emits the correct event when confirmed', async (action) => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: true,
-        noTeleport: true
+        dialogActive: true
       }
     })
 
@@ -246,11 +260,13 @@ describe('SetupMonitorDialog component', () => {
   it('indicates loading when confirmed until dialog is closed', async () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {
-        plugins: [vuetify]
+        plugins: [vuetify],
+        provide: {
+          noTeleport: true
+        }
       },
       props: {
-        dialogActive: true,
-        noTeleport: true
+        dialogActive: true
       }
     })
 
@@ -280,11 +296,13 @@ describe('SetupMonitorDialog component', () => {
     (noTeleport) => {
       const wrapper = mount(SetupMonitorDialog, {
         global: {
-          plugins: [vuetify]
+          plugins: [vuetify],
+          provide: {
+            noTeleport: noTeleport
+          }
         },
         props: {
-          dialogActive: true,
-          noTeleport: noTeleport
+          dialogActive: true
         }
       })
 

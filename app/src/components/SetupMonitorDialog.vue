@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, inject } from 'vue'
 
 import type { MonitorSummary } from '@/models/monitor'
 import { durationFromString, formatDuration } from '@/utils/time'
@@ -72,14 +72,13 @@ import { durationFromString, formatDuration } from '@/utils/time'
 const props = defineProps<{
   dialogActive: boolean
   monitor?: MonitorSummary | null
-  noTeleport?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'dialog-complete', monitorInfo: MonitorSummary): void
   (e: 'dialog-aborted'): void
 }>()
 
-const attach = props.noTeleport !== undefined ? props.noTeleport : false
+const attach = inject<boolean>('noTeleport', false)
 
 const title = props.monitor ? 'Edit Monitor' : 'Create new Monitor'
 const name = ref(props.monitor ? props.monitor.name : '')
