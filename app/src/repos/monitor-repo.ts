@@ -4,8 +4,8 @@ export interface MonitorRepoInterface {
   getMonitorInfos(): Promise<Array<MonitorInformation>>
   getMonitor(monitorId: string): Promise<Monitor>
   addMonitor(monitor: MonitorSummary): Promise<Monitor>
-  updateMonitor(monitor: MonitorInformation): Promise<Monitor>
-  deleteMonitor(monitor: MonitorInformation): Promise<void>
+  updateMonitor(monitor: MonitorIdentity): Promise<Monitor>
+  deleteMonitor(monitor: MonitorIdentity): Promise<void>
 }
 
 type MonitorResp = {
