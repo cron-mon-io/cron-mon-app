@@ -7,8 +7,8 @@ import * as directives from 'vuetify/directives'
 
 import MonitorsView from '@/views/MonitorsView.vue'
 
-import { FakeMonitorRepository } from './fake-monitor-repo'
-import { FakeVueCookies } from './fake-vue-cookies'
+import { FakeMonitorRepository } from '@/utils/testing/fake-monitor-repo'
+import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 
 describe('MonitorsView view', () => {
   const vuetify = createVuetify({ components, directives })

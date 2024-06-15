@@ -4,7 +4,7 @@ import { HttpResponse, http } from 'msw'
 import type { MonitorSummary } from '@/models/monitor'
 import { MonitorRepository } from '@/repos/monitor-repo'
 
-import { setupTestAPI } from './test-api'
+import { setupTestAPI } from '@/utils/testing/test-api'
 
 describe('MonitorRepository', () => {
   const server = setupTestAPI()

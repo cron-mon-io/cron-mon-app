@@ -60,7 +60,7 @@ import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import MonitorSummary from '@/components/MonitorSummary.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorSummary as MonitorSummaryType, MonitorInformation } from '@/models/monitor'
-import { MonitorRepository } from '@/repos/monitor-repo'
+import type { MonitorRepoInterface } from '@/repos/monitor-repo'
 import { copyToClipboard } from '@/utils/copy'
 
 const ONE_MINUTE_MS = 60 * 1000
