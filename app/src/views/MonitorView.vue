@@ -67,9 +67,9 @@ const ONE_MINUTE_MS = 60 * 1000
 const route = useRoute()
 const router = useRouter()
 const cookies = inject<VueCookies>('$cookies')
+const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
 const clipboard = inject<Clipboard>('$clipboard') as Clipboard
 
-const monitorRepo = new MonitorRepository()
 const monitor = ref(await monitorRepo.getMonitor(route.params.id as string))
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)

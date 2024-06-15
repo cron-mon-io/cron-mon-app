@@ -28,13 +28,17 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
 
   async getMonitor(monitorId: string): Promise<Monitor> {
     const monitor = this.data[monitorId]
-    return Promise.resolve({
-      monitor_id: monitor.monitor_id,
-      name: monitor.name,
-      expected_duration: monitor.expected_duration,
-      grace_duration: monitor.grace_duration,
-      jobs: monitor.jobs
-    })
+    return Promise.resolve(
+      monitor !== undefined
+        ? {
+            monitor_id: monitor.monitor_id,
+            name: monitor.name,
+            expected_duration: monitor.expected_duration,
+            grace_duration: monitor.grace_duration,
+            jobs: monitor.jobs
+          }
+        : (undefined as unknown as Monitor) // TODO: Remove this hack once we have proper error handling
+    )
   }
 
   async addMonitor(monitor: MonitorSummary): Promise<Monitor> {
