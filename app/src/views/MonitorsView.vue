@@ -29,14 +29,14 @@ import type { MonitorSummary } from '@/models/monitor'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
-const cookies = inject<VueCookies>('$cookies')
+const cookies = inject<VueCookies>('$cookies') as VueCookies
 const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
 const monitors = ref(await monitorRepo.getMonitorInfos())
 const dialogActive = ref(false)
 
 async function dialogComplete(monitorInfo: MonitorSummary) {
   const monitor = await monitorRepo.addMonitor(monitorInfo)
-  cookies?.set(monitor.monitor_id, 'new', '5min')
+  cookies.set(monitor.monitor_id, 'new', '5min')
 
   // We get the list of monitors again here, rather than just inserting the new monitor,
   // so that the list is sorted by the API.

@@ -66,7 +66,7 @@ const ONE_MINUTE_MS = 60 * 1000
 
 const route = useRoute()
 const router = useRouter()
-const cookies = inject<VueCookies>('$cookies')
+const cookies = inject<VueCookies>('$cookies') as VueCookies
 const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
 const clipboard = inject<Clipboard>('$clipboard') as Clipboard
 
@@ -84,7 +84,7 @@ async function editDialogComplete(monitorInfo: MonitorSummaryType) {
     ...monitorInfo
   } as MonitorInformation
   monitor.value = await monitorRepo.updateMonitor(newMonitor)
-  cookies?.set(monitor.value.monitor_id, 'new', '5min')
+  cookies.set(monitor.value.monitor_id, 'new', '5min')
   closeEditDialog()
 }
 
