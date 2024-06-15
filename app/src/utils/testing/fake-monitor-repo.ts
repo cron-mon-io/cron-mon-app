@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/models/monitor'
+import type { Job } from '@/models/job'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
 
 type MonitorData = Monitor & MonitorInformation
@@ -72,5 +73,11 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   async deleteMonitor(monitor: MonitorIdentity): Promise<void> {
     delete this.data[monitor.monitor_id]
     return Promise.resolve()
+  }
+
+  // Not part of the interface, but required for testing.
+  addJob(monitorId: string, job: Job) {
+    const monitor = this.data[monitorId]
+    monitor.jobs.push(job)
   }
 }
