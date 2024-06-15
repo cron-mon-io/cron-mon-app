@@ -77,7 +77,6 @@
 import { inject, ref } from 'vue'
 
 import PythonIcon from '@/assets/python.svg'
-import { copyToClipboard } from '@/utils/copy'
 
 const pythonExample = `from cron_mon import monitor
 
@@ -114,6 +113,6 @@ const examples = ref<{
 })
 
 function copyExampleToClipboard() {
-  copyToClipboard(examples.value[tab.value], clipboard)
+  clipboard.writeText(examples.value[tab.value])
 }
 </script>

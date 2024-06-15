@@ -61,7 +61,6 @@ import MonitorSummary from '@/components/MonitorSummary.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorSummary as MonitorSummaryType, MonitorInformation } from '@/models/monitor'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
-import { copyToClipboard } from '@/utils/copy'
 
 const ONE_MINUTE_MS = 60 * 1000
 
@@ -76,7 +75,7 @@ const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
 
 function copyMonitorIDToClipboard() {
-  copyToClipboard(monitor.value.monitor_id, clipboard)
+  clipboard.writeText(monitor.value.monitor_id)
 }
 
 async function editDialogComplete(monitorInfo: MonitorSummaryType) {
