@@ -5,7 +5,7 @@
       <v-chip
         append-icon="mdi-content-copy"
         color="teal-accent-4"
-        @click="copyToClipboard(monitor.monitor_id)"
+        @click="copyMonitorIDToClipboard"
         class="text-body-1 font-weight-bold ma-2"
         variant="tonal"
         label
@@ -68,11 +68,16 @@ const ONE_MINUTE_MS = 60 * 1000
 const route = useRoute()
 const router = useRouter()
 const cookies = inject<VueCookies>('$cookies')
+const clipboard = inject<Clipboard>('$clipboard') as Clipboard
 
 const monitorRepo = new MonitorRepository()
 const monitor = ref(await monitorRepo.getMonitor(route.params.id as string))
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
+
+function copyMonitorIDToClipboard() {
+  copyToClipboard(monitor.value.monitor_id, clipboard)
+}
 
 async function editDialogComplete(monitorInfo: MonitorSummaryType) {
   const newMonitor = {
