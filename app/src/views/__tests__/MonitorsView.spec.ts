@@ -20,6 +20,8 @@ describe('MonitorsView view', () => {
     }))
   }))
 
+  // The MonitorsView component uses an async setup, so we need to wrap it in a
+  // Suspense component to test it.
   const TestComponent = defineComponent({
     components: { MonitorsView },
     template: '<Suspense><MonitorsView/></Suspense>'
