@@ -6,28 +6,10 @@ import * as directives from 'vuetify/directives'
 
 import ThemePicker from '@/components/ThemePicker.vue'
 
+import { FakeLocalStorage } from '@/utils/testing/fake-localstorage'
+
 const LIGHT_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-white-balance-sunny'
 const DARK_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-weather-night'
-
-class FakeLocalStorage {
-  private data: Record<string, any> = {}
-
-  constructor(data: Record<string, any> = {}) {
-    this.data = data
-  }
-
-  getItem(key: string) {
-    return this.data[key]
-  }
-
-  setItem(key: string, value: any) {
-    this.data[key] = value
-  }
-
-  clear() {
-    this.data = {}
-  }
-}
 
 const vuetify = createVuetify({ components, directives })
 
