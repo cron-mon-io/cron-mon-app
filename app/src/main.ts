@@ -5,6 +5,7 @@ import 'highlight.js/lib/common'
 import { createApp, type App as VueApp } from 'vue'
 import VueCookies from 'vue-cookies'
 import hljsVuePlugin from '@highlightjs/vue-plugin'
+import { ApiReference } from '@scalar/api-reference'
 
 // Vuetify
 import 'vuetify/styles'
@@ -36,8 +37,8 @@ createApp(App)
   .use(hljsVuePlugin)
   // Adhoc plugin to make the API docs view more testable.
   .use({
-    async install(app: VueApp) {
-      app.component('api-reference', (await import('@scalar/api-reference')).ApiReference)
+    install(app: VueApp) {
+      app.component('ApiReference', ApiReference)
     }
   })
   .provide('$localStorage', localStorage)

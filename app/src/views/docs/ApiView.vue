@@ -1,5 +1,5 @@
 <template>
-  <api-reference :configuration="ScalarConfig" />
+  <ApiReference :configuration="ScalarConfig" />
 </template>
 
 <script setup lang="ts">
