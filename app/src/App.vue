@@ -1,7 +1,7 @@
 <template>
   <v-theme-provider class="app-container" :theme="themeName" with-background>
     <v-app>
-      <v-navigation-drawer :rail="rail">
+      <v-navigation-drawer :rail="rail" :mobile="false">
         <v-list-item class="d-flex justify-center pa-0" :height="80">
           <v-img
             :width="rail ? 40 : 230"
