@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import { ApiReference } from '@scalar/api-reference'
 import { ref } from 'vue'
 
 const openApiSpec = await (await fetch('http://127.0.0.1:8000/api/v1/docs/openapi.yaml')).text()
