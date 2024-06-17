@@ -19,7 +19,10 @@ export default mergeConfig(
           'src/views/HomeView.vue', // Home page is just content, no logic.
           'src/views/NotFoundView.vue', // 404 is just a placeholder, no logic.
           ...coverageConfigDefaults.exclude
-        ]
+        ],
+        thresholds: {
+          '100': true
+        }
       }
     }
   })
