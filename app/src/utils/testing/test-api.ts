@@ -107,6 +107,12 @@ export function setupTestAPI(): SetupServer {
 
   return setupServer(
     ...[
+      http.get('http://127.0.0.1:8000/api/v1/docs/openapi.yaml', () => {
+        return new HttpResponse('openapi: 3.0.0', {
+          status: 201,
+          headers: { 'Content-Type': 'application/yaml' }
+        })
+      }),
       http.get('http://127.0.0.1:8000/api/v1/monitors', () => {
         return HttpResponse.json({
           data: monitors.map((monitor) => {
