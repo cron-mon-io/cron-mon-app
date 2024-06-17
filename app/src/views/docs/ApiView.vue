@@ -13,7 +13,7 @@ const ScalarConfig = ref({
   spec: {
     // This is a bit of an ugly workaround to allow Scalar to hit the API, since it's
     // running on a different domain.
-    // TODO: Figure out how to handy this for local dev and in real deployments.
+    // TODO: Figure out how to handle this for local dev and in real deployments.
     content: openApiSpec.replace('- url: /api/v1', '- url: http://127.0.0.1:8000/api/v1')
   },
   // Limit the clients shown for the time being, just to make the page look a bit cleaner.
