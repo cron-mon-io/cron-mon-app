@@ -1,21 +1,23 @@
 <template>
-  <v-btn append-icon="mdi-plus" color="primary" class="ma-4" @click="openDialog">
-    Add Monitor
-    <v-tooltip activator="parent" location="top">Click to add a new monitor</v-tooltip>
-  </v-btn>
-  <div class="d-flex flex-column align-center">
-    <MonitorInfo
-      v-for="monitor in monitors"
-      :key="monitor.monitor_id"
-      :monitor="monitor"
-      :isNew="$cookies.isKey(monitor.monitor_id)"
+  <div>
+    <v-btn append-icon="mdi-plus" color="primary" class="ma-4" @click="openDialog">
+      Add Monitor
+      <v-tooltip activator="parent" location="top">Click to add a new monitor</v-tooltip>
+    </v-btn>
+    <div class="d-flex flex-column align-center">
+      <MonitorInfo
+        v-for="monitor in monitors"
+        :key="monitor.monitor_id"
+        :monitor="monitor"
+        :isNew="$cookies.isKey(monitor.monitor_id)"
+      />
+    </div>
+    <SetupMonitorDialog
+      :dialogActive="dialogActive"
+      @dialog-complete="dialogComplete"
+      @dialog-aborted="closeDialog"
     />
   </div>
-  <SetupMonitorDialog
-    :dialogActive="dialogActive"
-    @dialog-complete="dialogComplete"
-    @dialog-aborted="closeDialog"
-  />
 </template>
 
 <script setup lang="ts">
