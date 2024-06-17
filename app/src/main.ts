@@ -2,7 +2,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'highlight.js/lib/common'
 
-import { createApp } from 'vue'
+import { createApp, type App as VueApp } from 'vue'
 import VueCookies from 'vue-cookies'
 import hljsVuePlugin from '@highlightjs/vue-plugin'
 
@@ -34,6 +34,12 @@ createApp(App)
   .use(vuetify)
   .use(VueCookies)
   .use(hljsVuePlugin)
+  // Adhoc plugin to make the API docs view more testable.
+  .use({
+    async install(app: VueApp) {
+      app.component('api-reference', (await import('@scalar/api-reference')).ApiReference)
+    }
+  })
   .provide('$localStorage', localStorage)
   .provide('$monitorRepo', new MonitorRepository())
   .provide('$clipboard', navigator.clipboard)
