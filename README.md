@@ -2,7 +2,7 @@
 
 # The frontend application for [_CronMon_](https://github.com/cron-mon-io/cron-mon)
 
-[![CI](https://github.com/howamith/cron-mon-app/actions/workflows/ci.yml/badge.svg)](https://github.com/howamith/cron-mon-app/actions/workflows/ci.yml)
+[![CI](https://github.com/cron-mon-io/cron-mon-app/actions/workflows/ci.yml/badge.svg)](https://github.com/cron-mon-io/cron-mon-app/actions/workflows/ci.yml)
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?logo=docker&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![Vue.js](https://img.shields.io/badge/Vue%20js-35495E?logo=vuedotjs&logoColor=4FC08D)
