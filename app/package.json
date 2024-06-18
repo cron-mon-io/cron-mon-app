@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@scalar/api-reference": "^1.22.53",
+    "@scalar/api-reference": "^1.24.11",
     "vue": "^3.4.21",
     "vue-cookies": "^1.8.4",
-    "vue-router": "^4.3.0",
-    "vuetify": "^3.6.3"
+    "vue-router": "^4.3.3",
+    "vuetify": "^3.6.9"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
