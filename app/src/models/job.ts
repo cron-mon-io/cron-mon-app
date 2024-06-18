@@ -1,7 +1,7 @@
 export type Job = {
   job_id: string
-  start_time: Date
-  end_time: Date | null
+  start_time: string
+  end_time: string | null
   in_progress: boolean
   late: boolean
   duration: number | null

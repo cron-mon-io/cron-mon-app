@@ -1,7 +1,13 @@
 <template>
-  <v-dialog v-model="active" width="auto" @keyup.esc="exit" @keyup.enter="saveAndExit">
+  <v-dialog
+    :model-value="active"
+    :attach="attach"
+    width="auto"
+    @keyup.esc="exit"
+    @keyup.enter="saveAndExit"
+  >
     <v-card min-width="500">
-      <v-card-title prepend-icon="mdi-update">Create new Monitor</v-card-title>
+      <v-card-title prepend-icon="mdi-update">{{ title }}</v-card-title>
       <v-card-text>
         <v-form v-model="formValid">
           <v-text-field
@@ -58,20 +64,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, inject } from 'vue'
 
-import type { BasicMonitorInformation, Monitor } from '@/models/monitor'
+import type { MonitorSummary } from '@/models/monitor'
 import { durationFromString, formatDuration } from '@/utils/time'
 
 const props = defineProps<{
   dialogActive: boolean
-  monitor?: Monitor | null
+  monitor?: MonitorSummary | null
 }>()
 const emit = defineEmits<{
-  (e: 'dialog-complete', monitorInfo: BasicMonitorInformation): void
+  (e: 'dialog-complete', monitorInfo: MonitorSummary): void
   (e: 'dialog-aborted'): void
 }>()
 
+const attach = inject<boolean>('noTeleport', false)
+
+const title = props.monitor ? 'Edit Monitor' : 'Create new Monitor'
 const name = ref(props.monitor ? props.monitor.name : '')
 const expectedDuration = ref(props.monitor ? formatDuration(props.monitor.expected_duration) : '')
 const graceDuration = ref(props.monitor ? formatDuration(props.monitor.grace_duration) : '')
@@ -92,7 +101,7 @@ const monitorInfo = computed(
       name: name.value,
       expected_duration: durationFromString(expectedDuration.value),
       grace_duration: durationFromString(graceDuration.value)
-    }) as BasicMonitorInformation
+    }) as MonitorSummary
 )
 
 // When the parent component closes the dialog, we want to set loading back to false.
@@ -111,7 +120,11 @@ async function saveAndExit() {
   emit('dialog-complete', monitorInfo.value)
 }
 
-function validateDuration(duration: string): boolean | string {
+function validateDuration(duration?: string): boolean | string {
+  if (!duration) {
+    return 'Duration is required'
+  }
+
   try {
     durationFromString(duration)
     return true

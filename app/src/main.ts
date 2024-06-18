@@ -2,9 +2,10 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'highlight.js/lib/common'
 
-import { createApp } from 'vue'
+import { createApp, type App as VueApp } from 'vue'
 import VueCookies from 'vue-cookies'
 import hljsVuePlugin from '@highlightjs/vue-plugin'
+import { ApiReference } from '@scalar/api-reference'
 
 // Vuetify
 import 'vuetify/styles'
@@ -13,8 +14,9 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
-import App from './App.vue'
-import router from './router'
+import App from '@/App.vue'
+import { MonitorRepository } from '@/repos/monitor-repo'
+import router from '@/router'
 
 const vuetify = createVuetify({
   components,
@@ -28,4 +30,18 @@ const vuetify = createVuetify({
   }
 })
 
-createApp(App).use(router).use(vuetify).use(VueCookies).use(hljsVuePlugin).mount('#app')
+createApp(App)
+  .use(router)
+  .use(vuetify)
+  .use(VueCookies)
+  .use(hljsVuePlugin)
+  // Adhoc plugin to make the API docs view more testable.
+  .use({
+    install(app: VueApp) {
+      app.component('ApiReference', ApiReference)
+    }
+  })
+  .provide('$localStorage', localStorage)
+  .provide('$monitorRepo', new MonitorRepository())
+  .provide('$clipboard', navigator.clipboard)
+  .mount('#app')

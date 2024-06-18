@@ -39,7 +39,7 @@
             More
           </v-tab>
           <v-spacer />
-          <v-btn class="mr-2 my-auto" density="comfortable" icon="" @click="copyToClipboard">
+          <v-btn class="mr-2 my-auto" density="comfortable" icon="" @click="copyExampleToClipboard">
             <v-icon>mdi-content-copy</v-icon>
             <v-tooltip activator="parent">Copy example to clipboard</v-tooltip>
           </v-btn>
@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 
 import PythonIcon from '@/assets/python.svg'
 
@@ -102,6 +102,8 @@ curl -X POST --silent \\
      http://127.0.0.1:8000/api/v1/monitors/\${MONITOR_ID}/jobs/\${job_id}/finish > /dev/null
 `
 
+const clipboard = inject<Clipboard>('$clipboard') as Clipboard
+
 const tab = ref('python')
 const examples = ref<{
   [key: string]: string
@@ -110,7 +112,7 @@ const examples = ref<{
   shell: shellExample
 })
 
-function copyToClipboard() {
-  navigator.clipboard.writeText(examples.value[tab.value])
+function copyExampleToClipboard() {
+  clipboard.writeText(examples.value[tab.value])
 }
 </script>

@@ -12,5 +12,10 @@ build-app:
 run:
 	docker compose up app
 
-test: 
-	@echo "Tests not yet implemented" && exit -1
+test: static-test unit-test
+
+unit-test:
+	docker compose run --rm --no-deps app bash -c  'npm run test:unit'
+
+static-test:
+	docker compose run --rm --no-deps app bash -c  'npm run lint && npm run type-check'

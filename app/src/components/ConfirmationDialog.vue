@@ -1,5 +1,11 @@
 <template>
-  <v-dialog v-model="active" width="auto" @keyup.esc="abort" @keyup.enter="confirm">
+  <v-dialog
+    :model-value="active"
+    width="auto"
+    :attach="attach"
+    @keyup.esc="abort"
+    @keyup.enter="confirm"
+  >
     <v-card max-width="500">
       <v-card-title :prepend-icon="icon">{{ title }}</v-card-title>
       <v-card-text>{{ question }}</v-card-text>
@@ -25,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, inject } from 'vue'
 
 const props = defineProps<{
   dialogActive: boolean
@@ -36,6 +42,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'dialog-complete', confirmed: boolean): void
 }>()
+
+const attach = inject<boolean>('noTeleport', false)
 
 const loading = ref(false)
 const active = computed(() => props.dialogActive)
@@ -51,7 +59,7 @@ function abort() {
   emit('dialog-complete', false)
 }
 
-async function confirm() {
+function confirm() {
   loading.value = true
   emit('dialog-complete', true)
 }

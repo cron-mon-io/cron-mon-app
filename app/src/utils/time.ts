@@ -1,4 +1,8 @@
 export function formatDuration(seconds: number): string {
+  if (seconds < 0) {
+    throw new Error('Invalid duration')
+  }
+
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor(seconds / 60) % 60
   seconds = seconds % 60
@@ -12,7 +16,7 @@ export function durationFromString(duration: string): number {
     .split(':')
     .reverse()
     .map((value: string, _index: number, array: string[]) => {
-      if (array.length < 1 || array.length > 3) {
+      if (array.length > 3) {
         throw new Error('Invalid duration')
       }
       const name = chunkNames.pop()
