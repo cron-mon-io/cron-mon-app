@@ -6,10 +6,10 @@ import * as directives from 'vuetify/directives'
 
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 
-const vuetify = createVuetify({ components, directives })
-global.ResizeObserver = require('resize-observer-polyfill')
-
 describe('SetupMonitorDialog component', () => {
+  const vuetify = createVuetify({ components, directives })
+  global.ResizeObserver = require('resize-observer-polyfill')
+
   it('is not rendered when not active', () => {
     const wrapper = mount(SetupMonitorDialog, {
       global: {

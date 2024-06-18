@@ -6,9 +6,9 @@ import * as directives from 'vuetify/directives'
 
 import MonitorSummary from '@/components/MonitorSummary.vue'
 
-const vuetify = createVuetify({ components, directives })
-
 describe('MonitorSummary component', () => {
+  const vuetify = createVuetify({ components, directives })
+
   it.each([true, false])('renders as expected', (isNew) => {
     const wrapper = mount(MonitorSummary, {
       global: {

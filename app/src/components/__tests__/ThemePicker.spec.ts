@@ -8,12 +8,12 @@ import ThemePicker from '@/components/ThemePicker.vue'
 
 import { FakeLocalStorage } from '@/utils/testing/fake-localstorage'
 
-const LIGHT_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-white-balance-sunny'
-const DARK_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-weather-night'
-
-const vuetify = createVuetify({ components, directives })
-
 describe('ThemePicker component', () => {
+  const LIGHT_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-white-balance-sunny'
+  const DARK_ICON_SELECTOR = '.v-btn > .v-btn__content > .mdi-weather-night'
+
+  const vuetify = createVuetify({ components, directives })
+
   it('renders the default theme without a prior choice', () => {
     const wrapper = mount(ThemePicker, {
       global: {

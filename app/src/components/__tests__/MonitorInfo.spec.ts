@@ -8,15 +8,15 @@ import { useRouter } from 'vue-router'
 
 import MonitorInfo from '@/components/MonitorInfo.vue'
 
-const vuetify = createVuetify({ components, directives })
-vi.mock('vue-router', () => ({
-  useRoute: vi.fn(),
-  useRouter: vi.fn(() => ({
-    push: () => {}
-  }))
-}))
-
 describe('MonitorInfo component', () => {
+  const vuetify = createVuetify({ components, directives })
+  vi.mock('vue-router', () => ({
+    useRoute: vi.fn(),
+    useRouter: vi.fn(() => ({
+      push: () => {}
+    }))
+  }))
+
   it('renders Monitor without any jobs as expected', async () => {
     const wrapper = mount(MonitorInfo, {
       global: {

@@ -6,10 +6,9 @@ import * as directives from 'vuetify/directives'
 
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
-const vuetify = createVuetify({ components, directives })
-global.ResizeObserver = require('resize-observer-polyfill')
-
 describe('ConfirmationDialog component', () => {
+  const vuetify = createVuetify({ components, directives })
+  global.ResizeObserver = require('resize-observer-polyfill')
   it('is not rendered when not active', () => {
     const wrapper = mount(ConfirmationDialog, {
       global: {

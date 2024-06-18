@@ -6,9 +6,9 @@ import * as directives from 'vuetify/directives'
 
 import JobInfo from '@/components/JobInfo.vue'
 
-const vuetify = createVuetify({ components, directives })
-
 describe('JobInfo component', () => {
+  const vuetify = createVuetify({ components, directives })
+
   it('renders in progress jobs as expected', () => {
     const wrapper = mount(JobInfo, {
       global: {
