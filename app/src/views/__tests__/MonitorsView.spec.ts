@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { flushPromises, mount } from '@vue/test-utils'
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -10,21 +10,35 @@ import MonitorsView from '@/views/MonitorsView.vue'
 import { FakeMonitorRepository } from '@/utils/testing/fake-monitor-repo'
 import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 
-describe('MonitorsView view', () => {
+async function mountMonitorsView(): Promise<{
+  wrapper: VueWrapper
+  cookies: FakeVueCookies
+  repo: FakeMonitorRepository
+}> {
   const vuetify = createVuetify({ components, directives })
-
-  vi.mock('vue-router', () => ({
-    useRoute: vi.fn(),
-    useRouter: vi.fn(() => ({
-      push: () => {}
-    }))
-  }))
 
   // The MonitorsView component uses an async setup, so we need to wrap it in a
   // Suspense component to test it.
   const TestComponent = defineComponent({
     components: { MonitorsView },
     template: '<Suspense><MonitorsView/></Suspense>'
+  })
+
+  const TestDialog = defineComponent({
+    template: '<div>Test dialog</div>',
+    emits: ['dialog-complete'],
+    props: ['dialogActive'],
+    watch: {
+      dialogActive(active: boolean) {
+        if (active) {
+          this.$emit('dialog-complete', {
+            name: 'New Monitor',
+            expected_duration: 1000,
+            grace_duration: 100
+          })
+        }
+      }
+    }
   })
 
   const TEST_MONITOR_DATA = [
@@ -87,22 +101,40 @@ describe('MonitorsView view', () => {
     }
   ]
 
-  it('renders as expected', async () => {
-    const fakeCookies = new FakeVueCookies()
-    const wrapper = mount(TestComponent, {
-      global: {
-        plugins: [vuetify],
-        provide: {
-          $monitorRepo: new FakeMonitorRepository(TEST_MONITOR_DATA),
-          $cookies: fakeCookies
-        },
-        mocks: {
-          $cookies: fakeCookies
-        }
+  const cookies = new FakeVueCookies()
+  const repo = new FakeMonitorRepository(TEST_MONITOR_DATA)
+  const wrapper = mount(TestComponent, {
+    global: {
+      plugins: [vuetify],
+      provide: {
+        $monitorRepo: repo,
+        $cookies: cookies
+      },
+      mocks: {
+        $cookies: cookies
+      },
+      stubs: {
+        // We don't want to test the dialog itself as it has its own tests, just that it is opened.
+        SetupMonitorDialog: TestDialog
       }
-    })
+    }
+  })
 
-    await flushPromises()
+  await flushPromises()
+
+  return { wrapper, cookies, repo }
+}
+
+describe('MonitorsView view', () => {
+  vi.mock('vue-router', () => ({
+    useRoute: vi.fn(),
+    useRouter: vi.fn(() => ({
+      push: () => {}
+    }))
+  }))
+
+  it('renders as expected', async () => {
+    const { wrapper } = await mountMonitorsView()
 
     // Should have a button for creating new monitors.
     const button = wrapper.find('.v-btn')
@@ -114,42 +146,7 @@ describe('MonitorsView view', () => {
   })
 
   it('adds new monitors as expected', async () => {
-    const TestDialog = defineComponent({
-      template: '<div>Test dialog</div>',
-      emits: ['dialog-complete'],
-      props: ['dialogActive'],
-      watch: {
-        dialogActive(active: boolean) {
-          if (active) {
-            this.$emit('dialog-complete', {
-              name: 'New Monitor',
-              expected_duration: 1000,
-              grace_duration: 100
-            })
-          }
-        }
-      }
-    })
-
-    const fakeCookies = new FakeVueCookies()
-    const wrapper = mount(TestComponent, {
-      global: {
-        plugins: [vuetify],
-        provide: {
-          $monitorRepo: new FakeMonitorRepository(TEST_MONITOR_DATA),
-          $cookies: fakeCookies
-        },
-        mocks: {
-          $cookies: fakeCookies
-        },
-        stubs: {
-          // We don't want to test the dialog itself as it has its own tests, just that it is opened.
-          SetupMonitorDialog: TestDialog
-        }
-      }
-    })
-
-    await flushPromises()
+    const { wrapper, cookies } = await mountMonitorsView()
 
     const numMonitors = wrapper.findAll('.v-card').length
 
@@ -168,34 +165,18 @@ describe('MonitorsView view', () => {
     const newMonitor = monitors[monitors.length - 1]
     expect(newMonitor.find('.v-card-title').text()).toBe('New Monitor')
     expect(newMonitor.find('.mdi-new-box')).toBeTruthy()
-    expect(fakeCookies.keys()).toHaveLength(1)
+    expect(cookies.keys()).toHaveLength(1)
   })
 
   it('detects new monitors when they are added externally', async () => {
     vi.useFakeTimers()
 
-    const fakeMonitorRepo = new FakeMonitorRepository()
-    const fakeCookies = new FakeVueCookies()
-    const wrapper = mount(TestComponent, {
-      global: {
-        plugins: [vuetify],
-        provide: {
-          $monitorRepo: fakeMonitorRepo,
-          $cookies: fakeCookies,
-          noTeleport: true
-        },
-        mocks: {
-          $cookies: fakeCookies
-        }
-      }
-    })
-
-    await flushPromises()
+    const { wrapper, repo } = await mountMonitorsView()
 
     const numMonitors = wrapper.findAll('.v-card').length
 
     // Add new monitor 'externally'
-    await fakeMonitorRepo.addMonitor({
+    await repo.addMonitor({
       name: 'New Monitor added externally',
       expected_duration: 1000,
       grace_duration: 100
