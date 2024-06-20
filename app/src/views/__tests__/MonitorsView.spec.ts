@@ -194,4 +194,30 @@ describe('MonitorsView view', () => {
 
     vi.useRealTimers()
   })
+
+  it('stops syncing when the component is unmounted', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper, repo } = await mountMonitorsView()
+
+    const spy = vi.spyOn(repo, 'getMonitorInfos')
+
+    // Let the MonitorsView component sync.
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the sync happened. This is a sanity check to ensure the spy is
+    // working and the test isn't evergreen.
+    expect(spy.mock.calls).toHaveLength(1)
+
+    // Unmount the component then allow enough time for another sync to happen.
+    await wrapper.unmount()
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure no more syncs happened.
+    expect(spy.mock.calls).toHaveLength(1)
+
+    vi.useRealTimers()
+  })
 })
