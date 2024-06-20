@@ -187,8 +187,6 @@ describe('MonitorsView view', () => {
 
     const { wrapper, repo } = await mountMonitorView()
 
-    await flushPromises()
-
     const numJobs = wrapper.findAll('.fake-job-info').length
 
     // Add a new job to the monitor.
