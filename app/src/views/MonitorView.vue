@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from 'vue'
+import { ref, inject, onUnmounted } from 'vue'
 import type { VueCookies } from 'vue-cookies'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -72,7 +72,14 @@ const cookies = inject<VueCookies>('$cookies') as VueCookies
 const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
 const clipboard = inject<Clipboard>('$clipboard') as Clipboard
 
-const monitor = ref(await monitorRepo.getMonitor(route.params.id as string))
+// After we've unmounted the component we don't want to keep syncing the monitor.
+let syncing = true
+onUnmounted(() => {
+  syncing = false
+})
+
+const monitorId = route.params.id as string
+const monitor = ref(await monitorRepo.getMonitor(monitorId))
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
 
@@ -122,8 +129,10 @@ function closeDeleteDialog() {
 
 function resyncMonitor() {
   setTimeout(async () => {
-    monitor.value = await monitorRepo.getMonitor(route.params.id as string)
-    resyncMonitor()
+    if (syncing) {
+      monitor.value = await monitorRepo.getMonitor(monitorId)
+      resyncMonitor()
+    }
   }, ONE_MINUTE_MS)
 }
 
