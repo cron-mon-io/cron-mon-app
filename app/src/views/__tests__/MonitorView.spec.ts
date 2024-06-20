@@ -187,8 +187,6 @@ describe('MonitorsView view', () => {
 
     const { wrapper, repo } = await mountMonitorView()
 
-    await flushPromises()
-
     const numJobs = wrapper.findAll('.fake-job-info').length
 
     // Add a new job to the monitor.
@@ -278,5 +276,31 @@ describe('MonitorsView view', () => {
 
     // We should not have been redirected to the Monitors view.
     expect(push).not.toHaveBeenCalled()
+  })
+
+  it('stops syncing when the component is unmounted', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper, repo } = await mountMonitorView()
+
+    const spy = vi.spyOn(repo, 'getMonitor')
+
+    // Let the MonitorView component sync.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the sync happened. This is a sanity check to ensure the spy is
+    // working and the test isn't evergreen.
+    expect(spy.mock.calls).toHaveLength(1)
+
+    // Unmount the component then allow enough time for another sync to happen.
+    await wrapper.unmount()
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure no more syncs happened.
+    expect(spy.mock.calls).toHaveLength(1)
+
+    vi.useRealTimers()
   })
 })
