@@ -13,6 +13,9 @@ type MonitorResp = {
 }
 
 export class MonitorRepository implements MonitorRepoInterface {
+  // TODO: Put API URL in env.
+  private readonly baseUrl = 'http://127.0.0.1:8000'
+
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
     // TODO: Put API URL in env.
     type MonitorList = {
@@ -21,40 +24,35 @@ export class MonitorRepository implements MonitorRepoInterface {
         total: number
       }
     }
-    const resp: MonitorList = await (await fetch('http://127.0.0.1:8000/api/v1/monitors')).json()
+    const resp: MonitorList = await (await fetch(`${this.baseUrl}/api/v1/monitors`)).json()
     return resp.data
   }
 
   async getMonitor(monitorId: string): Promise<Monitor> {
-    // TODO: Put API URL in env.
     const resp: MonitorResp = await (
-      await fetch(`http://127.0.0.1:8000/api/v1/monitors/${monitorId}`)
+      await fetch(`${this.baseUrl}/api/v1/monitors/${monitorId}`)
     ).json()
     return resp.data
   }
 
   async addMonitor(monitor: MonitorSummary): Promise<Monitor> {
-    return await this.postMonitorInfo('http://127.0.0.1:8000/api/v1/monitors', 'POST', monitor)
+    return await this.postMonitorInfo(`/api/v1/monitors`, 'POST', monitor)
   }
 
   async updateMonitor(monitor: MonitorIdentity): Promise<Monitor> {
-    return await this.postMonitorInfo(
-      `http://127.0.0.1:8000/api/v1/monitors/${monitor.monitor_id}`,
-      'PATCH',
-      monitor
-    )
+    return await this.postMonitorInfo(`/api/v1/monitors/${monitor.monitor_id}`, 'PATCH', monitor)
   }
 
   async deleteMonitor(monitor: MonitorIdentity): Promise<void> {
-    await fetch(`http://127.0.0.1:8000/api/v1/monitors/${monitor.monitor_id}`, { method: 'DELETE' })
+    await fetch(`${this.baseUrl}/api/v1/monitors/${monitor.monitor_id}`, { method: 'DELETE' })
   }
 
   private async postMonitorInfo(
-    url: string,
+    route: string,
     method: string,
     monitor: MonitorSummary
   ): Promise<Monitor> {
-    const rawResp = await fetch(url, {
+    const rawResp = await fetch(this.baseUrl + route, {
       method: method,
       headers: {
         Accept: 'application/json',
