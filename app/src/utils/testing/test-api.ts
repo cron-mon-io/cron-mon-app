@@ -137,8 +137,8 @@ export function setupTestAPI(): SetupServer {
             {
               error: {
                 code: 404,
-                reason: 'Not Found',
-                description: 'The requested resource could not be found.'
+                reason: 'Monitor Not Found',
+                description: `Failed to find monitor with id '${monitorId}'`
               }
             },
             { status: 404 }

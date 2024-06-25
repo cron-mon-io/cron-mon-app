@@ -133,6 +133,12 @@ describe('MonitorRepository', () => {
     })
   })
 
+  it('getMonitor() when monitor does not exist', async () => {
+    await expect(async () => await repo.getMonitor('non-existent-id')).rejects.toThrowError(
+      "Failed to find monitor with id 'non-existent-id'"
+    )
+  })
+
   it('addMonitor', async () => {
     const newMonitor: MonitorSummary = {
       name: 'new-monitor.sh',
@@ -169,7 +175,18 @@ describe('MonitorRepository', () => {
   it('deleteMonitor', async () => {
     const monitor = await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
     await repo.deleteMonitor(monitor)
-    const deletedMonitor = await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
-    expect(deletedMonitor).toBeUndefined()
+
+    await expect(
+      async () => await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
+    ).rejects.toThrowError()
+  })
+})
+
+describe('MonitorRepository when the API down', () => {
+  it('getMonitor', async () => {
+    const repo = new MonitorRepository()
+    await expect(
+      async () => await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
+    ).rejects.toThrowError('Failed to connect to the CronMon API.')
   })
 })
