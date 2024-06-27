@@ -246,8 +246,9 @@ describe('MonitorsView view', () => {
     await flushPromises()
 
     // The monitor should have been deleted.
-    const monitor = await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e')
-    expect(monitor).toBeUndefined()
+    await expect(
+      async () => await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e')
+    ).rejects.toThrowError("Failed to find monitor with id '547810d4-a636-4c1b-83e6-3e641391c84e'")
 
     // We should have been redirected to the Monitors view.
     expect(push).toHaveBeenCalledWith('/monitors')
