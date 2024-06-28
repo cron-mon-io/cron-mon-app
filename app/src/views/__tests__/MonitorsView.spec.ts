@@ -297,3 +297,59 @@ describe('MonitorsView listing monitors with errors', () => {
     vi.useRealTimers()
   })
 })
+
+describe('MonitorsView adding new monitors with errors', () => {
+  it('shows an error alert when the monitor repository has errors', async () => {
+    const { wrapper, repo } = await mountMonitorsView()
+
+    repo.addError('Failed to add new Monitor')
+
+    const addButton = wrapper.find('.v-btn')
+    await addButton.trigger('click')
+
+    await flushPromises()
+
+    const alert = wrapper.find('.v-alert')
+    expect(alert.find('.api-alert-content').find('span').text()).toBe('Failed to add new Monitor')
+
+    // The alert should have a close button.
+    const closeButton = alert.find('.v-btn')
+    expect(closeButton.find('.mdi').classes()).toContain('mdi-close')
+
+    // Clicking the close button should clear the alert.
+    await closeButton.trigger('click')
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+  })
+
+  it('displays multiple alerts if following sync fails', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper, repo } = await mountMonitorsView()
+
+    repo.addError('Failed to add new Monitor')
+    repo.addError('Could not retrieve Monitors')
+
+    const addButton = wrapper.find('.v-btn')
+    await addButton.trigger('click')
+
+    await flushPromises()
+
+    // Ensure 1st alert is visible.
+    let alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toEqual(['Failed to add new Monitor'])
+
+    // Let the MonitorsView component sync again.
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the previous alert and the new alert are visible.
+    alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toEqual(['Could not retrieve Monitors', 'Failed to add new Monitor'])
+
+    vi.useRealTimers()
+  })
+})
