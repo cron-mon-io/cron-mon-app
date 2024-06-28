@@ -1,6 +1,7 @@
 <template>
   <div>
     <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getMonitors" />
+    <ApiAlert class="mx-4 mt-4" :error="createError" @closed="createError = null" />
     <v-btn
       append-icon="mdi-plus"
       color="primary"
@@ -36,7 +37,7 @@ import ApiAlert from '@/components/ApiAlert.vue'
 import MonitorInfo from '@/components/MonitorInfo.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
-import type { MonitorInformation, MonitorSummary } from '@/models/monitor'
+import type { MonitorInformation, MonitorSummary, Monitor } from '@/models/monitor'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
@@ -51,16 +52,25 @@ onUnmounted(() => {
 
 const loading = ref(true)
 const syncError = ref<string | null>(null)
+const createError = ref<string | null>(null)
 const monitors = ref<MonitorInformation[]>([])
 const dialogActive = ref(false)
 
 async function dialogComplete(monitorInfo: MonitorSummary) {
-  const monitor = await monitorRepo.addMonitor(monitorInfo)
-  cookies.set(monitor.monitor_id, 'new', '5min')
+  let monitor: Monitor | null = null
+  try {
+    monitor = await monitorRepo.addMonitor(monitorInfo)
+  } catch (e: unknown) {
+    createError.value = (e as Error).message
+  }
 
-  // We get the list of monitors again here, rather than just inserting the new monitor,
-  // so that the list is sorted by the API.
-  monitors.value = await monitorRepo.getMonitorInfos()
+  if (monitor !== null) {
+    cookies.set(monitor.monitor_id, 'new', '5min')
+    // We get the list of monitors again here, rather than just inserting the new monitor,
+    // so that the list is sorted by the API.
+    await getMonitors()
+  }
+
   closeDialog()
 }
 
