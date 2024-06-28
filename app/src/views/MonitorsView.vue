@@ -1,10 +1,18 @@
 <template>
   <div>
-    <v-btn append-icon="mdi-plus" color="primary" class="ma-4" @click="openDialog">
+    <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getMonitors" />
+    <v-btn
+      append-icon="mdi-plus"
+      color="primary"
+      class="ma-4"
+      :disabled="syncError !== null"
+      @click="openDialog"
+    >
       Add Monitor
       <v-tooltip activator="parent" location="top">Click to add a new monitor</v-tooltip>
     </v-btn>
-    <div class="d-flex flex-column align-center">
+    <v-skeleton-loader v-if="loading" type="card" class="my-3 mx-auto w-50" elevation="4" />
+    <div v-else class="d-flex flex-column align-center">
       <MonitorInfo
         v-for="monitor in monitors"
         :key="monitor.monitor_id"
@@ -24,10 +32,11 @@
 import { ref, inject, onUnmounted } from 'vue'
 import type { VueCookies } from 'vue-cookies'
 
+import ApiAlert from '@/components/ApiAlert.vue'
 import MonitorInfo from '@/components/MonitorInfo.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
-import type { MonitorSummary } from '@/models/monitor'
+import type { MonitorInformation, MonitorSummary } from '@/models/monitor'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
@@ -40,7 +49,9 @@ onUnmounted(() => {
   syncing = false
 })
 
-const monitors = ref(await monitorRepo.getMonitorInfos())
+const loading = ref(true)
+const syncError = ref<string | null>(null)
+const monitors = ref<MonitorInformation[]>([])
 const dialogActive = ref(false)
 
 async function dialogComplete(monitorInfo: MonitorSummary) {
@@ -61,14 +72,26 @@ function closeDialog() {
   dialogActive.value = false
 }
 
-function resyncMonitors() {
-  setTimeout(async () => {
-    if (syncing) {
-      monitors.value = await monitorRepo.getMonitorInfos()
-      resyncMonitors()
-    }
-  }, FIVE_MINUTES_MS)
+async function getMonitors() {
+  try {
+    monitors.value = await monitorRepo.getMonitorInfos()
+    // If we've successfully got the monitors, we can clear any previous errors and set loading to false.
+    syncError.value = null
+    loading.value = false
+  } catch (e: unknown) {
+    syncError.value = (e as Error).message
+  }
 }
 
-resyncMonitors()
+async function syncMonitors() {
+  if (!syncing) {
+    return
+  }
+
+  await getMonitors()
+
+  setTimeout(async () => await syncMonitors(), FIVE_MINUTES_MS)
+}
+
+await syncMonitors()
 </script>
