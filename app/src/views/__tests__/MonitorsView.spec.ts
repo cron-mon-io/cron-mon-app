@@ -239,8 +239,8 @@ describe('MonitorsView listing monitors with errors', () => {
     expect(alert.find('.v-btn').text()).toBe('Retry')
 
     // Adding new monitors should be disabled whilst we're in a state of error.
-    const button = wrapper.findAll('.v-btn').filter((button) => button.text() === 'Add Monitor')[0]
-    expect(button.attributes('disabled')).toBeDefined()
+    const button = wrapper.findAll('.v-btn').find((button) => button.text() === 'Add Monitor')
+    expect(button?.attributes('disabled')).toBeDefined()
   })
 
   it('clears the error alert when the retry button is clicked', async () => {
