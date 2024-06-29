@@ -143,7 +143,7 @@ async function mountMonitorView(confirm: boolean = true): Promise<{
   return { wrapper, clipboard, repo }
 }
 
-describe('MonitorsView view', () => {
+describe('MonitorView view', () => {
   vi.mock('vue-router', () => ({
     useRoute: vi.fn(() => ({
       params: {
