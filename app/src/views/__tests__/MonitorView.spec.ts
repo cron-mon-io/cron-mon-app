@@ -12,7 +12,10 @@ import { FakeMonitorRepository } from '@/utils/testing/fake-monitor-repo'
 import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 import { FakeClipboard } from '@/utils/testing/fake-clipboard'
 
-async function mountMonitorView(confirm: boolean = true): Promise<{
+async function mountMonitorView(
+  confirm: boolean = true,
+  errors: string[] = []
+): Promise<{
   wrapper: VueWrapper
   clipboard: FakeClipboard
   repo: FakeMonitorRepository
@@ -118,7 +121,7 @@ async function mountMonitorView(confirm: boolean = true): Promise<{
 
   const fakeCookies = new FakeVueCookies()
   const clipboard = new FakeClipboard()
-  const repo = new FakeMonitorRepository([TEST_MONITOR_DATA])
+  const repo = new FakeMonitorRepository([TEST_MONITOR_DATA], errors)
   const wrapper = mount(TestComponent, {
     global: {
       plugins: [createVuetify({ components, directives })],
@@ -301,6 +304,85 @@ describe('MonitorView view', () => {
 
     // Ensure no more syncs happened.
     expect(spy.mock.calls).toHaveLength(1)
+
+    vi.useRealTimers()
+  })
+})
+
+describe('MonitorView listing monitor and its jobs with errors', () => {
+  it('does not show an error alert when the monitor repository has no errors', async () => {
+    const { wrapper } = await mountMonitorView()
+
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+  })
+
+  it('shows an error alert when the monitor repository has errors', async () => {
+    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+
+    const alert = wrapper.find('.v-alert').find('.api-alert-content')
+    expect(alert.find('span').text()).toBe('Test error message')
+
+    // The alert should have a Retry button.
+    expect(alert.find('.v-btn').text()).toBe('Retry')
+  })
+
+  it('clears the error alert when the retry button is clicked', async () => {
+    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+
+    const alert = wrapper.find('.v-alert')
+    await alert.find('.v-btn').trigger('click')
+
+    await flushPromises()
+
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+  })
+
+  it('automatically clears the alert when next sync is successful', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+
+    // Ensure the alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+
+    // Let the MonitorView component sync again.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the alert is gone.
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+
+    vi.useRealTimers()
+  })
+
+  it('shows alert when error happens after successful sync', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper, repo } = await mountMonitorView()
+
+    // Let the MonitorView component sync.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure no alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+
+    // Add an error to the repo.
+    repo.addError('Test error message')
+
+    // Let the MonitorView component sync again.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+
+    // Editting and deleting monitors should be disabled whilst we're in a state of error.
+    const buttons = wrapper.findAll('.v-btn')
+    const editButton = buttons.find((button) => button.text() === 'Edit Monitor')
+    const deleteButton = buttons.find((button) => button.text() === 'Delete Monitor')
+    expect(editButton?.attributes('disabled')).toBeDefined()
+    expect(deleteButton?.attributes('disabled')).toBeDefined()
 
     vi.useRealTimers()
   })
