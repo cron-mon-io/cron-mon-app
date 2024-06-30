@@ -397,4 +397,36 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
 
     vi.useRealTimers()
   })
+
+  it('shows alert when the monitor is deleted externally', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper, repo } = await mountMonitorView()
+
+    // Let the MonitorView component sync.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure no alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+
+    // Delete the monitor outside of the component.
+    await repo.deleteMonitor(await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e'))
+
+    // Let the MonitorView component sync again.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+
+    // Editting and deleting monitors should be disabled whilst we're in a state of error.
+    const buttons = wrapper.findAll('.v-btn')
+    const editButton = buttons.find((button) => button.text() === 'Edit Monitor')
+    const deleteButton = buttons.find((button) => button.text() === 'Delete Monitor')
+    expect(editButton?.attributes('disabled')).toBeDefined()
+    expect(deleteButton?.attributes('disabled')).toBeDefined()
+
+    vi.useRealTimers()
+  })
 })
