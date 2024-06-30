@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MonitorSummary } from '@/models/monitor'
+import type { MonitorSummary } from '@/types/monitor'
 import { formatDuration } from '@/utils/time'
 
 defineProps<{

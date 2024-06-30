@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeAll, describe, it, expect } from 'vitest'
 import { HttpResponse, http } from 'msw'
 
-import type { MonitorSummary } from '@/models/monitor'
 import { MonitorRepository } from '@/repos/monitor-repo'
+import type { MonitorSummary } from '@/types/monitor'
 
 import { setupTestAPI } from '@/utils/testing/test-api'
 

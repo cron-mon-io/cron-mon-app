@@ -37,7 +37,7 @@ import ApiAlert from '@/components/ApiAlert.vue'
 import MonitorInfo from '@/components/MonitorInfo.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
-import type { MonitorInformation, MonitorSummary, Monitor } from '@/models/monitor'
+import type { MonitorInformation, MonitorSummary, Monitor } from '@/types/monitor'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 

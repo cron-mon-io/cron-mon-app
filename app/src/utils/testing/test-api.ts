@@ -3,7 +3,7 @@ import type { SetupServer } from 'msw/node'
 import { HttpResponse, http } from 'msw'
 import { v4 as uuidv4 } from 'uuid'
 
-import type { MonitorSummary } from '@/models/monitor'
+import type { MonitorSummary } from '@/types/monitor'
 
 export function setupTestAPI(): SetupServer {
   let monitors = [
