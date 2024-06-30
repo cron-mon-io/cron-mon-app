@@ -3,14 +3,18 @@ import { v4 as uuidv4 } from 'uuid'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
 import type { Job } from '@/types/job'
 import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
+import { AppError } from '../error'
 
 type MonitorData = Monitor & MonitorInformation
 
 export class FakeMonitorRepository implements MonitorRepoInterface {
   private data: Record<string, MonitorData> = {}
-  private errors: Array<string> = []
+  private errors: Array<{ message: string; code: number }> = []
 
-  constructor(data: Array<MonitorData> = [], errors: Array<string> = []) {
+  constructor(
+    data: Array<MonitorData> = [],
+    errors: Array<{ message: string; code: number }> = []
+  ) {
     this.data = Object.fromEntries(data.map((monitor) => [monitor.monitor_id, monitor]))
     this.errors = errors
   }
@@ -18,7 +22,7 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
     const error = this.errors.shift()
     if (error !== undefined) {
-      return Promise.reject(new Error(error))
+      return Promise.reject(new AppError(error.message, error.code))
     }
 
     return Promise.resolve(
@@ -36,7 +40,7 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   async getMonitor(monitorId: string): Promise<Monitor> {
     const error = this.errors.shift()
     if (error !== undefined) {
-      return Promise.reject(new Error(error))
+      return Promise.reject(new AppError(error.message, error.code))
     }
 
     const monitor = this.data[monitorId]
@@ -54,7 +58,7 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   async addMonitor(monitor: MonitorSummary): Promise<Monitor> {
     const error = this.errors.shift()
     if (error !== undefined) {
-      return Promise.reject(new Error(error))
+      return Promise.reject(new AppError(error.message, error.code))
     }
 
     const fullMonitor = {
@@ -77,7 +81,7 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   async updateMonitor(monitor: MonitorIdentity): Promise<Monitor> {
     const error = this.errors.shift()
     if (error !== undefined) {
-      return Promise.reject(new Error(error))
+      return Promise.reject(new AppError(error.message, error.code))
     }
 
     const fullMonitor = this.data[monitor.monitor_id]
@@ -97,7 +101,7 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   async deleteMonitor(monitor: MonitorIdentity): Promise<void> {
     const error = this.errors.shift()
     if (error !== undefined) {
-      return Promise.reject(new Error(error))
+      return Promise.reject(new AppError(error.message, error.code))
     }
 
     delete this.data[monitor.monitor_id]
@@ -109,7 +113,7 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
     const monitor = this.data[monitorId]
     monitor.jobs.push(job)
   }
-  addError(error: string) {
+  addError(error: { message: string; code: number }) {
     this.errors.push(error)
   }
 }

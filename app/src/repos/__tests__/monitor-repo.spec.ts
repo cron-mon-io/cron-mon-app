@@ -3,8 +3,10 @@ import { HttpResponse, http } from 'msw'
 
 import { MonitorRepository } from '@/repos/monitor-repo'
 import type { MonitorSummary } from '@/types/monitor'
+import { AppError } from '@/utils/error'
 
 import { setupTestAPI } from '@/utils/testing/test-api'
+import { getError } from '@/utils/testing/errors'
 
 describe('MonitorRepository', () => {
   const server = setupTestAPI()
@@ -134,9 +136,9 @@ describe('MonitorRepository', () => {
   })
 
   it('getMonitor() when monitor does not exist', async () => {
-    await expect(async () => await repo.getMonitor('non-existent-id')).rejects.toThrowError(
-      "Failed to find monitor with id 'non-existent-id'"
-    )
+    const error = await getError<AppError>(async () => await repo.getMonitor('non-existent-id'))
+    expect(error.message).toBe("Failed to find monitor with id 'non-existent-id'")
+    expect(error.statusCode).toEqual(404)
   })
 
   it('addMonitor', async () => {

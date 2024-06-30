@@ -1,4 +1,5 @@
 import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
+import { AppError } from '@/utils/error'
 
 export interface MonitorRepoInterface {
   getMonitorInfos(): Promise<Array<MonitorInformation>>
@@ -84,7 +85,7 @@ export class MonitorRepository implements MonitorRepoInterface {
       response = await fetch(this.baseUrl + route, opts)
     } catch (e) {
       console.error('Failed to connect to the CronMon API:', e)
-      throw new Error('Failed to connect to the CronMon API.')
+      throw new AppError('Failed to connect to the CronMon API.')
     }
 
     if (response.ok) {
@@ -93,7 +94,7 @@ export class MonitorRepository implements MonitorRepoInterface {
     } else {
       // We always want the JSON out of errors to get the description.
       const json = await response.json()
-      throw new Error(json.error.description)
+      throw new AppError(json.error.description, json.error.code)
     }
   }
 }

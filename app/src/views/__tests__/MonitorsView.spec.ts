@@ -10,7 +10,7 @@ import MonitorsView from '@/views/MonitorsView.vue'
 import { FakeMonitorRepository } from '@/utils/testing/fake-monitor-repo'
 import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 
-async function mountMonitorsView(errors: string[] = []): Promise<{
+async function mountMonitorsView(errors: { message: string; code: number }[] = []): Promise<{
   wrapper: VueWrapper
   cookies: FakeVueCookies
   repo: FakeMonitorRepository
@@ -230,7 +230,7 @@ describe('MonitorsView listing monitors with errors', () => {
   })
 
   it('shows an error alert when the monitor repository has errors', async () => {
-    const { wrapper } = await mountMonitorsView(['Test error message'])
+    const { wrapper } = await mountMonitorsView([{ message: 'Test error message', code: 500 }])
 
     const alert = wrapper.find('.v-alert').find('.api-alert-content')
     expect(alert.find('span').text()).toBe('Test error message')
@@ -244,7 +244,7 @@ describe('MonitorsView listing monitors with errors', () => {
   })
 
   it('clears the error alert when the retry button is clicked', async () => {
-    const { wrapper } = await mountMonitorsView(['Test error message'])
+    const { wrapper } = await mountMonitorsView([{ message: 'Test error message', code: 500 }])
 
     const alert = wrapper.find('.v-alert')
     await alert.find('.v-btn').trigger('click')
@@ -257,7 +257,7 @@ describe('MonitorsView listing monitors with errors', () => {
   it('automatically clears the alert when next sync is successful', async () => {
     vi.useFakeTimers()
 
-    const { wrapper } = await mountMonitorsView(['Test error message'])
+    const { wrapper } = await mountMonitorsView([{ message: 'Test error message', code: 500 }])
 
     // Ensure the alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
@@ -285,7 +285,7 @@ describe('MonitorsView listing monitors with errors', () => {
     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
 
     // Add an error to the repo.
-    repo.addError('Test error message')
+    repo.addError({ message: 'Test error message', code: 500 })
 
     // Let the MonitorsView component sync again.
     vi.advanceTimersByTime(5 * 60 * 1000)
@@ -302,7 +302,7 @@ describe('MonitorsView adding new monitors with errors', () => {
   it('shows an error alert when the monitor repository has errors', async () => {
     const { wrapper, repo } = await mountMonitorsView()
 
-    repo.addError('Failed to add new Monitor')
+    repo.addError({ message: 'Failed to add new Monitor', code: 400 })
 
     const addButton = wrapper.find('.v-btn')
     await addButton.trigger('click')
@@ -326,8 +326,8 @@ describe('MonitorsView adding new monitors with errors', () => {
 
     const { wrapper, repo } = await mountMonitorsView()
 
-    repo.addError('Failed to add new Monitor')
-    repo.addError('Could not retrieve Monitors')
+    repo.addError({ message: 'Failed to add new Monitor', code: 400 })
+    repo.addError({ message: 'Could not retrieve Monitors', code: 500 })
 
     const addButton = wrapper.find('.v-btn')
     await addButton.trigger('click')

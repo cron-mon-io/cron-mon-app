@@ -14,7 +14,7 @@ import { FakeClipboard } from '@/utils/testing/fake-clipboard'
 
 async function mountMonitorView(
   confirm: boolean = true,
-  errors: string[] = []
+  errors: { message: string; code: number }[] = []
 ): Promise<{
   wrapper: VueWrapper
   clipboard: FakeClipboard
@@ -317,7 +317,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
   })
 
   it('shows an error alert when the monitor repository has errors', async () => {
-    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+    const { wrapper } = await mountMonitorView(true, [{ message: 'Test error message', code: 500 }])
 
     const alert = wrapper.find('.v-alert').find('.api-alert-content')
     expect(alert.find('span').text()).toBe('Test error message')
@@ -327,7 +327,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
   })
 
   it('clears the error alert when the retry button is clicked', async () => {
-    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+    const { wrapper } = await mountMonitorView(true, [{ message: 'Test error message', code: 500 }])
 
     const alert = wrapper.find('.v-alert')
     await alert.find('.v-btn').trigger('click')
@@ -340,7 +340,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
   it('automatically clears the alert when next sync is successful', async () => {
     vi.useFakeTimers()
 
-    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+    const { wrapper } = await mountMonitorView(true, [{ message: 'Test error message', code: 500 }])
 
     // Ensure the alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
@@ -368,7 +368,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
 
     // Add an error to the repo.
-    repo.addError('Test error message')
+    repo.addError({ message: 'Test error message', code: 500 })
 
     // Let the MonitorView component sync again.
     vi.advanceTimersByTime(1 * 60 * 1000)
