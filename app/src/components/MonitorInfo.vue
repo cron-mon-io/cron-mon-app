@@ -31,8 +31,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { MonitorInformation } from '@/models/monitor'
 import MonitorSummary from '@/components/MonitorSummary.vue'
+import type { MonitorInformation } from '@/types/monitor'
 
 const props = defineProps<{
   monitor: MonitorInformation

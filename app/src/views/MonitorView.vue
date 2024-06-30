@@ -81,13 +81,13 @@ import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import JobInfo from '@/components/JobInfo.vue'
 import MonitorSummary from '@/components/MonitorSummary.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
+import type { MonitorRepoInterface } from '@/repos/monitor-repo'
 import type {
   MonitorSummary as MonitorSummaryType,
   MonitorInformation,
   Monitor,
   MonitorIdentity
-} from '@/models/monitor'
-import type { MonitorRepoInterface } from '@/repos/monitor-repo'
+} from '@/types/monitor'
 
 const ONE_MINUTE_MS = 60 * 1000
 

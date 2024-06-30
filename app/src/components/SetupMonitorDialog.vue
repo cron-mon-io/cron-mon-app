@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, inject } from 'vue'
 
-import type { MonitorSummary } from '@/models/monitor'
+import type { MonitorSummary } from '@/types/monitor'
 import { durationFromString, formatDuration } from '@/utils/time'
 
 const props = defineProps<{

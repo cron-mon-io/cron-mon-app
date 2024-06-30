@@ -1,4 +1,4 @@
-import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/models/monitor'
+import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
 
 export interface MonitorRepoInterface {
   getMonitorInfos(): Promise<Array<MonitorInformation>>

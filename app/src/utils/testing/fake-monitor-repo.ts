@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/models/monitor'
-import type { Job } from '@/models/job'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
+import type { Job } from '@/types/job'
+import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
 
 type MonitorData = Monitor & MonitorInformation
 
