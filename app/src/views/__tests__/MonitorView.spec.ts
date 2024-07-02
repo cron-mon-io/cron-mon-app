@@ -146,18 +146,18 @@ async function mountMonitorView(
   return { wrapper, clipboard, repo }
 }
 
-describe('MonitorView view', () => {
-  vi.mock('vue-router', () => ({
-    useRoute: vi.fn(() => ({
-      params: {
-        id: '547810d4-a636-4c1b-83e6-3e641391c84e'
-      }
-    })),
-    useRouter: vi.fn(() => ({
-      push: () => {}
-    }))
+vi.mock('vue-router', () => ({
+  useRoute: vi.fn(() => ({
+    params: {
+      id: '547810d4-a636-4c1b-83e6-3e641391c84e'
+    }
+  })),
+  useRouter: vi.fn(() => ({
+    push: () => {}
   }))
+}))
 
+describe('MonitorView view', () => {
   it('renders as expected', async () => {
     const { wrapper, clipboard } = await mountMonitorView()
 
@@ -310,17 +310,6 @@ describe('MonitorView view', () => {
 })
 
 describe('MonitorView listing monitor and its jobs with errors', () => {
-  vi.mock('vue-router', () => ({
-    useRoute: vi.fn(() => ({
-      params: {
-        id: '547810d4-a636-4c1b-83e6-3e641391c84e'
-      }
-    })),
-    useRouter: vi.fn(() => ({
-      push: () => {}
-    }))
-  }))
-
   it('does not show an error alert when the monitor repository has no errors', async () => {
     const { wrapper } = await mountMonitorView()
 
