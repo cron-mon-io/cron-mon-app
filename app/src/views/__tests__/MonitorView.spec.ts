@@ -39,18 +39,23 @@ async function mountMonitorView(
   // The SetupMonitorDialog component has its own tests, so we just want to
   // stub it here so we can test how we interact wit it.
   const FakeSetupMonitorDialog = defineComponent({
-    template: '<div>Test dialog</div>',
+    template: `
+      <div class="fake-setup-monitor-dialog">
+        <div v-if="dialogActive" class="content">
+          Test dialog
+          <p>{{ monitor ? monitor.monitor_id : "" }}</p>
+          <button @click="finish" />
+        </div>
+      </div>`,
     emits: ['dialog-complete'],
-    props: ['dialogActive'],
-    watch: {
-      dialogActive(active: boolean) {
-        if (active) {
-          this.$emit('dialog-complete', {
-            name: 'Monitor 1 with a new name',
-            expected_duration: 1001,
-            grace_duration: 101
-          })
-        }
+    props: ['dialogActive', 'monitor'],
+    methods: {
+      finish() {
+        this.$emit('dialog-complete', {
+          name: 'Monitor 1 with a new name',
+          expected_duration: 1001,
+          grace_duration: 101
+        })
       }
     }
   })
@@ -58,14 +63,18 @@ async function mountMonitorView(
   // The ConfirmationDialog component has its own tests, so we just want to
   // stub it here so we can test how we interact wit it.
   const FakeConfirmationDialog = defineComponent({
-    template: '<div>Test dialog</div>',
+    template: `
+      <div class="fake-confirmation-dialog">
+        <div v-if="dialogActive" class="content">
+          Test dialog
+          <button @click="finish" />
+        </div>
+      </div>`,
     emits: ['dialog-complete'],
     props: ['dialogActive'],
-    watch: {
-      dialogActive(active: boolean) {
-        if (active) {
-          this.$emit('dialog-complete', confirm)
-        }
+    methods: {
+      finish() {
+        this.$emit('dialog-complete', confirm)
       }
     }
   })
@@ -219,13 +228,26 @@ describe('MonitorView view', () => {
   it('edits monitors as expected', async () => {
     const { wrapper } = await mountMonitorView()
 
-    // Clicking the Edit button will trigger our test dialog, which will imediately
-    // complete with new Monitor info.
+    // Dialog should not be open.
+    const dialog = wrapper.find('.fake-setup-monitor-dialog')
+    expect(dialog.find('.content').exists()).toBeFalsy()
+
+    // Clicking the Edit button will trigger our test dialog.
     const addButton = wrapper.findAll('.v-btn')[0]
     await addButton.trigger('click')
-
-    // Let the MonitorView component add the new monitor.
     await flushPromises()
+
+    // The dialog should now be open and should contain the ID of our monitor.
+    const dialogContent = dialog.find('.content')
+    expect(dialogContent.exists()).toBeTruthy()
+    expect(dialogContent.find('p').text()).toBe('547810d4-a636-4c1b-83e6-3e641391c84e')
+
+    // Clicking the dialog's button will close the dialog, at which point the
+    // MonitorView component will update the monitor.
+    await dialogContent.find('button').trigger('click')
+    await flushPromises()
+
+    expect(dialog.find('.content').exists()).toBeFalsy()
 
     // The monitor should have been updated.
     expect(wrapper.find('.v-card-title').text()).toBe('Monitor 1 with a new name')
@@ -240,13 +262,25 @@ describe('MonitorView view', () => {
 
     const { wrapper, repo } = await mountMonitorView()
 
-    // Clicking the Delete button will trigger our test dialog, which will imediately
-    // complete with new Monitor info.
-    const addButton = wrapper.findAll('.v-btn')[1]
-    await addButton.trigger('click')
+    // Dialog should not be open.
+    const dialog = wrapper.find('.fake-confirmation-dialog')
+    expect(dialog.find('.content').exists()).toBeFalsy()
 
-    // Let the MonitorView component delete the monitor.
+    // Clicking the Delete button will trigger our test dialog.
+    const deleteButton = wrapper.findAll('.v-btn')[1]
+    await deleteButton.trigger('click')
     await flushPromises()
+
+    // The dialog should now be open and should contain the ID of our monitor.
+    const dialogContent = dialog.find('.content')
+    expect(dialogContent.exists()).toBeTruthy()
+
+    // Clicking the dialog's button will close the dialog, at which point the
+    // MonitorView component should delete the monitor.
+    await dialogContent.find('button').trigger('click')
+    await flushPromises()
+
+    expect(dialog.find('.content').exists()).toBeFalsy()
 
     // The monitor should have been deleted.
     await expect(
@@ -421,16 +455,22 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
 })
 
 describe('MonitorView editing and deleting monitors with errors', () => {
-  it.each([0, 1])(
+  it.each([
+    { iconClass: '.mdi-pencil', dialogClass: '.fake-setup-monitor-dialog' },
+    { iconClass: '.mdi-delete', dialogClass: '.fake-confirmation-dialog' }
+  ])(
     'shows an error alert when the monitor cannot be editted/ deleted',
-    async (buttonIndex) => {
+    async ({ iconClass, dialogClass }) => {
       const { wrapper, repo } = await mountMonitorView()
 
       repo.addError('Test error message')
 
       // Trigger an edit or deletion.
-      const button = wrapper.findAll('.v-btn')[buttonIndex]
+      const button = wrapper.find(iconClass)
       await button.trigger('click')
+      await flushPromises()
+      const dialogButton = wrapper.find(dialogClass).find('button')
+      await dialogButton.trigger('click')
       await flushPromises()
 
       const alert = wrapper.find('.v-alert')
@@ -458,6 +498,9 @@ describe('MonitorView editing and deleting monitors with errors', () => {
     const editButton = wrapper.find('.mdi-pencil')
     await editButton.trigger('click')
     await flushPromises()
+    const editDialogButton = wrapper.find('.fake-setup-monitor-dialog').find('button')
+    await editDialogButton.trigger('click')
+    await flushPromises()
 
     let alerts = wrapper
       .findAll('.v-alert')
@@ -469,8 +512,10 @@ describe('MonitorView editing and deleting monitors with errors', () => {
 
     // Trigger a delete
     const deleteButton = wrapper.find('.mdi-delete')
-    console.log(deleteButton.html())
-    await deleteButton?.trigger('click')
+    await deleteButton.trigger('click')
+    await flushPromises()
+    const deleteDialogButton = wrapper.find('.fake-confirmation-dialog').find('button')
+    await deleteDialogButton.trigger('click')
     await flushPromises()
 
     alerts = wrapper
