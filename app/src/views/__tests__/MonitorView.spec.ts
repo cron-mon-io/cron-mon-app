@@ -419,3 +419,64 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
     vi.useRealTimers()
   })
 })
+
+describe('MonitorView editting and deleting monitors with errors', () => {
+  it.each([0, 1])(
+    'shows an error alert when the monitor cannot be editted/ deleted',
+    async (buttonIndex) => {
+      const { wrapper, repo } = await mountMonitorView()
+
+      repo.addError('Test error message')
+
+      // Trigger an edit or deletion.
+      const button = wrapper.findAll('.v-btn')[buttonIndex]
+      await button.trigger('click')
+      await flushPromises()
+
+      const alert = wrapper.find('.v-alert')
+      expect(alert.find('.api-alert-content').find('span').text()).toBe('Test error message')
+
+      // The alert shouldn't have a Retry button, just a close button.
+      const alertButton = alert.find('.v-btn')
+      expect(alertButton.text()).not.toBe('Retry')
+      expect(alertButton.find('.mdi').classes()).toContain('mdi-close')
+
+      // Closing the alert should get rid of it, and nothing should be retried.
+      repo.addError('We should not see this error message')
+      await alertButton.trigger('click')
+      await flushPromises()
+      expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+    }
+  )
+
+  it('shows multiple error alerts if monitor cannot be editted, deleted, or resynced', async () => {
+    const { wrapper, repo } = await mountMonitorView()
+
+    repo.addError('Failed to edit')
+
+    // Trigger an edit.
+    const editButton = wrapper.find('.mdi-pencil')
+    await editButton.trigger('click')
+    await flushPromises()
+
+    let alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toHaveLength(1)
+    expect(alerts).toEqual(['Failed to edit'])
+
+    repo.addError('Failed to delete')
+
+    // Trigger a delete
+    const deleteButton = wrapper.find('.mdi-delete')
+    console.log(deleteButton.html())
+    await deleteButton?.trigger('click')
+    await flushPromises()
+
+    alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toHaveLength(2)
+    expect(alerts).toEqual(['Failed to edit', 'Failed to delete'])
+  })
+})

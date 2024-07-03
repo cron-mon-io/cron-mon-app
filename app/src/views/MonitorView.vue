@@ -1,6 +1,8 @@
 <template>
   <div>
     <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getMonitor" />
+    <ApiAlert class="mx-4 mt-4" :error="editError" @closed="editError = null" />
+    <ApiAlert class="mx-4 mt-4" :error="deleteError" @closed="deleteError = null" />
     <v-skeleton-loader
       v-if="monitor === null"
       type="card"
@@ -106,6 +108,8 @@ onUnmounted(() => {
 const monitorId = route.params.id as string
 const monitor = ref<Monitor | null>(null)
 const syncError = ref<string | null>(null)
+const deleteError = ref<string | null>(null)
+const editError = ref<string | null>(null)
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
 
@@ -118,8 +122,13 @@ async function editDialogComplete(monitorInfo: MonitorSummaryType) {
     monitor_id: monitorId,
     ...monitorInfo
   } as MonitorInformation
-  monitor.value = await monitorRepo.updateMonitor(newMonitor)
-  cookies.set(monitor.value.monitor_id, 'new', '5min')
+
+  try {
+    monitor.value = await monitorRepo.updateMonitor(newMonitor)
+    cookies.set(monitor.value.monitor_id, 'new', '5min')
+  } catch (e: unknown) {
+    editError.value = (e as Error).message
+  }
   closeEditDialog()
 }
 
@@ -132,15 +141,21 @@ function closeEditDialog() {
 }
 
 async function deleteDialogComplete(confirmed: boolean) {
+  let deleted = false
   if (confirmed) {
-    await monitorRepo.deleteMonitor(monitor.value as MonitorIdentity)
+    try {
+      await monitorRepo.deleteMonitor(monitor.value as MonitorIdentity)
+      deleted = true
+    } catch (e: unknown) {
+      deleteError.value = (e as Error).message
+    }
   }
 
   closeDeleteDialog()
 
   // We want to close the dialog first before we navigate back to the monitors page,
   // just because it looks slightly better.
-  if (confirmed) {
+  if (deleted) {
     router.push('/monitors')
   }
 }
