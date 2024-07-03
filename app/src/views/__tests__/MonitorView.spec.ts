@@ -172,7 +172,7 @@ describe('MonitorView view', () => {
     await copyChip.trigger('click')
     expect(await clipboard.readText()).toBe('547810d4-a636-4c1b-83e6-3e641391c84e')
 
-    // We should have buttons for editting and deleting the monitor.
+    // We should have buttons for editing and deleting the monitor.
     const buttons = wrapper.findAll('.v-btn')
     expect(buttons[0].text()).toBe('Edit Monitor')
     expect(buttons[1].text()).toBe('Delete Monitor')
@@ -377,7 +377,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
     // Ensure the alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
 
-    // Editting and deleting monitors should be disabled whilst we're in a state of error.
+    // editing and deleting monitors should be disabled whilst we're in a state of error.
     const buttons = wrapper.findAll('.v-btn')
     const editButton = buttons.find((button) => button.text() === 'Edit Monitor')
     const deleteButton = buttons.find((button) => button.text() === 'Delete Monitor')
@@ -409,7 +409,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
     // Ensure the alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
 
-    // Editting and deleting monitors should be disabled whilst we're in a state of error.
+    // editing and deleting monitors should be disabled whilst we're in a state of error.
     const buttons = wrapper.findAll('.v-btn')
     const editButton = buttons.find((button) => button.text() === 'Edit Monitor')
     const deleteButton = buttons.find((button) => button.text() === 'Delete Monitor')
@@ -420,7 +420,7 @@ describe('MonitorView listing monitor and its jobs with errors', () => {
   })
 })
 
-describe('MonitorView editting and deleting monitors with errors', () => {
+describe('MonitorView editing and deleting monitors with errors', () => {
   it.each([0, 1])(
     'shows an error alert when the monitor cannot be editted/ deleted',
     async (buttonIndex) => {
