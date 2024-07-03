@@ -524,4 +524,42 @@ describe('MonitorView editing and deleting monitors with errors', () => {
     expect(alerts).toHaveLength(2)
     expect(alerts).toEqual(['Failed to edit', 'Failed to delete'])
   })
+
+  it('allows monitors to be editted after initial sync fails', async () => {
+    // Regression test for error where the edit monitor dialog was rendered as if creating a new
+    // monitor, rather than editing an existing one, if the first sync failed. This was caused by
+    // the `SetupMonitorDialog` component checking if the monitor provided to it is `null` to know
+    // whether to show the dialog for creating a new monitor or editing an existing one. This is
+    // fixed by using a `v-if="monitor !== null"` on the `SetupMonitorDialog` component, so that it
+    // doesn't get injected into the `MonitorView` until the monitor is available, meaning the dialog
+    // is guaranteed to get a monitor and not `null`.
+    vi.useFakeTimers()
+
+    const { wrapper } = await mountMonitorView(true, ['Test error message'])
+
+    // Since the first sync fails, the monitor should be `null` and we shouldn't
+    // have any dialog at all.
+    expect(wrapper.find('.fake-setup-monitor-dialog').exists()).toBeFalsy()
+
+    // Let the MonitorView component sync again - which will succeed this time.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
+
+    // Now that we've synced the monitor and it's no longer `null`, we shoud have the
+    // dialog container again.
+    const editDialog = wrapper.find('.fake-setup-monitor-dialog')
+    expect(editDialog.exists()).toBeTruthy()
+
+    // Open the edit dialog.
+    const button = wrapper.find('.mdi-pencil')
+    await button.trigger('click')
+    await flushPromises()
+
+    // The dialog should contain the monitor ID.
+    expect(wrapper.find('.fake-setup-monitor-dialog').find('p').text()).toBe(
+      '547810d4-a636-4c1b-83e6-3e641391c84e'
+    )
+
+    vi.useRealTimers()
+  })
 })

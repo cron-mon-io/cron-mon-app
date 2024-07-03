@@ -58,6 +58,7 @@
       </v-card-text>
     </v-card>
     <SetupMonitorDialog
+      v-if="monitor !== null"
       :dialogActive="editDialogActive"
       @dialog-complete="editDialogComplete"
       @dialog-aborted="closeEditDialog"
