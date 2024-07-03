@@ -185,7 +185,7 @@ describe('MonitorView view', () => {
     ])
   })
 
-  it('deteched new jobs', async () => {
+  it('detects new jobs', async () => {
     vi.useFakeTimers()
 
     const { wrapper, repo } = await mountMonitorView()
