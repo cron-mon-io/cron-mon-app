@@ -29,7 +29,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Job } from '@/models/job'
+
+import type { Job } from '@/types/job'
 import { formatDuration } from '@/utils/time'
 const props = defineProps<{
   job: Job
