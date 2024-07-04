@@ -1,4 +1,4 @@
-import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/models/monitor'
+import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
 
 export interface MonitorRepoInterface {
   getMonitorInfos(): Promise<Array<MonitorInformation>>
@@ -8,66 +8,92 @@ export interface MonitorRepoInterface {
   deleteMonitor(monitor: MonitorIdentity): Promise<void>
 }
 
+type ApiResponse = {
+  data: any
+}
+
 type MonitorResp = {
   data: Monitor
 }
 
+type MonitorList = {
+  data: Array<MonitorInformation>
+  paging: {
+    total: number
+  }
+}
+
 export class MonitorRepository implements MonitorRepoInterface {
+  // TODO: Put API URL in env.
+  private readonly baseUrl = 'http://127.0.0.1:8000'
+
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
-    // TODO: Put API URL in env.
-    type MonitorList = {
-      data: Array<MonitorInformation>
-      paging: {
-        total: number
-      }
-    }
-    const resp: MonitorList = await (await fetch('http://127.0.0.1:8000/api/v1/monitors')).json()
-    return resp.data
+    const resp = await this.sendRequest(`/api/v1/monitors`, 'GET')
+    return (resp as MonitorList).data
   }
 
   async getMonitor(monitorId: string): Promise<Monitor> {
-    // TODO: Put API URL in env.
-    const resp: MonitorResp = await (
-      await fetch(`http://127.0.0.1:8000/api/v1/monitors/${monitorId}`)
-    ).json()
-    return resp.data
+    const resp = await this.sendRequest(`/api/v1/monitors/${monitorId}`, 'GET')
+    return (resp as MonitorResp).data
   }
 
   async addMonitor(monitor: MonitorSummary): Promise<Monitor> {
-    return await this.postMonitorInfo('http://127.0.0.1:8000/api/v1/monitors', 'POST', monitor)
+    return await this.postMonitorInfo(`/api/v1/monitors`, 'POST', monitor)
   }
 
   async updateMonitor(monitor: MonitorIdentity): Promise<Monitor> {
-    return await this.postMonitorInfo(
-      `http://127.0.0.1:8000/api/v1/monitors/${monitor.monitor_id}`,
-      'PATCH',
-      monitor
-    )
+    return await this.postMonitorInfo(`/api/v1/monitors/${monitor.monitor_id}`, 'PATCH', monitor)
   }
 
   async deleteMonitor(monitor: MonitorIdentity): Promise<void> {
-    await fetch(`http://127.0.0.1:8000/api/v1/monitors/${monitor.monitor_id}`, { method: 'DELETE' })
+    await this.sendRequest(`/api/v1/monitors/${monitor.monitor_id}`, 'DELETE')
   }
 
   private async postMonitorInfo(
-    url: string,
+    route: string,
     method: string,
     monitor: MonitorSummary
   ): Promise<Monitor> {
-    const rawResp = await fetch(url, {
-      method: method,
-      headers: {
+    const resp = await this.sendRequest(route, method, {
+      name: monitor.name,
+      expected_duration: monitor.expected_duration,
+      grace_duration: monitor.grace_duration
+    })
+
+    return (resp as MonitorResp).data
+  }
+
+  private async sendRequest(
+    route: string,
+    method: string,
+    body: Record<string, any> | undefined = undefined
+  ): Promise<ApiResponse | undefined> {
+    const opts: Record<string, any> = {
+      method: method
+    }
+    if (body !== undefined) {
+      opts['headers'] = {
         Accept: 'application/json',
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: monitor.name,
-        expected_duration: monitor.expected_duration,
-        grace_duration: monitor.grace_duration
-      })
-    })
-    const resp: MonitorResp = await rawResp.json()
+      }
+      opts['body'] = JSON.stringify(body)
+    }
 
-    return resp.data
+    let response: Response | null = null
+    try {
+      response = await fetch(this.baseUrl + route, opts)
+    } catch (e) {
+      console.error('Failed to connect to the CronMon API:', e)
+      throw new Error('Failed to connect to the CronMon API.')
+    }
+
+    if (response.ok) {
+      const length = Number(response.headers.get('Content-Length'))
+      return length > 0 ? await response.json() : undefined
+    } else {
+      // We always want the JSON out of errors to get the description.
+      const json = await response.json()
+      throw new Error(json.error.description)
+    }
   }
 }

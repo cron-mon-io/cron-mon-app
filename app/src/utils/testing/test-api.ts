@@ -3,7 +3,7 @@ import type { SetupServer } from 'msw/node'
 import { HttpResponse, http } from 'msw'
 import { v4 as uuidv4 } from 'uuid'
 
-import type { MonitorSummary } from '@/models/monitor'
+import type { MonitorSummary } from '@/types/monitor'
 
 export function setupTestAPI(): SetupServer {
   let monitors = [
@@ -137,8 +137,8 @@ export function setupTestAPI(): SetupServer {
             {
               error: {
                 code: 404,
-                reason: 'Not Found',
-                description: 'The requested resource could not be found.'
+                reason: 'Monitor Not Found',
+                description: `Failed to find monitor with id '${monitorId}'`
               }
             },
             { status: 404 }

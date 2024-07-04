@@ -1,6 +1,15 @@
 <template>
   <div>
-    <v-card class="elevation-2 mx-6 mt-13">
+    <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getMonitor" />
+    <ApiAlert class="mx-4 mt-4" :error="editError" @closed="editError = null" />
+    <ApiAlert class="mx-4 mt-4" :error="deleteError" @closed="deleteError = null" />
+    <v-skeleton-loader
+      v-if="monitor === null"
+      type="card"
+      class="my-3 mx-auto w-50"
+      elevation="4"
+    />
+    <v-card v-else class="elevation-2 mx-6 mt-13">
       <MonitorSummary :monitor="monitor" :is-new="$cookies.isKey(monitor.monitor_id)" />
       <v-card-text>
         <v-chip
@@ -16,11 +25,23 @@
             You'll need this to use the monitor in your cron job, see the docs for more.
           </v-tooltip>
         </v-chip>
-        <v-btn append-icon="mdi-pencil" color="primary" class="ma-3" @click="openEditDialog">
+        <v-btn
+          append-icon="mdi-pencil"
+          color="primary"
+          class="ma-3"
+          @click="openEditDialog"
+          :disabled="syncError !== null"
+        >
           Edit Monitor
           <v-tooltip activator="parent" location="top">Click to modify this Monitor</v-tooltip>
         </v-btn>
-        <v-btn append-icon="mdi-delete" color="primary" class="ma-3" @click="openDeleteDialog">
+        <v-btn
+          append-icon="mdi-delete"
+          color="primary"
+          class="ma-3"
+          @click="openDeleteDialog"
+          :disabled="syncError !== null"
+        >
           Delete Monitor
           <v-tooltip activator="parent" location="top">Click to delete this Monitor</v-tooltip>
         </v-btn>
@@ -37,6 +58,7 @@
       </v-card-text>
     </v-card>
     <SetupMonitorDialog
+      v-if="monitor !== null"
       :dialogActive="editDialogActive"
       @dialog-complete="editDialogComplete"
       @dialog-aborted="closeEditDialog"
@@ -57,12 +79,18 @@ import { ref, inject, onUnmounted } from 'vue'
 import type { VueCookies } from 'vue-cookies'
 import { useRoute, useRouter } from 'vue-router'
 
-import JobInfo from '@/components/JobInfo.vue'
+import ApiAlert from '@/components/ApiAlert.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import JobInfo from '@/components/JobInfo.vue'
 import MonitorSummary from '@/components/MonitorSummary.vue'
 import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
-import type { MonitorSummary as MonitorSummaryType, MonitorInformation } from '@/models/monitor'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
+import type {
+  MonitorSummary as MonitorSummaryType,
+  MonitorInformation,
+  Monitor,
+  MonitorIdentity
+} from '@/types/monitor'
 
 const ONE_MINUTE_MS = 60 * 1000
 
@@ -79,21 +107,29 @@ onUnmounted(() => {
 })
 
 const monitorId = route.params.id as string
-const monitor = ref(await monitorRepo.getMonitor(monitorId))
+const monitor = ref<Monitor | null>(null)
+const syncError = ref<string | null>(null)
+const deleteError = ref<string | null>(null)
+const editError = ref<string | null>(null)
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
 
 function copyMonitorIDToClipboard() {
-  clipboard.writeText(monitor.value.monitor_id)
+  clipboard.writeText(monitorId)
 }
 
 async function editDialogComplete(monitorInfo: MonitorSummaryType) {
   const newMonitor = {
-    monitor_id: monitor.value.monitor_id,
+    monitor_id: monitorId,
     ...monitorInfo
   } as MonitorInformation
-  monitor.value = await monitorRepo.updateMonitor(newMonitor)
-  cookies.set(monitor.value.monitor_id, 'new', '5min')
+
+  try {
+    monitor.value = await monitorRepo.updateMonitor(newMonitor)
+    cookies.set(monitor.value.monitor_id, 'new', '5min')
+  } catch (e: unknown) {
+    editError.value = (e as Error).message
+  }
   closeEditDialog()
 }
 
@@ -106,15 +142,21 @@ function closeEditDialog() {
 }
 
 async function deleteDialogComplete(confirmed: boolean) {
+  let deleted = false
   if (confirmed) {
-    await monitorRepo.deleteMonitor(monitor.value)
+    try {
+      await monitorRepo.deleteMonitor(monitor.value as MonitorIdentity)
+      deleted = true
+    } catch (e: unknown) {
+      deleteError.value = (e as Error).message
+    }
   }
 
   closeDeleteDialog()
 
   // We want to close the dialog first before we navigate back to the monitors page,
   // just because it looks slightly better.
-  if (confirmed) {
+  if (deleted) {
     router.push('/monitors')
   }
 }
@@ -127,14 +169,25 @@ function closeDeleteDialog() {
   deleteDialogActive.value = false
 }
 
-function resyncMonitor() {
-  setTimeout(async () => {
-    if (syncing) {
-      monitor.value = await monitorRepo.getMonitor(monitorId)
-      resyncMonitor()
-    }
-  }, ONE_MINUTE_MS)
+async function getMonitor() {
+  try {
+    monitor.value = await monitorRepo.getMonitor(monitorId)
+    // If we've successfully got the monitors, we can clear any previous errors.
+    syncError.value = null
+  } catch (e: unknown) {
+    syncError.value = (e as Error).message
+  }
 }
 
-resyncMonitor()
+async function syncMonitor() {
+  if (!syncing) {
+    return
+  }
+
+  await getMonitor()
+
+  setTimeout(async () => await syncMonitor(), ONE_MINUTE_MS)
+}
+
+await syncMonitor()
 </script>

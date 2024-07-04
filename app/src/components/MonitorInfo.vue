@@ -1,5 +1,5 @@
 <template>
-  <v-card class="elevation-2 ma-3 w-50">
+  <v-card class="elevation-4 ma-3 w-50">
     <MonitorSummary :monitor="monitor" :is-new="isNew" />
     <v-card-actions>
       <v-chip class="ma-2 font-weight-bold" :color="lastFinish.colour" variant="outlined">
@@ -31,8 +31,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { MonitorInformation } from '@/models/monitor'
 import MonitorSummary from '@/components/MonitorSummary.vue'
+import type { MonitorInformation } from '@/types/monitor'
 
 const props = defineProps<{
   monitor: MonitorInformation

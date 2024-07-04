@@ -1,19 +1,26 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/models/monitor'
-import type { Job } from '@/models/job'
 import type { MonitorRepoInterface } from '@/repos/monitor-repo'
+import type { Job } from '@/types/job'
+import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
 
 type MonitorData = Monitor & MonitorInformation
 
 export class FakeMonitorRepository implements MonitorRepoInterface {
   private data: Record<string, MonitorData> = {}
+  private errors: Array<string> = []
 
-  constructor(data: Array<MonitorData> = []) {
+  constructor(data: Array<MonitorData> = [], errors: Array<string> = []) {
     this.data = Object.fromEntries(data.map((monitor) => [monitor.monitor_id, monitor]))
+    this.errors = errors
   }
 
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
+    const error = this.errors.shift()
+    if (error !== undefined) {
+      return Promise.reject(new Error(error))
+    }
+
     return Promise.resolve(
       Object.entries(this.data).map(([_key, monitor]) => ({
         monitor_id: monitor.monitor_id,
@@ -27,21 +34,29 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   }
 
   async getMonitor(monitorId: string): Promise<Monitor> {
+    const error = this.errors.shift()
+    if (error !== undefined) {
+      return Promise.reject(new Error(error))
+    }
+
     const monitor = this.data[monitorId]
-    return Promise.resolve(
-      monitor !== undefined
-        ? {
-            monitor_id: monitor.monitor_id,
-            name: monitor.name,
-            expected_duration: monitor.expected_duration,
-            grace_duration: monitor.grace_duration,
-            jobs: monitor.jobs
-          }
-        : (undefined as unknown as Monitor) // TODO: Remove this hack once we have proper error handling
-    )
+    return monitor !== undefined
+      ? Promise.resolve({
+          monitor_id: monitor.monitor_id,
+          name: monitor.name,
+          expected_duration: monitor.expected_duration,
+          grace_duration: monitor.grace_duration,
+          jobs: monitor.jobs
+        })
+      : Promise.reject(new Error(`Failed to find monitor with id '${monitorId}'`))
   }
 
   async addMonitor(monitor: MonitorSummary): Promise<Monitor> {
+    const error = this.errors.shift()
+    if (error !== undefined) {
+      return Promise.reject(new Error(error))
+    }
+
     const fullMonitor = {
       ...monitor,
       monitor_id: uuidv4(),
@@ -60,6 +75,11 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   }
 
   async updateMonitor(monitor: MonitorIdentity): Promise<Monitor> {
+    const error = this.errors.shift()
+    if (error !== undefined) {
+      return Promise.reject(new Error(error))
+    }
+
     const fullMonitor = this.data[monitor.monitor_id]
     fullMonitor.name = monitor.name
     fullMonitor.expected_duration = monitor.expected_duration
@@ -75,6 +95,11 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   }
 
   async deleteMonitor(monitor: MonitorIdentity): Promise<void> {
+    const error = this.errors.shift()
+    if (error !== undefined) {
+      return Promise.reject(new Error(error))
+    }
+
     delete this.data[monitor.monitor_id]
     return Promise.resolve()
   }
@@ -83,5 +108,8 @@ export class FakeMonitorRepository implements MonitorRepoInterface {
   addJob(monitorId: string, job: Job) {
     const monitor = this.data[monitorId]
     monitor.jobs.push(job)
+  }
+  addError(error: string) {
+    this.errors.push(error)
   }
 }
