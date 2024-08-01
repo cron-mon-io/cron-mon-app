@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@scalar/api-reference": "^1.24.27",
-    "vue": "^3.4.31",
+    "@scalar/api-reference": "^1.24.64",
+    "vue": "^3.4.35",
     "vue-cookies": "^1.8.4",
-    "vue-router": "^4.4.0",
-    "vuetify": "^3.6.9"
+    "vue-router": "^4.4.1",
+    "vuetify": "^3.6.14"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
@@ -48,6 +48,6 @@
     "vue-tsc": "^2.0.21"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.18.0"
+    "@rollup/rollup-linux-x64-gnu": "^4.19.1"
   }
 }
