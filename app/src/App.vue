@@ -65,7 +65,8 @@ import CronMonLogo from '@/assets/logo.svg'
 import CronMonIcon from '@/assets/icon.svg'
 import GitHubIcon from '@/components/icons/GitHub.vue'
 import ThemePicker from '@/components/ThemePicker.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import Keycloak from 'keycloak-js'
 
 const rail = ref(false)
 const themeName = ref('') // This will be set by the ThemePicker during setup/initialisation.
@@ -86,4 +87,22 @@ function updateTheme(name: string, isDark: boolean): void {
   themeName.value = name
   themeIsDark.value = isDark
 }
+
+onMounted(async () => {
+  const keycloak = new Keycloak({
+    url: 'http://127.0.0.1:8080',
+    realm: 'cron-mon-io',
+    clientId: 'cron-mon'
+  })
+
+  try {
+    const authenticated = await keycloak.init({
+      onLoad: 'login-required',
+      redirectUri: window.location.href
+    })
+    console.log(`User is ${authenticated ? 'authenticated' : 'not authenticated'}`)
+  } catch (error) {
+    console.error('Failed to initialize adapter:', error)
+  }
+})
 </script>
