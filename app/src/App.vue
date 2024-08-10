@@ -44,7 +44,11 @@
 
       <v-main>
         <v-toolbar density="compact">
-          <v-btn density="comfortable" @click="rail = !rail" icon="mdi-dots-vertical"></v-btn>
+          <v-btn
+            density="comfortable"
+            @click="rail = !rail"
+            :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
+          ></v-btn>
           <v-spacer></v-spacer>
           <ThemePicker @theme-changed="updateTheme" />
         </v-toolbar>
