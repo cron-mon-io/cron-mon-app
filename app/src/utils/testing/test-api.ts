@@ -1,11 +1,11 @@
 import { setupServer } from 'msw/node'
 import type { SetupServer } from 'msw/node'
-import { HttpResponse, http } from 'msw'
+import { HttpResponse, http, type StrictRequest, type JsonBodyType } from 'msw'
 import { v4 as uuidv4 } from 'uuid'
 
 import type { MonitorSummary } from '@/types/monitor'
 
-export function setupTestAPI(): SetupServer {
+export function setupTestAPI(expectedToken: string): SetupServer {
   let monitors = [
     {
       monitor_id: 'cfe88463-5c04-4b43-b10f-1f508963cc5d',
@@ -105,6 +105,22 @@ export function setupTestAPI(): SetupServer {
     }
   ]
 
+  function assertAuth(request: StrictRequest<JsonBodyType>): HttpResponse | void {
+    const token = request.headers.get('Authorization')
+    return token === `Bearer ${expectedToken}`
+      ? undefined
+      : HttpResponse.json(
+          {
+            error: {
+              code: 401,
+              reason: 'Unauthorized',
+              description: 'The request requires user authentication.'
+            }
+          },
+          { status: 401 }
+        )
+  }
+
   return setupServer(
     ...[
       http.get('http://127.0.0.1:8000/api/v1/docs/openapi.yaml', () => {
@@ -113,22 +129,30 @@ export function setupTestAPI(): SetupServer {
           headers: { 'Content-Type': 'application/yaml' }
         })
       }),
-      http.get('http://127.0.0.1:8000/api/v1/monitors', () => {
-        return HttpResponse.json({
-          data: monitors.map((monitor) => {
-            return {
-              monitor_id: monitor.monitor_id,
-              name: monitor.name,
-              expected_duration: monitor.expected_duration,
-              grace_duration: monitor.grace_duration,
-              last_started_job: monitor.last_started_job,
-              last_finished_job: monitor.last_finished_job
-            }
-          }),
-          paging: { total: monitors.length }
-        })
+      http.get('http://127.0.0.1:8000/api/v1/monitors', ({ request }) => {
+        return (
+          assertAuth(request) ||
+          HttpResponse.json({
+            data: monitors.map((monitor) => {
+              return {
+                monitor_id: monitor.monitor_id,
+                name: monitor.name,
+                expected_duration: monitor.expected_duration,
+                grace_duration: monitor.grace_duration,
+                last_started_job: monitor.last_started_job,
+                last_finished_job: monitor.last_finished_job
+              }
+            }),
+            paging: { total: monitors.length }
+          })
+        )
       }),
-      http.get('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ params }) => {
+      http.get('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ request, params }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
         const { monitorId } = params
         const monitor = monitors.find((m) => m.monitor_id === monitorId)
 
@@ -156,8 +180,12 @@ export function setupTestAPI(): SetupServer {
         })
       }),
       http.post('http://127.0.0.1:8000/api/v1/monitors', async ({ request }) => {
-        const body = (await request.json()) as MonitorSummary
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
 
+        const body = (await request.json()) as MonitorSummary
         const monitor = {
           monitor_id: uuidv4(),
           name: body.name,
@@ -182,6 +210,11 @@ export function setupTestAPI(): SetupServer {
       http.patch(
         'http://127.0.0.1:8000/api/v1/monitors/:monitorId',
         async ({ params, request }) => {
+          const authErroResponse = assertAuth(request)
+          if (authErroResponse) {
+            return authErroResponse
+          }
+
           const { monitorId } = params
           const monitor = monitors.find((m) => m.monitor_id === monitorId)
 
@@ -211,7 +244,12 @@ export function setupTestAPI(): SetupServer {
           })
         }
       ),
-      http.delete('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ params }) => {
+      http.delete('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ request, params }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
         const { monitorId } = params
         const monitor = monitors.find((m) => m.monitor_id === monitorId)
 

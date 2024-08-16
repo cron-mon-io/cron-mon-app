@@ -97,8 +97,10 @@ const ONE_MINUTE_MS = 60 * 1000
 const route = useRoute()
 const router = useRouter()
 const cookies = inject<VueCookies>('$cookies') as VueCookies
-const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
 const clipboard = inject<Clipboard>('$clipboard') as Clipboard
+const getMonitorRepo = inject<() => Promise<MonitorRepoInterface>>(
+  '$getMonitorRepo'
+) as () => Promise<MonitorRepoInterface>
 
 // After we've unmounted the component we don't want to keep syncing the monitor.
 let syncing = true
@@ -124,6 +126,7 @@ async function editDialogComplete(monitorInfo: MonitorSummaryType) {
     ...monitorInfo
   } as MonitorInformation
 
+  const monitorRepo = await getMonitorRepo()
   try {
     monitor.value = await monitorRepo.updateMonitor(newMonitor)
     cookies.set(monitor.value.monitor_id, 'new', '5min')
@@ -143,6 +146,7 @@ function closeEditDialog() {
 
 async function deleteDialogComplete(confirmed: boolean) {
   let deleted = false
+  const monitorRepo = await getMonitorRepo()
   if (confirmed) {
     try {
       await monitorRepo.deleteMonitor(monitor.value as MonitorIdentity)
@@ -170,6 +174,7 @@ function closeDeleteDialog() {
 }
 
 async function getMonitor() {
+  const monitorRepo = await getMonitorRepo()
   try {
     monitor.value = await monitorRepo.getMonitor(monitorId)
     // If we've successfully got the monitors, we can clear any previous errors.
