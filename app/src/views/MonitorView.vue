@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, onUnmounted } from 'vue'
+import { ref, inject, onUnmounted, onMounted } from 'vue'
 import type { VueCookies } from 'vue-cookies'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -189,5 +189,5 @@ async function syncMonitor() {
   setTimeout(async () => await syncMonitor(), ONE_MINUTE_MS)
 }
 
-await syncMonitor()
+onMounted(syncMonitor)
 </script>
