@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, onUnmounted } from 'vue'
+import { ref, inject, onUnmounted, onMounted } from 'vue'
 import type { VueCookies } from 'vue-cookies'
 
 import ApiAlert from '@/components/ApiAlert.vue'
@@ -103,5 +103,5 @@ async function syncMonitors() {
   setTimeout(async () => await syncMonitors(), FIVE_MINUTES_MS)
 }
 
-await syncMonitors()
+onMounted(syncMonitors)
 </script>
