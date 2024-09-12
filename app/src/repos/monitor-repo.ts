@@ -26,6 +26,11 @@ type MonitorList = {
 export class MonitorRepository implements MonitorRepoInterface {
   // TODO: Put API URL in env.
   private readonly baseUrl = 'http://127.0.0.1:8000'
+  private readonly getAuthToken: () => string
+
+  constructor(getAuthToken: () => string) {
+    this.getAuthToken = getAuthToken
+  }
 
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
     const resp = await this.sendRequest(`/api/v1/monitors`, 'GET')
@@ -69,14 +74,15 @@ export class MonitorRepository implements MonitorRepoInterface {
     body: Record<string, any> | undefined = undefined
   ): Promise<ApiResponse | undefined> {
     const opts: Record<string, any> = {
-      method: method
+      method: method,
+      headers: {
+        Authorization: `Bearer ${this.getAuthToken()}`
+      }
     }
     if (body !== undefined) {
-      opts['headers'] = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
-      opts['body'] = JSON.stringify(body)
+      opts.headers.Accept = 'application/json'
+      opts.headers['Content-Type'] = 'application/json'
+      opts.body = JSON.stringify(body)
     }
 
     let response: Response | null = null

@@ -7,7 +7,7 @@ import type { MonitorSummary } from '@/types/monitor'
 import { setupTestAPI } from '@/utils/testing/test-api'
 
 describe('MonitorRepository', () => {
-  const server = setupTestAPI()
+  const server = setupTestAPI('foo-token')
 
   // Start server before all tests
   beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
@@ -18,7 +18,7 @@ describe('MonitorRepository', () => {
   // Reset handlers after each test `important for test isolation`
   afterEach(() => server.resetHandlers())
 
-  const repo = new MonitorRepository()
+  const repo = new MonitorRepository(() => 'foo-token')
 
   it('getMonitorInfos', async () => {
     const monitorInfos = await repo.getMonitorInfos()
@@ -182,9 +182,71 @@ describe('MonitorRepository', () => {
   })
 })
 
+describe('MonitorRepository when auth token is invalid', () => {
+  const server = setupTestAPI('foo-token')
+
+  // Start server before all tests
+  beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+
+  // Close server after all tests
+  afterAll(() => server.close())
+
+  // Reset handlers after each test `important for test isolation`
+  afterEach(() => server.resetHandlers())
+
+  const repo = new MonitorRepository(() => 'invalid-token')
+
+  it('getMonitorInfos', async () => {
+    await expect(async () => await repo.getMonitorInfos()).rejects.toThrowError(
+      'The request requires user authentication.'
+    )
+  })
+
+  it('getMonitor', async () => {
+    await expect(
+      async () => await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
+    ).rejects.toThrowError('The request requires user authentication.')
+  })
+
+  it('addMonitor', async () => {
+    await expect(
+      async () =>
+        await repo.addMonitor({
+          name: 'new-monitor.sh',
+          expected_duration: 300,
+          grace_duration: 60
+        })
+    ).rejects.toThrowError('The request requires user authentication.')
+  })
+
+  it('updateMonitor', async () => {
+    await expect(
+      async () =>
+        await repo.updateMonitor({
+          monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
+          name: 'new-name.sh',
+          expected_duration: 301,
+          grace_duration: 61
+        })
+    ).rejects.toThrowError('The request requires user authentication.')
+  })
+
+  it('deleteMonitor', async () => {
+    await expect(
+      async () =>
+        await repo.deleteMonitor({
+          monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
+          name: 'new-name.sh',
+          expected_duration: 301,
+          grace_duration: 61
+        })
+    ).rejects.toThrowError('The request requires user authentication.')
+  })
+})
+
 describe('MonitorRepository when the API down', () => {
   it('getMonitor', async () => {
-    const repo = new MonitorRepository()
+    const repo = new MonitorRepository(() => 'foo-token')
     await expect(
       async () => await repo.getMonitor('e534a01a-4efe-4b8e-9b04-44a3c76b0462')
     ).rejects.toThrowError('Failed to connect to the CronMon API.')
