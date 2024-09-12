@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, it, expect } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, vi, it, expect } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -7,7 +7,6 @@ import { createRouter, createWebHistory, type Router } from 'vue-router'
 
 import App from '@/App.vue'
 import routes from '@/router/routes'
-import { MonitorRepository } from '@/repos/monitor-repo'
 
 import { FakeLocalStorage } from '@/utils/testing/fake-localstorage'
 import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
@@ -30,8 +29,7 @@ async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
       provide: {
         $localStorage: new FakeLocalStorage(),
         $clipboard: new FakeClipboard(),
-        $cookies: fakeCookies,
-        $monitorRepo: new MonitorRepository()
+        $cookies: fakeCookies
       },
       mocks: {
         $cookies: fakeCookies
@@ -48,18 +46,31 @@ async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
   return { wrapper, router }
 }
 
+const mocks = vi.hoisted(() => {
+  return {
+    useAuth: vi.fn()
+  }
+})
+
+vi.mock('@/composables/auth', () => ({
+  useAuth: mocks.useAuth
+}))
+
 describe('The App', () => {
-  global.ResizeObserver = require('resize-observer-polyfill')
-  const server = setupTestAPI()
+  beforeAll(() => {
+    mocks.useAuth.mockReturnValue({
+      isAuthenticated: false,
+      user: null,
+      openAccountManagement: vi.fn(),
+      logout: vi.fn(() => Promise.resolve),
+      getToken: vi.fn(() => undefined),
+      isReady: vi.fn(() => Promise.resolve)
+    })
+  })
 
-  // Start server before all tests
-  beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
-
-  // Close server after all tests
-  afterAll(() => server.close())
-
-  // Reset handlers after each test `important for test isolation`
-  afterEach(() => server.resetHandlers())
+  afterAll(() => {
+    mocks.useAuth.mockRestore()
+  })
 
   it('renders home page as expected', async () => {
     const { wrapper } = await mountApp()
@@ -82,7 +93,7 @@ describe('The App', () => {
     const toolbar = wrapper.find('.v-toolbar')
     const icons = toolbar.findAll('.v-btn')
     expect(icons).toHaveLength(2)
-    expect(icons[0].find('.v-icon').classes()).toContain('mdi-dots-vertical')
+    expect(icons[0].find('.v-icon').classes()).toContain('mdi-chevron-left')
     expect(icons[1].find('.v-icon').classes()).toContain('mdi-white-balance-sunny')
 
     // We should have a footer with a link to the GitHub repo.
@@ -160,6 +171,37 @@ describe('The App', () => {
     await router.push('/docs/hosting')
     expect(getTitle()).toBe('Hosting')
   })
+})
+
+describe('Interacting with Monitors', async () => {
+  global.ResizeObserver = require('resize-observer-polyfill')
+  const server = setupTestAPI('foo-token')
+
+  const mockGetToken = vi.fn(() => 'foo-token')
+
+  // Start server before all tests
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: 'error' })
+    mocks.useAuth.mockReturnValue({
+      isAuthenticated: true,
+      user: { name: 'Test User' },
+      openAccountManagement: vi.fn(),
+      logout: vi.fn(() => Promise.resolve),
+      getToken: mockGetToken,
+      isReady: vi.fn(() => Promise.resolve)
+    })
+  })
+
+  // Close server after all tests
+  afterAll(() => {
+    server.close()
+    mocks.useAuth.mockRestore()
+  })
+
+  // Reset handlers after each test `important for test isolation`
+  afterEach(() => server.resetHandlers())
+
+  // TODO Check we have user in top bar.
 
   it('navigates to specific monitors as expected', async () => {
     const { wrapper, router } = await mountApp()
@@ -167,6 +209,8 @@ describe('The App', () => {
     // Navigate to the monitors page.
     await router.push('/monitors')
     await flushPromises()
+
+    expect(mockGetToken).toHaveBeenCalledOnce()
 
     const firstMonitor = wrapper.find('.v-main').findAll('.v-card')[0]
     expect(firstMonitor.find('.v-card-title').text()).toBe('foo-backup.sh')
