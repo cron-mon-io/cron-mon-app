@@ -52,7 +52,12 @@
           <v-spacer></v-spacer>
           <span v-if="user">
             Hello, {{ user.firstName }}
-            <v-btn density="comfortable" icon="mdi-logout" @click="logout" />
+            <IconButton
+              icon="mdi-account"
+              tooltip="Open account management"
+              @click="openAccountManagement"
+            />
+            <IconButton icon="mdi-logout" tooltip="Log out" @click="logout" />
           </span>
           <ThemePicker @theme-changed="updateTheme" />
         </v-toolbar>
@@ -72,6 +77,7 @@
 import CronMonLogo from '@/assets/logo.svg'
 import CronMonIcon from '@/assets/icon.svg'
 import GitHubIcon from '@/components/icons/GitHub.vue'
+import IconButton from './components/IconButton.vue'
 import ThemePicker from '@/components/ThemePicker.vue'
 import { useAuth } from '@/composables/auth'
 import { MonitorRepository } from '@/repos/monitor-repo'
