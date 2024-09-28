@@ -42,7 +42,9 @@ import type { MonitorInformation, MonitorSummary, Monitor } from '@/types/monito
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
 const cookies = inject<VueCookies>('$cookies') as VueCookies
-const monitorRepo = inject<MonitorRepoInterface>('$monitorRepo') as MonitorRepoInterface
+const getMonitorRepo = inject<() => Promise<MonitorRepoInterface>>(
+  '$getMonitorRepo'
+) as () => Promise<MonitorRepoInterface>
 
 // After we've unmounted the component we don't want to keep syncing the monitor.
 let syncing = true
@@ -58,6 +60,7 @@ const dialogActive = ref(false)
 
 async function dialogComplete(monitorInfo: MonitorSummary) {
   let monitor: Monitor | null = null
+  const monitorRepo = await getMonitorRepo()
   try {
     monitor = await monitorRepo.addMonitor(monitorInfo)
   } catch (e: unknown) {
@@ -83,6 +86,7 @@ function closeDialog() {
 }
 
 async function getMonitors() {
+  const monitorRepo = await getMonitorRepo()
   try {
     monitors.value = await monitorRepo.getMonitorInfos()
     // If we've successfully got the monitors, we can clear any previous errors and set loading to false.

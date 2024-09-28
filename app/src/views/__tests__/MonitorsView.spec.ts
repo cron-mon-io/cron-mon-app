@@ -107,7 +107,7 @@ async function mountMonitorsView(errors: string[] = []): Promise<{
     global: {
       plugins: [vuetify],
       provide: {
-        $monitorRepo: repo,
+        $getMonitorRepo: () => repo,
         $cookies: cookies
       },
       mocks: {

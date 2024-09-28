@@ -135,7 +135,7 @@ async function mountMonitorView(
     global: {
       plugins: [createVuetify({ components, directives })],
       provide: {
-        $monitorRepo: repo,
+        $getMonitorRepo: () => repo,
         $cookies: fakeCookies,
         $clipboard: clipboard
       },

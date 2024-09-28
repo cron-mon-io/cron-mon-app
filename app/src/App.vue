@@ -44,8 +44,21 @@
 
       <v-main>
         <v-toolbar density="compact">
-          <v-btn density="comfortable" @click="rail = !rail" icon="mdi-dots-vertical"></v-btn>
+          <v-btn
+            density="comfortable"
+            @click="rail = !rail"
+            :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
+          ></v-btn>
           <v-spacer></v-spacer>
+          <span v-if="user">
+            Hello, {{ user.firstName }}
+            <IconButton
+              icon="mdi-account"
+              tooltip="Open account management"
+              @click="openAccountManagement"
+            />
+            <IconButton icon="mdi-logout" tooltip="Log out" @click="logout" />
+          </span>
           <ThemePicker @theme-changed="updateTheme" />
         </v-toolbar>
         <RouterView class="mb-3" />
@@ -64,8 +77,12 @@
 import CronMonLogo from '@/assets/logo.svg'
 import CronMonIcon from '@/assets/icon.svg'
 import GitHubIcon from '@/components/icons/GitHub.vue'
+import IconButton from './components/IconButton.vue'
 import ThemePicker from '@/components/ThemePicker.vue'
-import { ref } from 'vue'
+import { useAuth } from '@/composables/auth'
+import { MonitorRepository } from '@/repos/monitor-repo'
+
+import { ref, provide } from 'vue'
 
 const rail = ref(false)
 const themeName = ref('') // This will be set by the ThemePicker during setup/initialisation.
@@ -86,4 +103,10 @@ function updateTheme(name: string, isDark: boolean): void {
   themeName.value = name
   themeIsDark.value = isDark
 }
+const { user, logout, openAccountManagement, getToken, isReady } = useAuth(['monitors', 'monitor'])
+console.log('User: ', user)
+provide('$getMonitorRepo', async () => {
+  await isReady()
+  return new MonitorRepository(() => getToken() || '')
+})
 </script>
