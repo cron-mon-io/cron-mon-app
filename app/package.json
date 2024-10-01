@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@scalar/api-reference": "^1.25.9",
-    "keycloak-js": "^25.0.2",
-    "vue": "^3.5.1",
+    "@scalar/api-reference": "^1.25.25",
+    "keycloak-js": "^25.0.6",
+    "vue": "^3.5.10",
     "vue-cookies": "^1.8.4",
-    "vue-router": "^4.4.3",
-    "vuetify": "^3.7.1"
+    "vue-router": "^4.4.5",
+    "vuetify": "^3.7.2"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
