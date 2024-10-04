@@ -3,6 +3,7 @@
 # The frontend application for [_CronMon_](https://github.com/cron-mon-io/cron-mon)
 
 [![CI](https://github.com/cron-mon-io/cron-mon-app/actions/workflows/ci.yml/badge.svg)](https://github.com/cron-mon-io/cron-mon-app/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/cron-mon-io/cron-mon-app/graph/badge.svg?token=M2OKBDCCXX)](https://codecov.io/github/cron-mon-io/cron-mon-app)
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?logo=docker&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![Vue.js](https://img.shields.io/badge/Vue%20js-35495E?logo=vuedotjs&logoColor=4FC08D)
