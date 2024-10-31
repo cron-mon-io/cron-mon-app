@@ -75,13 +75,15 @@ describe('The App', () => {
   it('renders home page as expected', async () => {
     const { wrapper } = await mountApp()
 
-    // We should have a navigation drawer (1st item should be the CronMon logo, followed by 7 items)
+    // We should have a navigation drawer (1st item should be the CronMon logo, followed by 9 items)
     const navDrawerItems = wrapper.find('.v-navigation-drawer').findAll('.v-list-item')
-    expect(navDrawerItems).toHaveLength(8)
+    expect(navDrawerItems).toHaveLength(10)
     expect(navDrawerItems[0].find('img').attributes('src')).toBe('/src/assets/logo.svg')
-    expect(navDrawerItems.slice(1, 8).map((item) => item.text())).toEqual([
+    expect(navDrawerItems.slice(1, 10).map((item) => item.text())).toEqual([
       'Home',
+      'Monitoring',
       'Monitors',
+      'API Keys',
       'Docs',
       'Setup',
       'Integration',
@@ -128,7 +130,7 @@ describe('The App', () => {
 
     // The navigation drawer should now have a smaller logo but the same number of items.
     const navDrawerItems = navDrawer.findAll('.v-list-item')
-    expect(navDrawerItems).toHaveLength(8)
+    expect(navDrawerItems).toHaveLength(10)
     expect(navDrawerItems[0].find('img').attributes('src')).toBe('/src/assets/icon.svg')
   })
 
@@ -207,7 +209,7 @@ describe('Interacting with Monitors', async () => {
     const { wrapper, router } = await mountApp()
 
     // Navigate to the monitors page.
-    await router.push('/monitors')
+    await router.push('/monitoring/monitors')
     await flushPromises()
 
     expect(mockGetToken).toHaveBeenCalledOnce()
@@ -216,7 +218,7 @@ describe('Interacting with Monitors', async () => {
     expect(firstMonitor.find('.v-card-title').text()).toBe('foo-backup.sh')
 
     // Navigate to the first monitor in the list.
-    await router.push('/monitors/cfe88463-5c04-4b43-b10f-1f508963cc5d')
+    await router.push('/monitoring/monitors/cfe88463-5c04-4b43-b10f-1f508963cc5d')
     await flushPromises()
 
     const firstChip = wrapper.find('.v-main').findAll('.v-chip')[0]

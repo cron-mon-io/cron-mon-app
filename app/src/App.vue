@@ -23,6 +23,22 @@
           >
             <v-list-item-title class="text-body-1">{{ link.name }}</v-list-item-title>
           </v-list-item>
+          <v-list-group value="monitoring">
+            <template v-slot:activator="{ props }">
+              <v-list-item v-bind="props" prepend-icon="mdi-monitor-eye">
+                <v-list-item-title class="text-body-1">Monitoring</v-list-item-title>
+              </v-list-item>
+            </template>
+            <v-list-item
+              v-for="link in monitorLinks"
+              :key="link.target"
+              link
+              :prepend-icon="link.icon"
+              :to="{ name: link.target }"
+            >
+              <v-list-item-title class="text-body-1">{{ link.name }}</v-list-item-title>
+            </v-list-item>
+          </v-list-group>
           <v-list-group value="docs">
             <template v-slot:activator="{ props }">
               <v-list-item v-bind="props" prepend-icon="mdi-bookshelf">
@@ -88,9 +104,12 @@ const rail = ref(false)
 const themeName = ref('') // This will be set by the ThemePicker during setup/initialisation.
 const themeIsDark = ref(true)
 const opened = ref(['docs'])
-const topLevelLinks = ref([
-  { icon: 'mdi-home', target: 'home', name: 'Home' },
-  { icon: 'mdi-monitor-eye', target: 'monitors', name: 'Monitors' }
+
+// Navigation links
+const topLevelLinks = ref([{ icon: 'mdi-home', target: 'home', name: 'Home' }])
+const monitorLinks = ref([
+  { icon: 'mdi-monitor-multiple', target: 'monitors', name: 'Monitors' },
+  { icon: 'mdi-key-variant', target: 'keys', name: 'API Keys' }
 ])
 const docLinks = ref([
   { icon: 'mdi-math-compass', target: 'docs-setup', name: 'Setup' },
@@ -103,7 +122,11 @@ function updateTheme(name: string, isDark: boolean): void {
   themeName.value = name
   themeIsDark.value = isDark
 }
-const { user, logout, openAccountManagement, getToken, isReady } = useAuth(['monitors', 'monitor'])
+const { user, logout, openAccountManagement, getToken, isReady } = useAuth([
+  'monitors',
+  'monitor',
+  'keys'
+])
 console.log('User: ', user)
 provide('$getMonitorRepo', async () => {
   await isReady()

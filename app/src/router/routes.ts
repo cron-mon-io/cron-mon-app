@@ -4,6 +4,7 @@ import MonitorView from '@/views/MonitorView.vue'
 import SetupView from '@/views/docs/SetupView.vue'
 import HostingView from '@/views/docs/HostingView.vue'
 import IntegrationView from '@/views/docs/IntegrationView.vue'
+import KeysView from '@/views/KeysView.vue'
 
 const routes = [
   {
@@ -39,17 +40,28 @@ const routes = [
     ]
   },
   {
-    path: '/monitors',
+    path: '/monitoring',
+    name: 'monitoring',
     children: [
       {
-        path: '',
-        name: 'monitors',
-        component: MonitorsView
+        path: 'monitors',
+        children: [
+          {
+            path: '',
+            name: 'monitors',
+            component: MonitorsView
+          },
+          {
+            path: ':id',
+            name: 'monitor',
+            component: MonitorView
+          }
+        ]
       },
       {
-        path: ':id',
-        name: 'monitor',
-        component: MonitorView
+        path: 'keys',
+        name: 'keys',
+        component: KeysView
       }
     ]
   },
