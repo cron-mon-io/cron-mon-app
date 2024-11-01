@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@scalar/api-reference": "^1.25.25",
-    "keycloak-js": "^25.0.6",
+    "@scalar/api-reference": "^1.25.54",
+    "keycloak-js": "^26.0.4",
     "vue": "^3.5.10",
     "vue-cookies": "^1.8.4",
     "vue-router": "^4.4.5",
-    "vuetify": "^3.7.2"
+    "vuetify": "^3.7.3"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
@@ -49,6 +49,6 @@
     "vue-tsc": "^2.1.6"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.21.2"
+    "@rollup/rollup-linux-x64-gnu": "^4.24.3"
   }
 }
