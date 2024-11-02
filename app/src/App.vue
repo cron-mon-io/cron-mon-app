@@ -97,6 +97,7 @@ import IconButton from './components/IconButton.vue'
 import ThemePicker from '@/components/ThemePicker.vue'
 import { useAuth } from '@/composables/auth'
 import { MonitorRepository } from '@/repos/monitor-repo'
+import { ApiKeyRepository } from './repos/api-key-repo'
 
 import { ref, provide } from 'vue'
 
@@ -131,5 +132,9 @@ console.log('User: ', user)
 provide('$getMonitorRepo', async () => {
   await isReady()
   return new MonitorRepository(() => getToken() || '')
+})
+provide('$getApiKeyRepo', async () => {
+  await isReady()
+  return new ApiKeyRepository(() => getToken() || '')
 })
 </script>
