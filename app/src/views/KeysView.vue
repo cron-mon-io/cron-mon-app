@@ -22,7 +22,7 @@
           Generate New Key
           <v-tooltip activator="parent" location="top">Click to generate a new API key</v-tooltip>
         </v-btn>
-        <v-table height="300px" style="width: 100%" fixed-header>
+        <v-table height="400px" style="width: 100%" fixed-header>
           <thead>
             <tr>
               <th class="text-left" style="width: 30%">API KEY</th>
@@ -43,9 +43,22 @@
                   >{{ key.masked }}</v-chip
                 >
               </td>
-              <td class="py-4">{{ formatLastUsed(key.created) }}</td>
+              <td class="py-4">
+                <div>
+                  {{ formatLastUsed(key.created) }}
+                  <v-tooltip activator="parent" location="top">
+                    {{ key.created }}
+                  </v-tooltip>
+                </div>
+              </td>
               <td v-if="key.last_used" class="py-4">
-                {{ formatLastUsed(key.last_used.time) }} by
+                <div>
+                  {{ formatLastUsed(key.last_used.time) }}
+                  <v-tooltip activator="parent" location="top">
+                    {{ key.last_used.time }}
+                  </v-tooltip>
+                </div>
+                by
                 <router-link
                   :to="{ name: 'monitor', params: { id: key.last_used.monitor_id } }"
                   target="_blank"
