@@ -4,6 +4,7 @@
     width="auto"
     :attach="attach"
     @keyup.esc="abort"
+    @after-leave="abort"
     @keyup.enter="confirm"
   >
     <v-card max-width="500">
