@@ -73,6 +73,11 @@
         </v-table>
       </v-card-text>
     </v-card>
+    <GenerateApiKeyDialog
+      :dialogActive="openGenerateKeyDialog"
+      @dialog-aborted="generateDialogComplete"
+      @dialog-complete="generateDialogComplete"
+    />
     <ConfirmationDialog
       :dialogActive="keyToRevoke !== null"
       title="Revoke this API Key?"
@@ -91,6 +96,7 @@ import ApiAlert from '@/components/ApiAlert.vue'
 import type { ApiKeyRepoInterface } from '@/repos/api-key-repo'
 import type { ApiKey } from '@/types/api-key'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import GenerateApiKeyDialog from '@/components/GenerateApiKeyDialog.vue'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
@@ -108,10 +114,11 @@ const loading = ref(true)
 const syncError = ref<string | null>(null)
 const revokeError = ref<string | null>(null)
 const apiKeys = ref<ApiKey[]>([])
+const openGenerateKeyDialog = ref(false)
 const keyToRevoke = ref<ApiKey | null>(null)
 
 function generateKey() {
-  alert('Not implemented yet!')
+  openGenerateKeyDialog.value = true
 }
 
 function openRevokeKeyDialog(key: ApiKey) {
@@ -128,13 +135,20 @@ async function revokeDialogComplete(confirmed: boolean) {
     try {
       await apiKeyRepo.revokeKey(keyToRevoke.value as ApiKey)
       // If we've successfully revoked the key, we can remove it from the list.
-      apiKeys.value = apiKeys.value.filter((key) => key.api_key_id !== keyToRevoke.value?.api_key_id)
+      apiKeys.value = apiKeys.value.filter(
+        (key) => key.api_key_id !== keyToRevoke.value?.api_key_id
+      )
     } catch (e: unknown) {
       revokeError.value = (e as Error).message
     }
   }
 
   closeRevokeDialog()
+}
+
+async function generateDialogComplete() {
+  openGenerateKeyDialog.value = false
+  await getApiKeys()
 }
 
 function formatLastUsed(lastUsed: string): string {
