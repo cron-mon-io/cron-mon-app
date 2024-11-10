@@ -34,7 +34,9 @@ function setupMockAuth(mockGetToken: Mock): void {
   })
 }
 
-async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
+async function mountApp(
+  noTeleport: boolean = false
+): Promise<{ wrapper: VueWrapper; router: Router }> {
   const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
@@ -50,7 +52,8 @@ async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
       provide: {
         $localStorage: new FakeLocalStorage(),
         $clipboard: new FakeClipboard(),
-        $cookies: fakeCookies
+        $cookies: fakeCookies,
+        noTeleport: noTeleport
       },
       mocks: {
         $cookies: fakeCookies
@@ -288,5 +291,53 @@ describe('Interacting with API Keys', async () => {
     )
 
     vi.useRealTimers()
+  })
+
+  it('generates a new API key as expected', async () => {
+    global.ResizeObserver = require('resize-observer-polyfill')
+    const { wrapper, router } = await mountApp(true)
+
+    // Navigate to the API keys page.
+    await router.push('/monitoring/keys')
+    await flushPromises()
+
+    // Click the 'Generate API Key' button.
+    await wrapper.find('.v-main').find('.v-card').find('.v-btn').trigger('click')
+    await flushPromises()
+
+    // The dialog should be open.
+    const dialog = wrapper.find('.v-dialog')
+    expect(dialog.exists()).toBeTruthy()
+
+    // Set a name for the key then click the 'Generate Key' button.
+    const textField = dialog.find('.v-text-field').find('input')
+    await textField.setValue('Test Key')
+    const generateButton = dialog.findAll('.v-btn')[1]
+    expect(generateButton.text()).toBe('Generate Key')
+    await generateButton.trigger('click')
+    await flushPromises()
+
+    // The dialog should now show the generated key.
+    const key = dialog.find('.v-card-text').findAll('.v-chip')[1]
+    expect(key.text()).toBe('yeK tseT')
+
+    // Click the 'Done' button to close the dialog.
+    const doneButton = dialog.find('.v-btn')
+    expect(doneButton.text()).toBe('Done')
+    await doneButton.trigger('click')
+    await flushPromises()
+
+    // We should now have 3 keys in the list; 'Test Key 1', 'Test Key 2' and 'Test Key'.
+    const keyRows = wrapper
+      .find('.v-main')
+      .find('.v-card')
+      .find('.v-table')
+      .find('tbody')
+      .findAll('tr')
+    expect(keyRows.map((key) => key.find('td').find('div').text())).toEqual([
+      'Test Key 1',
+      'Test Key 2',
+      'Test Key'
+    ])
   })
 })
