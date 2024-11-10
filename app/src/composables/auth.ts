@@ -17,7 +17,6 @@ export interface Auth {
   isReady: () => Promise<void>
 }
 
-// TODO: Write tests for this.
 export function useAuth(protectedRoutes: string[]): Auth {
   const keycloak = new Keycloak({
     url: 'http://127.0.0.1:8080',
