@@ -186,7 +186,7 @@ describe('Interacting with Monitors', async () => {
     server.listen({ onUnhandledRequest: 'error' })
     mocks.useAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { name: 'Test User' },
+      user: { firstName: 'Test User' },
       openAccountManagement: vi.fn(),
       logout: vi.fn(() => Promise.resolve),
       getToken: mockGetToken,
@@ -203,8 +203,6 @@ describe('Interacting with Monitors', async () => {
   // Reset handlers after each test `important for test isolation`
   afterEach(() => server.resetHandlers())
 
-  // TODO Check we have user in top bar.
-
   it('navigates to specific monitors as expected', async () => {
     const { wrapper, router } = await mountApp()
 
@@ -212,6 +210,9 @@ describe('Interacting with Monitors', async () => {
     await router.push('/monitoring/monitors')
     await flushPromises()
 
+    // Some auth assertions: ensure the toolbar displays the user's name and that we've called our getToken function.
+    const toolbar = wrapper.find('.v-toolbar')
+    expect(toolbar.text()).toBe('Hello, Test User')
     expect(mockGetToken).toHaveBeenCalledOnce()
 
     const firstMonitor = wrapper.find('.v-main').findAll('.v-card')[0]
