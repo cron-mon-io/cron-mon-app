@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, vi, it, expect } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, vi, it, expect, type Mock } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -12,6 +12,27 @@ import { FakeLocalStorage } from '@/utils/testing/fake-localstorage'
 import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 import { FakeClipboard } from '@/utils/testing/fake-clipboard'
 import { setupTestAPI } from '@/utils/testing/test-api'
+
+const mocks = vi.hoisted(() => {
+  return {
+    useAuth: vi.fn()
+  }
+})
+
+vi.mock('@/composables/auth', () => ({
+  useAuth: mocks.useAuth
+}))
+
+function setupMockAuth(mockGetToken: Mock): void {
+  mocks.useAuth.mockReturnValue({
+    isAuthenticated: true,
+    user: { firstName: 'Test User' },
+    openAccountManagement: vi.fn(),
+    logout: vi.fn(() => Promise.resolve),
+    getToken: mockGetToken,
+    isReady: vi.fn(() => Promise.resolve)
+  })
+}
 
 async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
   const vuetify = createVuetify({ components, directives })
@@ -45,16 +66,6 @@ async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
   await flushPromises()
   return { wrapper, router }
 }
-
-const mocks = vi.hoisted(() => {
-  return {
-    useAuth: vi.fn()
-  }
-})
-
-vi.mock('@/composables/auth', () => ({
-  useAuth: mocks.useAuth
-}))
 
 describe('The App', () => {
   beforeAll(() => {
@@ -184,14 +195,7 @@ describe('Interacting with Monitors', async () => {
   // Start server before all tests
   beforeAll(() => {
     server.listen({ onUnhandledRequest: 'error' })
-    mocks.useAuth.mockReturnValue({
-      isAuthenticated: true,
-      user: { firstName: 'Test User' },
-      openAccountManagement: vi.fn(),
-      logout: vi.fn(() => Promise.resolve),
-      getToken: mockGetToken,
-      isReady: vi.fn(() => Promise.resolve)
-    })
+    setupMockAuth(mockGetToken)
   })
 
   // Close server after all tests
