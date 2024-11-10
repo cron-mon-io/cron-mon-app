@@ -230,3 +230,63 @@ describe('Interacting with Monitors', async () => {
     expect(firstChip.text()).toBe('Monitor ID: cfe88463-5c04-4b43-b10f-1f508963cc5d')
   })
 })
+
+describe('Interacting with API Keys', async () => {
+  global.ResizeObserver = require('resize-observer-polyfill')
+  const server = setupTestAPI('foo-token')
+
+  const mockGetToken = vi.fn(() => 'foo-token')
+
+  // Start server before all tests
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: 'error' })
+    setupMockAuth(mockGetToken)
+  })
+
+  // Close server after all tests
+  afterAll(() => {
+    server.close()
+    mocks.useAuth.mockRestore()
+  })
+
+  // Reset handlers after each test `important for test isolation`
+  afterEach(() => server.resetHandlers())
+
+  it('navigates to specific API keys as expected', async () => {
+    vi.useFakeTimers({ now: new Date('2024-09-15T12:00:00') })
+    const { wrapper, router } = await mountApp()
+
+    // Navigate to the API keys page.
+    await router.push('/monitoring/keys')
+    await flushPromises()
+
+    // We should have 2 keys in the list; 'Test Key 1' and 'Test Key 2'.
+    const keyRows = wrapper
+      .find('.v-main')
+      .find('.v-card')
+      .find('.v-table')
+      .find('tbody')
+      .findAll('tr')
+    expect(keyRows.map((key) => key.find('td').find('div').text())).toEqual([
+      'Test Key 1',
+      'Test Key 2'
+    ])
+
+    // One of the keys should have been used by a monitor.
+    expect(keyRows.map((key) => key.findAll('td')[2].text())).toEqual([
+      '6 months ago  by analyse-bar.py',
+      'Never used'
+    ])
+
+    // The key that's been used should contain a link to the monitor.
+    const lastAccessColumn = keyRows[0].findAll('td')[2]
+    const monitorLink = lastAccessColumn.find('a')
+    expect(monitorLink).toBeDefined()
+    expect(monitorLink.text()).toBe('analyse-bar.py')
+    expect(monitorLink.attributes('href')).toBe(
+      '/monitoring/monitors/e534a01a-4efe-4b8e-9b04-44a3c76b0462'
+    )
+
+    vi.useRealTimers()
+  })
+})
