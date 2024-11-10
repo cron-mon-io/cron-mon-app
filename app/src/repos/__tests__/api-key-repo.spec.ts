@@ -31,7 +31,7 @@ describe('MonitorApiKeyRepositoryRepository', () => {
         last_used: {
           time: '2024-03-31T12:35:00',
           monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
-          name: 'analyse-bar.py'
+          monitor_name: 'analyse-bar.py'
         }
       },
       {

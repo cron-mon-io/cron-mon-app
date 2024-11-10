@@ -114,7 +114,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
       last_used: {
         time: '2024-03-31T12:35:00',
         monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
-        name: 'analyse-bar.py'
+        monitor_name: 'analyse-bar.py'
       }
     },
     {
@@ -131,15 +131,15 @@ export function setupTestAPI(expectedToken: string): SetupServer {
     return token === `Bearer ${expectedToken}`
       ? undefined
       : HttpResponse.json(
-        {
-          error: {
-            code: 401,
-            reason: 'Unauthorized',
-            description: 'The request requires user authentication.'
-          }
-        },
-        { status: 401 }
-      )
+          {
+            error: {
+              code: 401,
+              reason: 'Unauthorized',
+              description: 'The request requires user authentication.'
+            }
+          },
+          { status: 401 }
+        )
   }
 
   return setupServer(
