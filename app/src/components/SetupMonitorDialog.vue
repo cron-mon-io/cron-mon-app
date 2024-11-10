@@ -4,6 +4,7 @@
     :attach="attach"
     width="auto"
     @keyup.esc="exit"
+    @after-leave="exit"
     @keyup.enter="saveAndExit"
   >
     <v-card min-width="500">

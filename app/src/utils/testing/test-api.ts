@@ -105,6 +105,27 @@ export function setupTestAPI(expectedToken: string): SetupServer {
     }
   ]
 
+  let apiKeys = [
+    {
+      api_key_id: 'f4b3b3b4-0b3b-4b3b-8b3b-2b3b3b3b3b3b',
+      name: 'Test Key 1',
+      masked: 'test************key1',
+      created: '2024-03-31T12:35:00',
+      last_used: {
+        time: '2024-03-31T12:35:00',
+        monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
+        monitor_name: 'analyse-bar.py'
+      }
+    },
+    {
+      api_key_id: 'f47f4cfc-92b0-4987-bf53-883ea8c6851b',
+      name: 'Test Key 2',
+      masked: 'test************key2',
+      created: '2024-03-30T10:30:00',
+      last_used: null
+    }
+  ]
+
   function assertAuth(request: StrictRequest<JsonBodyType>): HttpResponse | void {
     const token = request.headers.get('Authorization')
     return token === `Bearer ${expectedToken}`
@@ -267,6 +288,66 @@ export function setupTestAPI(expectedToken: string): SetupServer {
         }
 
         monitors = monitors.filter((m) => m.monitor_id !== monitorId)
+
+        return new HttpResponse(null, { status: 200 })
+      }),
+      http.get('http://127.0.0.1:8000/api/v1/keys', ({ request }) => {
+        return (
+          assertAuth(request) ||
+          HttpResponse.json({
+            data: apiKeys,
+            paging: { total: apiKeys.length }
+          })
+        )
+      }),
+
+      http.post('http://127.0.0.1:8000/api/v1/keys', async ({ request }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
+        const body = (await request.json()) as { name: string }
+        const name = body.name
+        const key = name.split('').reverse().join('')
+        const apiKey = {
+          api_key_id: uuidv4(),
+          name: name,
+          masked: `${key.slice(0, 4)}************${key.slice(-4)}`,
+          created: new Date().toISOString(),
+          last_used: null
+        }
+        apiKeys.push(apiKey)
+
+        return HttpResponse.json({
+          data: {
+            key
+          }
+        })
+      }),
+      http.delete('http://127.0.0.1:8000/api/v1/keys/:keyId', ({ request, params }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
+        const { keyId } = params
+        const apiKey = apiKeys.find((key) => key.api_key_id === keyId)
+
+        if (!apiKey) {
+          return HttpResponse.json(
+            {
+              error: {
+                code: 404,
+                reason: 'Not Found',
+                description: 'The requested resource could not be found.'
+              }
+            },
+            { status: 404 }
+          )
+        }
+
+        apiKeys = apiKeys.filter((key) => key.api_key_id !== keyId)
 
         return new HttpResponse(null, { status: 200 })
       })

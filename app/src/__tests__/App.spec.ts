@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, vi, it, expect } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, vi, it, expect, type Mock } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -13,7 +13,30 @@ import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 import { FakeClipboard } from '@/utils/testing/fake-clipboard'
 import { setupTestAPI } from '@/utils/testing/test-api'
 
-async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
+const mocks = vi.hoisted(() => {
+  return {
+    useAuth: vi.fn()
+  }
+})
+
+vi.mock('@/composables/auth', () => ({
+  useAuth: mocks.useAuth
+}))
+
+function setupMockAuth(mockGetToken: Mock): void {
+  mocks.useAuth.mockReturnValue({
+    isAuthenticated: true,
+    user: { firstName: 'Test User' },
+    openAccountManagement: vi.fn(),
+    logout: vi.fn(() => Promise.resolve),
+    getToken: mockGetToken,
+    isReady: vi.fn(() => Promise.resolve)
+  })
+}
+
+async function mountApp(
+  noTeleport: boolean = false
+): Promise<{ wrapper: VueWrapper; router: Router }> {
   const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
@@ -29,7 +52,8 @@ async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
       provide: {
         $localStorage: new FakeLocalStorage(),
         $clipboard: new FakeClipboard(),
-        $cookies: fakeCookies
+        $cookies: fakeCookies,
+        noTeleport: noTeleport
       },
       mocks: {
         $cookies: fakeCookies
@@ -45,16 +69,6 @@ async function mountApp(): Promise<{ wrapper: VueWrapper; router: Router }> {
   await flushPromises()
   return { wrapper, router }
 }
-
-const mocks = vi.hoisted(() => {
-  return {
-    useAuth: vi.fn()
-  }
-})
-
-vi.mock('@/composables/auth', () => ({
-  useAuth: mocks.useAuth
-}))
 
 describe('The App', () => {
   beforeAll(() => {
@@ -75,13 +89,15 @@ describe('The App', () => {
   it('renders home page as expected', async () => {
     const { wrapper } = await mountApp()
 
-    // We should have a navigation drawer (1st item should be the CronMon logo, followed by 7 items)
+    // We should have a navigation drawer (1st item should be the CronMon logo, followed by 9 items)
     const navDrawerItems = wrapper.find('.v-navigation-drawer').findAll('.v-list-item')
-    expect(navDrawerItems).toHaveLength(8)
+    expect(navDrawerItems).toHaveLength(10)
     expect(navDrawerItems[0].find('img').attributes('src')).toBe('/src/assets/logo.svg')
-    expect(navDrawerItems.slice(1, 8).map((item) => item.text())).toEqual([
+    expect(navDrawerItems.slice(1, 10).map((item) => item.text())).toEqual([
       'Home',
+      'Monitoring',
       'Monitors',
+      'API Keys',
       'Docs',
       'Setup',
       'Integration',
@@ -128,7 +144,7 @@ describe('The App', () => {
 
     // The navigation drawer should now have a smaller logo but the same number of items.
     const navDrawerItems = navDrawer.findAll('.v-list-item')
-    expect(navDrawerItems).toHaveLength(8)
+    expect(navDrawerItems).toHaveLength(10)
     expect(navDrawerItems[0].find('img').attributes('src')).toBe('/src/assets/icon.svg')
   })
 
@@ -182,14 +198,7 @@ describe('Interacting with Monitors', async () => {
   // Start server before all tests
   beforeAll(() => {
     server.listen({ onUnhandledRequest: 'error' })
-    mocks.useAuth.mockReturnValue({
-      isAuthenticated: true,
-      user: { name: 'Test User' },
-      openAccountManagement: vi.fn(),
-      logout: vi.fn(() => Promise.resolve),
-      getToken: mockGetToken,
-      isReady: vi.fn(() => Promise.resolve)
-    })
+    setupMockAuth(mockGetToken)
   })
 
   // Close server after all tests
@@ -201,25 +210,134 @@ describe('Interacting with Monitors', async () => {
   // Reset handlers after each test `important for test isolation`
   afterEach(() => server.resetHandlers())
 
-  // TODO Check we have user in top bar.
-
   it('navigates to specific monitors as expected', async () => {
     const { wrapper, router } = await mountApp()
 
     // Navigate to the monitors page.
-    await router.push('/monitors')
+    await router.push('/monitoring/monitors')
     await flushPromises()
 
+    // Some auth assertions: ensure the toolbar displays the user's name and that we've called our getToken function.
+    const toolbar = wrapper.find('.v-toolbar')
+    expect(toolbar.text()).toBe('Hello, Test User')
     expect(mockGetToken).toHaveBeenCalledOnce()
 
     const firstMonitor = wrapper.find('.v-main').findAll('.v-card')[0]
     expect(firstMonitor.find('.v-card-title').text()).toBe('foo-backup.sh')
 
     // Navigate to the first monitor in the list.
-    await router.push('/monitors/cfe88463-5c04-4b43-b10f-1f508963cc5d')
+    await router.push('/monitoring/monitors/cfe88463-5c04-4b43-b10f-1f508963cc5d')
     await flushPromises()
 
     const firstChip = wrapper.find('.v-main').findAll('.v-chip')[0]
     expect(firstChip.text()).toBe('Monitor ID: cfe88463-5c04-4b43-b10f-1f508963cc5d')
+  })
+})
+
+describe('Interacting with API Keys', async () => {
+  global.ResizeObserver = require('resize-observer-polyfill')
+  const server = setupTestAPI('foo-token')
+
+  const mockGetToken = vi.fn(() => 'foo-token')
+
+  // Start server before all tests
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: 'error' })
+    setupMockAuth(mockGetToken)
+  })
+
+  // Close server after all tests
+  afterAll(() => {
+    server.close()
+    mocks.useAuth.mockRestore()
+  })
+
+  // Reset handlers after each test `important for test isolation`
+  afterEach(() => server.resetHandlers())
+
+  it('navigates to specific API keys as expected', async () => {
+    vi.useFakeTimers({ now: new Date('2024-09-15T12:00:00') })
+    const { wrapper, router } = await mountApp()
+
+    // Navigate to the API keys page.
+    await router.push('/monitoring/keys')
+    await flushPromises()
+
+    // We should have 2 keys in the list; 'Test Key 1' and 'Test Key 2'.
+    const keyRows = wrapper
+      .find('.v-main')
+      .find('.v-card')
+      .find('.v-table')
+      .find('tbody')
+      .findAll('tr')
+    expect(keyRows.map((key) => key.find('td').find('div').text())).toEqual([
+      'Test Key 1',
+      'Test Key 2'
+    ])
+
+    // One of the keys should have been used by a monitor.
+    expect(keyRows.map((key) => key.findAll('td')[2].text())).toEqual([
+      '6 months ago  by analyse-bar.py',
+      'Never used'
+    ])
+
+    // The key that's been used should contain a link to the monitor.
+    const lastAccessColumn = keyRows[0].findAll('td')[2]
+    const monitorLink = lastAccessColumn.find('a')
+    expect(monitorLink).toBeDefined()
+    expect(monitorLink.text()).toBe('analyse-bar.py')
+    expect(monitorLink.attributes('href')).toBe(
+      '/monitoring/monitors/e534a01a-4efe-4b8e-9b04-44a3c76b0462'
+    )
+
+    vi.useRealTimers()
+  })
+
+  it('generates a new API key as expected', async () => {
+    global.ResizeObserver = require('resize-observer-polyfill')
+    const { wrapper, router } = await mountApp(true)
+
+    // Navigate to the API keys page.
+    await router.push('/monitoring/keys')
+    await flushPromises()
+
+    // Click the 'Generate API Key' button.
+    await wrapper.find('.v-main').find('.v-card').find('.v-btn').trigger('click')
+    await flushPromises()
+
+    // The dialog should be open.
+    const dialog = wrapper.find('.v-dialog')
+    expect(dialog.exists()).toBeTruthy()
+
+    // Set a name for the key then click the 'Generate Key' button.
+    const textField = dialog.find('.v-text-field').find('input')
+    await textField.setValue('Test Key')
+    const generateButton = dialog.findAll('.v-btn')[1]
+    expect(generateButton.text()).toBe('Generate Key')
+    await generateButton.trigger('click')
+    await flushPromises()
+
+    // The dialog should now show the generated key.
+    const key = dialog.find('.v-card-text').findAll('.v-chip')[1]
+    expect(key.text()).toBe('yeK tseT')
+
+    // Click the 'Done' button to close the dialog.
+    const doneButton = dialog.find('.v-btn')
+    expect(doneButton.text()).toBe('Done')
+    await doneButton.trigger('click')
+    await flushPromises()
+
+    // We should now have 3 keys in the list; 'Test Key 1', 'Test Key 2' and 'Test Key'.
+    const keyRows = wrapper
+      .find('.v-main')
+      .find('.v-card')
+      .find('.v-table')
+      .find('tbody')
+      .findAll('tr')
+    expect(keyRows.map((key) => key.find('td').find('div').text())).toEqual([
+      'Test Key 1',
+      'Test Key 2',
+      'Test Key'
+    ])
   })
 })

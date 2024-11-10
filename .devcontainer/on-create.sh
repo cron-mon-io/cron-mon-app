@@ -14,4 +14,4 @@ echo 'eval "$(starship init bash)"' >> ~/.bashrc
 echo 'export EDITOR="code "' >> ~/.bashrc
 
 # Start shells in the app/ directory
-echo 'cd /workspace/cron-mon-app/app' >> ~/.bashrc
+echo 'cd /workspaces/cron-mon-app/app' >> ~/.bashrc
