@@ -59,12 +59,9 @@
                   </v-tooltip>
                 </div>
                 by
-                <router-link
-                  :to="{ name: 'monitor', params: { id: key.last_used.monitor_id } }"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  >{{ key.last_used.monitor_name }}</router-link
-                >
+                <router-link :to="{ name: 'monitor', params: { id: key.last_used.monitor_id } }">{{
+                  key.last_used.monitor_name
+                }}</router-link>
               </td>
               <td v-else class="py-4 text-disabled">Never used</td>
               <td><v-btn icon="mdi-key-remove" @click="openRevokeKeyDialog(key)"></v-btn></td>
