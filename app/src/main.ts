@@ -1,6 +1,7 @@
 import '@mdi/font/css/materialdesignicons.css'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'highlight.js/lib/common'
+import '@scalar/api-reference/style.css'
 
 import { createApp, type App as VueApp } from 'vue'
 import VueCookies from 'vue-cookies'
