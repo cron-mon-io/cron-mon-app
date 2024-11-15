@@ -1,11 +1,16 @@
 <template>
-  <ApiReference :configuration="ScalarConfig" />
+  <div v-if="!scalarConfig.spec.content" class="d-flex justify-center mt-10">
+    <v-progress-circular indeterminate size="85" width="6"></v-progress-circular>
+  </div>
+  <div v-else>
+    <ApiReference :configuration="scalarConfig" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const ScalarConfig = ref({
+const scalarConfig = ref({
   isEditable: false,
   hideModels: true,
   spec: {
@@ -35,6 +40,6 @@ onMounted(async () => {
   // This is a bit of an ugly workaround to allow Scalar to hit the API, since it's
   // running on a different domain.
   // TODO: Figure out how to handle this for local dev and in real deployments.
-  ScalarConfig.value.spec.content = openApiSpec + 'servers:\n  - url: http://127.0.0.1:8000'
+  scalarConfig.value.spec.content = openApiSpec + 'servers:\n  - url: http://127.0.0.1:8000'
 })
 </script>
