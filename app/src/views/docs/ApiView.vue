@@ -1,21 +1,26 @@
 <template>
-  <ApiReference :configuration="ScalarConfig" />
+  <div>
+    <ApiReference :configuration="scalarConfig" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const openApiSpec = await (await fetch('http://127.0.0.1:8000/api/v1/docs/openapi.yaml')).text()
-
-const ScalarConfig = ref({
+// TODO: Figure out how to handle this for local dev and in real deployments.
+const API_URL = 'http://127.0.0.1:8000'
+const scalarConfig = ref({
   isEditable: false,
   hideModels: true,
   spec: {
-    // This is a bit of an ugly workaround to allow Scalar to hit the API, since it's
-    // running on a different domain.
-    // TODO: Figure out how to handle this for local dev and in real deployments.
-    content: openApiSpec + 'servers:\n  - url: http://127.0.0.1:8000'
+    url: `${API_URL}/api/v1/docs/openapi.yaml`
   },
+  servers: [
+    {
+      url: API_URL,
+      description: 'Cron Mon API server'
+    }
+  ],
   // Limit the clients shown for the time being, just to make the page look a bit cleaner.
   hiddenClients: {
     c: ['libcurl'],
