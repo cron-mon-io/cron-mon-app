@@ -1,4 +1,4 @@
-install: build-containers npm-install
+install: build-containers
 
 build-containers:
 	docker compose build --no-cache
@@ -10,7 +10,7 @@ build-app:
 	docker compose run --rm --no-deps app bash -c  'npm run build'
 
 run:
-	docker compose up app
+	docker compose up caddy
 
 test: static-test unit-test
 

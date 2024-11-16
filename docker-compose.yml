@@ -1,10 +1,25 @@
 services:
 
-  app:
+  caddy:
+    image: public.ecr.aws/docker/library/caddy:2.9
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./app/Caddyfile:/etc/caddy/Caddyfile
+      - ./app/dist:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - dev
+
+  dev:
     build:
       dockerfile: ./Dockerfile
       context: .
-    container_name: cron-mon-app
+      target: builder
+    container_name: cron-mon-app-npm
     stdin_open: true
     tty: true
     volumes:
@@ -20,3 +35,7 @@ networks:
   cron-mon-network:
     driver: bridge
     name: cron-mon-network
+
+volumes:
+  caddy_data:
+  caddy_config:
