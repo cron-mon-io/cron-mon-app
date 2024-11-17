@@ -1,5 +1,13 @@
-localhost
+:3000 {
+	encode gzip zstd
 
-tls internal
-root * /srv
-file_server
+	handle_path /api/* {
+		reverse_proxy ${API_HOST}
+	}
+
+	handle {
+		root * /srv
+		try_files {path}.html {path} /index.html
+		file_server
+	}
+}

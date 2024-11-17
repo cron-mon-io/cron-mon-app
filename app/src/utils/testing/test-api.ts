@@ -144,13 +144,13 @@ export function setupTestAPI(expectedToken: string): SetupServer {
 
   return setupServer(
     ...[
-      http.get('http://127.0.0.1:8000/api/v1/docs/openapi.yaml', () => {
+      http.get('/api/v1/docs/openapi.yaml', () => {
         return new HttpResponse('openapi: 3.0.0', {
           status: 201,
           headers: { 'Content-Type': 'application/yaml' }
         })
       }),
-      http.get('http://127.0.0.1:8000/api/v1/monitors', ({ request }) => {
+      http.get('/api/v1/monitors', ({ request }) => {
         return (
           assertAuth(request) ||
           HttpResponse.json({
@@ -168,7 +168,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
           })
         )
       }),
-      http.get('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ request, params }) => {
+      http.get('/api/v1/monitors/:monitorId', ({ request, params }) => {
         const authErroResponse = assertAuth(request)
         if (authErroResponse) {
           return authErroResponse
@@ -200,7 +200,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
           }
         })
       }),
-      http.post('http://127.0.0.1:8000/api/v1/monitors', async ({ request }) => {
+      http.post('/api/v1/monitors', async ({ request }) => {
         const authErroResponse = assertAuth(request)
         if (authErroResponse) {
           return authErroResponse
@@ -228,44 +228,41 @@ export function setupTestAPI(expectedToken: string): SetupServer {
           }
         })
       }),
-      http.patch(
-        'http://127.0.0.1:8000/api/v1/monitors/:monitorId',
-        async ({ params, request }) => {
-          const authErroResponse = assertAuth(request)
-          if (authErroResponse) {
-            return authErroResponse
-          }
-
-          const { monitorId } = params
-          const monitor = monitors.find((m) => m.monitor_id === monitorId)
-
-          if (!monitor) {
-            return HttpResponse.json(
-              {
-                error: {
-                  code: 404,
-                  reason: 'Not Found',
-                  description: 'The requested resource could not be found.'
-                }
-              },
-              { status: 404 }
-            )
-          }
-
-          const body = (await request.json()) as MonitorSummary
-
-          return HttpResponse.json({
-            data: {
-              monitor_id: monitor.monitor_id,
-              name: body.name,
-              expected_duration: body.expected_duration,
-              grace_duration: body.grace_duration,
-              jobs: monitor.jobs
-            }
-          })
+      http.patch('/api/v1/monitors/:monitorId', async ({ params, request }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
         }
-      ),
-      http.delete('http://127.0.0.1:8000/api/v1/monitors/:monitorId', ({ request, params }) => {
+
+        const { monitorId } = params
+        const monitor = monitors.find((m) => m.monitor_id === monitorId)
+
+        if (!monitor) {
+          return HttpResponse.json(
+            {
+              error: {
+                code: 404,
+                reason: 'Not Found',
+                description: 'The requested resource could not be found.'
+              }
+            },
+            { status: 404 }
+          )
+        }
+
+        const body = (await request.json()) as MonitorSummary
+
+        return HttpResponse.json({
+          data: {
+            monitor_id: monitor.monitor_id,
+            name: body.name,
+            expected_duration: body.expected_duration,
+            grace_duration: body.grace_duration,
+            jobs: monitor.jobs
+          }
+        })
+      }),
+      http.delete('/api/v1/monitors/:monitorId', ({ request, params }) => {
         const authErroResponse = assertAuth(request)
         if (authErroResponse) {
           return authErroResponse
@@ -291,7 +288,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
 
         return new HttpResponse(null, { status: 200 })
       }),
-      http.get('http://127.0.0.1:8000/api/v1/keys', ({ request }) => {
+      http.get('/api/v1/keys', ({ request }) => {
         return (
           assertAuth(request) ||
           HttpResponse.json({
@@ -301,7 +298,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
         )
       }),
 
-      http.post('http://127.0.0.1:8000/api/v1/keys', async ({ request }) => {
+      http.post('/api/v1/keys', async ({ request }) => {
         const authErroResponse = assertAuth(request)
         if (authErroResponse) {
           return authErroResponse
@@ -325,7 +322,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
           }
         })
       }),
-      http.delete('http://127.0.0.1:8000/api/v1/keys/:keyId', ({ request, params }) => {
+      http.delete('/api/v1/keys/:keyId', ({ request, params }) => {
         const authErroResponse = assertAuth(request)
         if (authErroResponse) {
           return authErroResponse

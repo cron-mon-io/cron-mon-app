@@ -11,6 +11,8 @@ services:
       - ./app/dist:/srv
       - caddy_data:/data
       - caddy_config:/config
+    environment:
+      API_HOST: http://127.0.0.1:8000
     depends_on:
       - dev
 

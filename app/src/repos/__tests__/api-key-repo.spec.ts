@@ -46,7 +46,7 @@ describe('MonitorApiKeyRepositoryRepository', () => {
 
   it("getKeys() when there aren't any API keys", async () => {
     server.use(
-      http.get('http://127.0.0.1:8000/api/v1/keys', () => {
+      http.get('/api/v1/keys', () => {
         return HttpResponse.json({
           data: [],
           paging: { total: 0 }
