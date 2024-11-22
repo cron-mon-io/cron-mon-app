@@ -1,7 +1,7 @@
 #! /usr/bin/bash
 
 # Need bash-completion for bash completion, curl to download startship.rs, and ssh for Git.
-apt-get update && apt-get install -y bash-completion curl ssh
+apt-get update && apt-get install -y bash-completion caddy curl ssh
 
 # Setup bash completion
 echo "source /etc/bash_completion" >> ~/.bashrc
