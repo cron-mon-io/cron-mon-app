@@ -11,6 +11,9 @@ services:
       - caddy_config:/config
     environment:
       API_HOST: http://host.docker.internal:8000
+      KEYCLOAK_URL: http://127.0.0.1:8080
+      KEYCLOAK_REALM: cron-mon-io
+      KEYCLOAK_CLIENT_ID: cron-mon
 
   dev:
     build:
