@@ -3,18 +3,14 @@ services:
   caddy:
     image: public.ecr.aws/docker/library/caddy:2.9
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - 3000:3000
     volumes:
       - ./app/Caddyfile:/etc/caddy/Caddyfile
       - ./app/dist:/srv
       - caddy_data:/data
       - caddy_config:/config
     environment:
-      API_HOST: http://127.0.0.1:8000
-    depends_on:
-      - dev
+      API_HOST: http://host.docker.internal:8000
 
   dev:
     build:
