@@ -50,9 +50,6 @@
             <v-tabs-window-item value="python" class="text-body-1">
               <highlightjs language="python" :code="examples['python']" />
               <br />
-              <v-alert type="info" density="compact" variant="tonal">
-                The <code>cron-mon</code> Python package doesn't exist yet - but it will soon!
-              </v-alert>
             </v-tabs-window-item>
             <v-tabs-window-item value="shell" class="text-body-1">
               <highlightjs language="bash" :code="examples['shell']" />
