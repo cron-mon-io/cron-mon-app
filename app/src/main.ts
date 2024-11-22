@@ -17,6 +17,7 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
 import App from '@/App.vue'
 import router from '@/router'
+import { getAuthConfig } from './utils/config'
 
 const vuetify = createVuetify({
   components,
@@ -30,17 +31,20 @@ const vuetify = createVuetify({
   }
 })
 
-createApp(App)
-  .use(router)
-  .use(vuetify)
-  .use(VueCookies)
-  .use(hljsVuePlugin)
-  // Adhoc plugin to make the API docs view more testable.
-  .use({
-    install(app: VueApp) {
-      app.component('ApiReference', ApiReference)
-    }
-  })
-  .provide('$localStorage', localStorage)
-  .provide('$clipboard', navigator.clipboard)
-  .mount('#app')
+getAuthConfig().then((config) => {
+  createApp(App)
+    .use(router)
+    .use(vuetify)
+    .use(VueCookies)
+    .use(hljsVuePlugin)
+    // Adhoc plugin to make the API docs view more testable.
+    .use({
+      install(app: VueApp) {
+        app.component('ApiReference', ApiReference)
+      }
+    })
+    .provide('$localStorage', localStorage)
+    .provide('$clipboard', navigator.clipboard)
+    .provide('$authConfig', config)
+    .mount('#app')
+})
