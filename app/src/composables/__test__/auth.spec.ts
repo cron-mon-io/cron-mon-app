@@ -204,6 +204,16 @@ describe('useAuth composable when user not previously authenticated', () => {
       }
     )
   })
+
+  it('throws error when no auth config provided', async () => {
+    await expect(() => {
+      mount(TestComponent, {
+        props: {
+          protectedRoutes: ['/protected']
+        }
+      })
+    }).toThrowError('AuthConfig not provided')
+  })
 })
 
 describe('useAuth composable when user is previously authenticated', () => {
