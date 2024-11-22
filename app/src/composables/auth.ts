@@ -1,6 +1,8 @@
 import Keycloak from 'keycloak-js'
-import { ref, type Ref, type ComputedRef, onMounted, computed } from 'vue'
+import { ref, type Ref, type ComputedRef, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute, type RouteLocationNormalizedGeneric } from 'vue-router'
+
+import type { AuthConfig } from '@/utils/config'
 
 export interface AuthenticatedUser {
   firstName: string
@@ -18,11 +20,7 @@ export interface Auth {
 }
 
 export function useAuth(protectedRoutes: string[]): Auth {
-  const keycloak = new Keycloak({
-    url: 'http://127.0.0.1:8080',
-    realm: 'cron-mon-io',
-    clientId: 'cron-mon'
-  })
+  const keycloak = setupKeycloak()
 
   let ready = false
   const router = useRouter()
@@ -86,6 +84,19 @@ export function useAuth(protectedRoutes: string[]): Auth {
           email: keycloak.tokenParsed?.email
         }
       : null
+  }
+
+  function setupKeycloak(): Keycloak {
+    console.log('Getting authConfig...')
+    const authConfig = inject<AuthConfig>('$authConfig')
+    if (!authConfig) {
+      throw new Error('AuthConfig not provided')
+    }
+    return new Keycloak({
+      url: authConfig.url,
+      realm: authConfig.realm,
+      clientId: authConfig.client
+    })
   }
 
   return {
