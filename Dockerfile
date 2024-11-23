@@ -16,3 +16,4 @@ COPY --from=builder /usr/cron-mon/app/dist /srv
 COPY ./app/Caddyfile /etc/caddy/Caddyfile
 
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
