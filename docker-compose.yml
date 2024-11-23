@@ -6,10 +6,9 @@ services:
       context: .
     ports:
       - 3000:3000
-    volumes:
-      - ./app/Caddyfile:/etc/caddy/Caddyfile
-      - ./app/dist:/srv
-      - caddy_data:/data
+    # volumes:
+    #   - ./nginx.conv:/etc/nginx/templates/nginx.conf.template
+    #   - ./app/dist:/usr/share/nginx/html
     environment:
       API_HOST: http://host.docker.internal:8000
       KEYCLOAK_URL: http://127.0.0.1:8080
@@ -37,6 +36,3 @@ networks:
   cron-mon-network:
     driver: bridge
     name: cron-mon-network
-
-volumes:
-  caddy_data:
