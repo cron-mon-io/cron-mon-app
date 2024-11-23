@@ -1,7 +1,7 @@
 install: build-containers
 
 build-containers:
-	docker compose build --no-cache
+	docker compose build
 
 npm-install:
 	docker compose run --rm dev bash -c 'npm install'
