@@ -1,7 +1,9 @@
 services:
 
   caddy:
-    image: public.ecr.aws/docker/library/caddy:2.9
+    build:
+      dockerfile: ./Dockerfile
+      context: .
     ports:
       - 3000:3000
     volumes:
