@@ -1,22 +1,24 @@
 services:
 
   caddy:
-    build:
-      dockerfile: ./Dockerfile
-      context: .
+    extends: caddy-base
+    container_name: cron-mon-app-caddy
     ports:
       - 3000:3000
+    volumes:
+      - caddy_data:/data
+
+  caddy-dev:
+    extends: caddy-base
+    container_name: cron-mon-app-caddy-dev
+    ports:
+      - 3001:3000
     volumes:
       - ./app/Caddyfile:/etc/caddy/Caddyfile
       - ./app/dist:/srv
       - caddy_data:/data
-    environment:
-      API_HOST: http://host.docker.internal:8000
-      KEYCLOAK_URL: http://127.0.0.1:8080
-      KEYCLOAK_REALM: cron-mon-io
-      KEYCLOAK_CLIENT_ID: cron-mon
 
-  dev:
+  vue-dev:
     build:
       dockerfile: ./Dockerfile
       context: .
@@ -27,11 +29,23 @@ services:
     volumes:
       - ./app:/usr/cron-mon/app
     ports:
-      - 3000:3000
+      - 3002:3000
     command: npm run dev
     networks:
       - default
       - cron-mon-network
+
+  caddy-base:
+    image: cron-mon-app/caddy-base
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    environment:
+      API_HOST: http://host.docker.internal:8000
+      KEYCLOAK_URL: http://127.0.0.1:8080
+      KEYCLOAK_REALM: cron-mon-io
+      KEYCLOAK_CLIENT_ID: cron-mon
+
 
 networks:
   cron-mon-network:
