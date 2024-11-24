@@ -18,6 +18,9 @@ run-caddy-dev:
 run-vue-dev:
 	docker compose up vue-dev
 
+reload-caddy-dev:
+	docker compose exec caddy-dev caddy reload --config /etc/caddy/Caddyfile
+
 test: static-test unit-test
 
 unit-test:
