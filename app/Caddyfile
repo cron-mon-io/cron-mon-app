@@ -1,0 +1,48 @@
+:3000 {
+	# Access logs
+	log {
+		format filter {
+			# No need for any headers to be in any of the logs
+			# (might be useful to be able to switch these on though?)
+			request>headers delete
+			resp_headers delete
+
+			wrap json {
+				message_key message
+				time_key time
+				time_format rfc3339
+			}
+		}
+	}
+
+	encode gzip zstd
+
+	# Provide dynamic Keycloak config.
+	handle /auth-config {
+		header {
+			Content-Type application/json
+		}
+		respond 200 {
+			# Caddy docs say we can use heredocs here, but it doesn't work, and the caddy formatter
+			# doesn't like the newlines in the string, so we have to do it like this.
+			body ` {
+				"url": "{$KEYCLOAK_URL}",
+				"realm": "{$KEYCLOAK_REALM}",
+				"client": "{$KEYCLOAK_CLIENT_ID}"
+			}
+			`
+		}
+	}
+
+	# Proxy the Cron Mon API.
+	handle /api/* {
+		reverse_proxy {$API_HOST}
+	}
+
+	# Serve up the frontend application.
+	handle {
+		root * /srv
+		try_files {path}.html {path} /index.html
+		file_server
+	}
+}

@@ -2,7 +2,8 @@
   "name": "CronMon App Dev Container",
   "build": {
     "dockerfile": "../Dockerfile",
-    "context": ".."
+    "context": "..",
+    "target": "builder"
   },
   "runArgs": [
     "--name",
@@ -38,6 +39,7 @@
         "ms-azuretools.vscode-docker",
         "tamasfe.even-better-toml",
         "Vue.volar",
+        "matthewpi.caddyfile-support",
         "ms-vscode.makefile-tools",
         "tamasfe.even-better-toml"
       ]

@@ -3,8 +3,7 @@ type ApiResponse = {
 }
 
 export class ApiRepository {
-  // TODO: Put API URL in env.
-  protected readonly baseUrl = 'http://127.0.0.1:8000'
+  private readonly baseUrl = import.meta.env.VITE_API_HOST
   protected readonly getAuthToken: () => string
 
   constructor(getAuthToken: () => string) {
@@ -30,7 +29,7 @@ export class ApiRepository {
 
     let response: Response | null = null
     try {
-      response = await fetch(this.baseUrl + route, opts)
+      response = await fetch(`${this.baseUrl}${route}`, opts)
     } catch (e) {
       console.error('Failed to connect to the CronMon API:', e)
       throw new Error('Failed to connect to the CronMon API.')

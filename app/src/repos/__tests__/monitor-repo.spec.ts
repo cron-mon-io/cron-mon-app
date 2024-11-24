@@ -79,7 +79,7 @@ describe('MonitorRepository', () => {
 
   it("getMonitorInfos() when there aren't any monitors", async () => {
     server.use(
-      http.get('http://127.0.0.1:8000/api/v1/monitors', () => {
+      http.get('/api/v1/monitors', () => {
         return HttpResponse.json({
           data: [],
           paging: { total: 0 }

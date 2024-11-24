@@ -51,6 +51,23 @@ const TestComponent = defineComponent({
   }
 })
 
+function mountTestComponent(protectedRoutes: string[]) {
+  return mount(TestComponent, {
+    props: {
+      protectedRoutes
+    },
+    global: {
+      provide: {
+        $authConfig: {
+          url: 'http://keycloak',
+          realm: 'cron-mon-io',
+          client: 'cron-mon'
+        }
+      }
+    }
+  })
+}
+
 describe('useAuth composable when user not previously authenticated', () => {
   interface MockKeycloak {
     init: () => Promise<{ authenticated: boolean }>
@@ -99,11 +116,7 @@ describe('useAuth composable when user not previously authenticated', () => {
   it('does not log in user when on unprotected route', async () => {
     vi.useFakeTimers()
 
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/foo']
-      }
-    })
+    const wrapper = mountTestComponent(['/foo'])
     await flushPromises()
 
     expect(mockKeycloak.init).toHaveBeenCalled()
@@ -119,11 +132,7 @@ describe('useAuth composable when user not previously authenticated', () => {
   })
 
   it('logs in user when on protected route', async () => {
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/protected']
-      }
-    })
+    const wrapper = mountTestComponent(['/protected'])
     await flushPromises()
 
     expect(mockKeycloak.init).toHaveBeenCalled()
@@ -136,11 +145,7 @@ describe('useAuth composable when user not previously authenticated', () => {
   })
 
   it('logs in user when navigating to protected route', async () => {
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/foo']
-      }
-    })
+    const wrapper = mountTestComponent(['/foo'])
     await flushPromises()
 
     expect(mockKeycloak.init).toHaveBeenCalled()
@@ -163,11 +168,7 @@ describe('useAuth composable when user not previously authenticated', () => {
   it('handles login failure', async () => {
     mockKeycloak.login = vi.fn().mockRejectedValue(new Error('Login failed'))
 
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/protected']
-      }
-    })
+    const wrapper = mountTestComponent(['/protected'])
     await flushPromises()
 
     expect(mockKeycloak.init).toHaveBeenCalled()
@@ -176,11 +177,7 @@ describe('useAuth composable when user not previously authenticated', () => {
   })
 
   it('isReady when immediately ready', async () => {
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/protected']
-      }
-    })
+    const wrapper = mountTestComponent(['/protected'])
     await flushPromises()
 
     await wrapper.vm.isReady()
@@ -195,11 +192,7 @@ describe('useAuth composable when user not previously authenticated', () => {
       },
       async () => {
         vi.useFakeTimers()
-        const wrapper = mount(TestComponent, {
-          props: {
-            protectedRoutes: ['/protected']
-          }
-        })
+        const wrapper = mountTestComponent(['/protected'])
         await flushPromises()
 
         const prom = wrapper.vm.isReady()
@@ -210,6 +203,16 @@ describe('useAuth composable when user not previously authenticated', () => {
         vi.useRealTimers()
       }
     )
+  })
+
+  it('throws error when no auth config provided', async () => {
+    await expect(() => {
+      mount(TestComponent, {
+        props: {
+          protectedRoutes: ['/protected']
+        }
+      })
+    }).toThrowError('AuthConfig not provided')
   })
 })
 
@@ -253,11 +256,7 @@ describe('useAuth composable when user is previously authenticated', () => {
   })
 
   it('authenticates user without making them login again', async () => {
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/protected']
-      }
-    })
+    const wrapper = mountTestComponent(['/protected'])
 
     expect(wrapper.vm.user).toBeNull()
 
@@ -275,11 +274,7 @@ describe('useAuth composable when user is previously authenticated', () => {
   it('refreshes token', async () => {
     vi.useFakeTimers()
 
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/protected']
-      }
-    })
+    const wrapper = mountTestComponent(['/protected'])
     await flushPromises()
 
     const initialToken = wrapper.vm.getToken()
@@ -304,11 +299,7 @@ describe('useAuth composable when user is previously authenticated', () => {
       async () => {
         vi.useFakeTimers()
 
-        const wrapper = mount(TestComponent, {
-          props: {
-            protectedRoutes: ['/protected']
-          }
-        })
+        const wrapper = mountTestComponent(['/protected'])
         await flushPromises()
 
         const initialToken = wrapper.vm.getToken()
@@ -333,11 +324,7 @@ describe('useAuth composable when user is previously authenticated', () => {
     { protectedRoutes: ['/protected'], redirectUri: 'http://cron-mon.io' },
     { protectedRoutes: ['/foo'], redirectUri: 'http://cron-mon.io/protected' }
   ])('logs out user', async ({ protectedRoutes, redirectUri }) => {
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes
-      }
-    })
+    const wrapper = mountTestComponent(protectedRoutes)
     await flushPromises()
 
     await wrapper.vm.logout()
@@ -348,11 +335,7 @@ describe('useAuth composable when user is previously authenticated', () => {
   })
 
   it('opens account management', async () => {
-    const wrapper = mount(TestComponent, {
-      props: {
-        protectedRoutes: ['/protected']
-      }
-    })
+    const wrapper = mountTestComponent(['/protected'])
     await flushPromises()
 
     await wrapper.vm.openAccountManagement()
