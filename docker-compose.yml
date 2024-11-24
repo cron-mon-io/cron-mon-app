@@ -34,6 +34,11 @@ services:
     networks:
       - default
       - cron-mon-network
+    environment:
+      API_HOST: http://127.0.0.1:8000
+      KEYCLOAK_URL: http://127.0.0.1:8080
+      KEYCLOAK_REALM: cron-mon-io
+      KEYCLOAK_CLIENT_ID: cron-mon
 
   caddy-base:
     image: cron-mon-app/caddy-base

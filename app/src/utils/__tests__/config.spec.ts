@@ -65,3 +65,15 @@ describe('getAuthConfig', () => {
     await expect(getAuthConfig()).rejects.toThrowError('Invalid auth config')
   })
 })
+
+describe('getAuthConfig in development mode', () => {
+  it('returns the correct config', async () => {
+    import.meta.env.MODE = 'development'
+    const config = await getAuthConfig()
+    expect(config).toEqual({
+      url: 'http://keycloak',
+      realm: 'keycloak-realm',
+      client: 'keycloak-client-id'
+    })
+  })
+})

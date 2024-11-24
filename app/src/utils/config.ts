@@ -5,6 +5,15 @@ export type AuthConfig = {
 }
 
 export async function getAuthConfig(): Promise<AuthConfig> {
+  // If we running in dev mode, there won't be an /auth-config endpoint.
+  if (import.meta.env.MODE === 'development') {
+    return {
+      url: import.meta.env.VITE_KEYCLOAK_URL,
+      realm: import.meta.env.VITE_KEYCLOAK_REALM,
+      client: import.meta.env.VITE_KEYCLOAK_CLIENT_ID
+    }
+  }
+
   const response = await fetch('/auth-config')
   if (!response.ok) {
     throw new Error('Failed to fetch auth config')
