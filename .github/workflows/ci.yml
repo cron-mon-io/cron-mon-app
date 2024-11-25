@@ -42,3 +42,14 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-and-push-image:
+    name: Build and push container image to ghcr.io
+    needs: test
+    if: ${{ github.ref_name == 'main' }}
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    uses: cron-mon-io/ghcr-actions/.github/workflows/build-and-push.yml@main
