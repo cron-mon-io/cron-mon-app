@@ -14,7 +14,7 @@ services:
     ports:
       - 3001:3000
     volumes:
-      - ./app/Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - ./app/dist:/srv
       - caddy_data:/data
 
