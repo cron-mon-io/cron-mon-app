@@ -1,0 +1,19 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+# ${{ github.event.release.tag_name }} is the tag of the release
+
+jobs:
+  retag:
+    name: Retag image
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    uses: cron-mon-io/ghcr-actions/.github/workflows/retag.yml@main
+    with:
+      tag: ${{ github.event.release.tag_name }}
