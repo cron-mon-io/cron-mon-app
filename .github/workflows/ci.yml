@@ -7,13 +7,12 @@ on:
 name: CI
 
 jobs:
-  test:
-    name: Test
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./app
-    timeout-minutes: 15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -31,8 +30,48 @@ jobs:
       - name: Run lint checks
         run: npm run lint
 
+  type-check:
+    name: Type check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "app/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run type checks
         run: npm run type-check
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "app/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run unit tests
         run: npm run test:unit
@@ -45,7 +84,7 @@ jobs:
 
   build-and-push-image:
     name: Build and push container image to ghcr.io
-    needs: test
+    needs: [lint, type-check, test]
     if: ${{ github.ref_name == 'main' }}
     permissions:
       contents: read
