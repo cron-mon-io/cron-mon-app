@@ -4,10 +4,10 @@ build-containers:
 	docker compose build
 
 npm-install:
-	docker compose run --rm dev bash -c 'npm install'
+	docker compose run --rm vue-dev bash -c 'npm install'
 
 build-app:
-	docker compose run --rm --no-deps dev bash -c  'npm run build'
+	docker compose run --rm --no-deps vue-dev bash -c  'npm run build'
 
 run:
 	docker compose up caddy
