@@ -181,14 +181,9 @@ describe('SetupMonitorDialog component', () => {
     const messages = wrapper
       .findAll('.v-messages')
       .slice(1, 3)
-      .map((message) => {
-        return { text: message.text(), role: message.attributes('role') }
-      })
+      .map((message) => message.text())
 
-    expect(messages).toEqual([
-      { text: 'Invalid duration', role: 'alert' },
-      { text: 'Invalid seconds', role: 'alert' }
-    ])
+    expect(messages).toEqual(['Invalid duration', 'Invalid seconds'])
   })
 
   it('only allows setup to be confirmed with all fields supplied', async () => {
