@@ -1,6 +1,6 @@
 <template>
   <v-card variant="elevated" class="mx-6 mt-13">
-    <template v-slot:title>
+    <template #title>
       <div class="d-flex">
         <v-icon>
           <v-img :width="40" :height="40" aspect-ratio="16/9" :src="CronMonIcon"></v-img>

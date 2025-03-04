@@ -1,3 +1,4 @@
+import ResizeObserver from 'resize-observer-polyfill'
 import { afterAll, afterEach, beforeAll, describe, vi, it, expect, type Mock } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
@@ -190,7 +191,7 @@ describe('The App', () => {
 })
 
 describe('Interacting with Monitors', async () => {
-  global.ResizeObserver = require('resize-observer-polyfill')
+  global.ResizeObserver = ResizeObserver
   const server = setupTestAPI('foo-token')
 
   const mockGetToken = vi.fn(() => 'foo-token')
@@ -235,7 +236,7 @@ describe('Interacting with Monitors', async () => {
 })
 
 describe('Interacting with API Keys', async () => {
-  global.ResizeObserver = require('resize-observer-polyfill')
+  global.ResizeObserver = ResizeObserver
   const server = setupTestAPI('foo-token')
 
   const mockGetToken = vi.fn(() => 'foo-token')
@@ -294,7 +295,7 @@ describe('Interacting with API Keys', async () => {
   })
 
   it('generates a new API key as expected', async () => {
-    global.ResizeObserver = require('resize-observer-polyfill')
+    global.ResizeObserver = ResizeObserver
     const { wrapper, router } = await mountApp(true)
 
     // Navigate to the API keys page.

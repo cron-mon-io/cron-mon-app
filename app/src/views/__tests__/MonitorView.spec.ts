@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file */
 import { describe, it, expect, vi, type Mock } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent } from 'vue'
@@ -30,25 +31,29 @@ async function mountMonitorView(
   // The JobInfo component has its own tests, so we just want to stub it here so
   // we can test how we interact wit it.
   const FakeJobInfo = defineComponent({
-    template: '<div class="fake-job-info">{{ job.job_id }}</div>',
     props: {
-      job: Object
-    }
+      job: {
+        type: Object,
+        default: () => ({})
+      }
+    },
+    template: '<div class="fake-job-info">{{ job.job_id }}</div>'
   })
 
   // The SetupMonitorDialog component has its own tests, so we just want to
   // stub it here so we can test how we interact wit it.
   const FakeSetupMonitorDialog = defineComponent({
-    template: `
-      <div class="fake-setup-monitor-dialog">
-        <div v-if="dialogActive" class="content">
-          Test dialog
-          <p>{{ monitor ? monitor.monitor_id : "" }}</p>
-          <button @click="finish" />
-        </div>
-      </div>`,
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      },
+      monitor: {
+        type: Object,
+        default: () => null
+      }
+    },
     emits: ['dialog-complete'],
-    props: ['dialogActive', 'monitor'],
     methods: {
       finish() {
         this.$emit('dialog-complete', {
@@ -57,26 +62,39 @@ async function mountMonitorView(
           grace_duration: 101
         })
       }
-    }
+    },
+    template: `
+      <div class="fake-setup-monitor-dialog">
+        <div v-if="dialogActive" class="content">
+          Test dialog
+          <p>{{ monitor ? monitor.monitor_id : "" }}</p>
+          <button @click="finish" />
+        </div>
+      </div>`
   })
 
   // The ConfirmationDialog component has its own tests, so we just want to
   // stub it here so we can test how we interact wit it.
   const FakeConfirmationDialog = defineComponent({
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      }
+    },
+    emits: ['dialog-complete'],
+    methods: {
+      finish() {
+        this.$emit('dialog-complete', confirm)
+      }
+    },
     template: `
       <div class="fake-confirmation-dialog">
         <div v-if="dialogActive" class="content">
           Test dialog
           <button @click="finish" />
         </div>
-      </div>`,
-    emits: ['dialog-complete'],
-    props: ['dialogActive'],
-    methods: {
-      finish() {
-        this.$emit('dialog-complete', confirm)
-      }
-    }
+      </div>`
   })
 
   const TEST_MONITOR_DATA = {

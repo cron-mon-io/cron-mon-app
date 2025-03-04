@@ -15,11 +15,11 @@
           <ApiAlert class="mx-4 mt-4" :error="generateError" @closed="generateError = null" />
           <v-form @submit.prevent>
             <v-text-field
+              v-model="name"
               class="mt-5"
               hint="A name to help you identify this key"
               persistent-hint
               label="Name"
-              v-model="name"
               clearable
               variant="outlined"
             ></v-text-field>
@@ -29,19 +29,19 @@
           <v-spacer></v-spacer>
           <v-btn
             text="Cancel"
-            @click="abort"
             color="orange"
             variant="tonal"
             append-icon="mdi-close-circle"
+            @click="abort"
           ></v-btn>
           <v-btn
             text="Generate Key"
-            @click="generate"
             color="primary"
             variant="elevated"
             append-icon="mdi-check-circle"
             :disabled="!canGenerate"
             :loading="loading"
+            @click="generate"
           ></v-btn>
         </v-card-actions>
       </div>
@@ -63,10 +63,10 @@
             <v-chip
               append-icon="mdi-content-copy"
               color="teal-accent-4"
-              @click="copyGeneratedKey"
               class="text-body-1 font-weight-bold ma-2"
               variant="tonal"
               label
+              @click="copyGeneratedKey"
             >
               <code>{{ generatedKey }}</code>
             </v-chip>
@@ -76,10 +76,10 @@
           <v-spacer></v-spacer>
           <v-btn
             text="Done"
-            @click="finish"
             color="primary"
             variant="elevated"
             append-icon="mdi-check-circle"
+            @click="finish"
           ></v-btn>
         </v-card-actions>
       </div>

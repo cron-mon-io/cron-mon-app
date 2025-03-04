@@ -13,18 +13,18 @@
       <v-card-actions>
         <v-btn
           text="No"
-          @click="abort"
           color="orange"
           variant="tonal"
           append-icon="mdi-close-circle"
+          @click="abort"
         ></v-btn>
         <v-btn
           text="Yes"
-          @click="confirm"
           color="primary"
           variant="elevated"
           append-icon="mdi-check-circle"
           :loading="loading"
+          @click="confirm"
         ></v-btn>
       </v-card-actions>
     </v-card>

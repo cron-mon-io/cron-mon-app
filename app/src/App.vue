@@ -13,7 +13,7 @@
         </v-list-item>
         <v-divider></v-divider>
 
-        <v-list density="compact" nav v-model:opened="opened">
+        <v-list v-model:opened="opened" density="compact" nav>
           <v-list-item
             v-for="link in topLevelLinks"
             :key="link.target"
@@ -24,7 +24,7 @@
             <v-list-item-title class="text-body-1">{{ link.name }}</v-list-item-title>
           </v-list-item>
           <v-list-group value="monitoring">
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-list-item v-bind="props" prepend-icon="mdi-monitor-eye">
                 <v-list-item-title class="text-body-1">Monitoring</v-list-item-title>
               </v-list-item>
@@ -40,7 +40,7 @@
             </v-list-item>
           </v-list-group>
           <v-list-group value="docs">
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-list-item v-bind="props" prepend-icon="mdi-bookshelf">
                 <v-list-item-title class="text-body-1">Docs</v-list-item-title>
               </v-list-item>
@@ -62,8 +62,8 @@
         <v-toolbar density="compact">
           <v-btn
             density="comfortable"
-            @click="rail = !rail"
             :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
+            @click="rail = !rail"
           ></v-btn>
           <v-spacer></v-spacer>
           <span v-if="user">

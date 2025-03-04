@@ -1,3 +1,4 @@
+import ResizeObserver from 'resize-observer-polyfill'
 import { describe, it, expect } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
@@ -8,7 +9,7 @@ import SetupMonitorDialog from '@/components/SetupMonitorDialog.vue'
 
 describe('SetupMonitorDialog component', () => {
   const vuetify = createVuetify({ components, directives })
-  global.ResizeObserver = require('resize-observer-polyfill')
+  global.ResizeObserver = ResizeObserver
 
   it('is not rendered when not active', () => {
     const wrapper = mount(SetupMonitorDialog, {

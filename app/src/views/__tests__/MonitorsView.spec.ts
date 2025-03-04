@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file */
 import { describe, it, expect, vi } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
@@ -25,9 +26,13 @@ async function mountMonitorsView(errors: string[] = []): Promise<{
   })
 
   const TestDialog = defineComponent({
-    template: '<div>Test dialog</div>',
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      }
+    },
     emits: ['dialog-complete'],
-    props: ['dialogActive'],
     watch: {
       dialogActive(active: boolean) {
         if (active) {
@@ -38,7 +43,8 @@ async function mountMonitorsView(errors: string[] = []): Promise<{
           })
         }
       }
-    }
+    },
+    template: '<div>Test dialog</div>'
   })
 
   const TEST_MONITOR_DATA = [

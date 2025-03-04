@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file */
 import { describe, it, expect, vi, type Mock, beforeEach, afterEach } from 'vitest'
 import { VueWrapper, flushPromises, mount, RouterLinkStub } from '@vue/test-utils'
 import { defineComponent } from 'vue'
@@ -51,29 +52,44 @@ async function mountKeysView(): Promise<{
   })
 
   const TestGenerateDialog = defineComponent({
-    template: '<div>Test dialog</div>',
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      }
+    },
     emits: ['dialog-complete'],
-    props: ['dialogActive'],
     watch: {
       dialogActive(active: boolean) {
         if (active) {
           this.$emit('dialog-complete')
         }
       }
-    }
+    },
+    template: '<div>Test dialog</div>'
   })
 
   const TestConfirmationDialog = defineComponent({
-    template: '<div>Test confirmation dialog</div>',
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      },
+      dialogData: {
+        type: Object,
+        required: false,
+        default: () => ({})
+      }
+    },
     emits: ['dialog-complete'],
-    props: ['dialogActive', 'dialogData'],
     watch: {
       dialogActive(active: boolean) {
         if (active) {
           this.$emit('dialog-complete', true)
         }
       }
-    }
+    },
+    template: '<div>Test confirmation dialog</div>'
   })
 
   const cookies = new FakeVueCookies()
