@@ -12,30 +12,30 @@
       <v-card-text>
         <v-form v-model="formValid">
           <v-text-field
+            v-model="name"
             class="mt-5"
             hint="Give your monitor a name"
             persistent-hint
             label="Name"
-            v-model="name"
             clearable
             variant="outlined"
           ></v-text-field>
           <v-text-field
+            v-model="expectedDuration"
             class="mt-5"
             hint="How long do you expect the jobs being monitored to run for?"
             persistent-hint
             label="Expected duration"
-            v-model="expectedDuration"
             clearable
             variant="outlined"
             :rules="[validateDuration(expectedDuration)]"
           ></v-text-field>
           <v-text-field
+            v-model="graceDuration"
             class="mt-5"
             hint="How much longer after that should we wait before considering the job late?"
             persistent-hint
             label="Grace duration"
-            v-model="graceDuration"
             clearable
             variant="outlined"
             :rules="[validateDuration(graceDuration)]"
@@ -45,19 +45,19 @@
       <v-card-actions>
         <v-btn
           text="Cancel"
-          @click="exit"
           color="orange"
           variant="tonal"
           append-icon="mdi-close-circle"
+          @click="exit"
         ></v-btn>
         <v-btn
           text="Save"
-          @click="saveAndExit"
           color="primary"
           variant="elevated"
           append-icon="mdi-check-circle"
           :disabled="!canSave"
           :loading="loading"
+          @click="saveAndExit"
         ></v-btn>
       </v-card-actions>
     </v-card>

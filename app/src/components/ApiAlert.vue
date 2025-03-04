@@ -9,12 +9,12 @@
     :closable="!retryEnabled"
     @click:close="$emit('closed')"
   >
-    <template v-slot:text>
+    <template #text>
       <!-- api-alert-content class is purely to aid in testing here. -->
       <div class="api-alert-content d-flex">
         <span>{{ error }}</span>
         <v-spacer />
-        <v-btn v-if="retryEnabled" @click="$emit('retried')" color="error" append-icon="mdi-reload">
+        <v-btn v-if="retryEnabled" color="error" append-icon="mdi-reload" @click="$emit('retried')">
           Retry
         </v-btn>
       </div>

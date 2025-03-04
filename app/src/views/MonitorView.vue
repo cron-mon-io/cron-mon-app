@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getMonitor" />
+    <ApiAlert class="mx-4 mt-4" :error="syncError" :retry-enabled="true" @retried="getMonitor" />
     <ApiAlert class="mx-4 mt-4" :error="editError" @closed="editError = null" />
     <ApiAlert class="mx-4 mt-4" :error="deleteError" @closed="deleteError = null" />
     <v-skeleton-loader
@@ -15,10 +15,10 @@
         <v-chip
           append-icon="mdi-content-copy"
           color="teal-accent-4"
-          @click="copyMonitorIDToClipboard"
           class="text-body-1 font-weight-bold ma-2"
           variant="tonal"
           label
+          @click="copyMonitorIDToClipboard"
         >
           Monitor ID: <code>{{ monitor.monitor_id }}</code>
           <v-tooltip activator="parent" location="top">
@@ -29,8 +29,8 @@
           append-icon="mdi-pencil"
           color="primary"
           class="ma-3"
-          @click="openEditDialog"
           :disabled="syncError !== null"
+          @click="openEditDialog"
         >
           Edit Monitor
           <v-tooltip activator="parent" location="top">Click to modify this Monitor</v-tooltip>
@@ -39,8 +39,8 @@
           append-icon="mdi-delete"
           color="primary"
           class="ma-3"
-          @click="openDeleteDialog"
           :disabled="syncError !== null"
+          @click="openDeleteDialog"
         >
           Delete Monitor
           <v-tooltip activator="parent" location="top">Click to delete this Monitor</v-tooltip>
@@ -59,13 +59,13 @@
     </v-card>
     <SetupMonitorDialog
       v-if="monitor !== null"
-      :dialogActive="editDialogActive"
+      :dialog-active="editDialogActive"
+      :monitor="monitor"
       @dialog-complete="editDialogComplete"
       @dialog-aborted="closeEditDialog"
-      :monitor="monitor"
     />
     <ConfirmationDialog
-      :dialogActive="deleteDialogActive"
+      :dialog-active="deleteDialogActive"
       title="Delete this Monitor?"
       icon="mdi-delete"
       question="This cannot be undone and will result in the jobs within this Monitor also being deleted. Are you sure?"

@@ -1,6 +1,6 @@
 <template>
   <v-tooltip location="bottom">
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn density="comfortable" v-bind="props" icon @click="$emit('click')">
         <v-icon>{{ icon }}</v-icon>
       </v-btn>
