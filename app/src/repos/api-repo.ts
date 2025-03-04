@@ -1,5 +1,5 @@
 type ApiResponse = {
-  data: any
+  data: unknown
 }
 
 export class ApiRepository {
@@ -13,9 +13,9 @@ export class ApiRepository {
   protected async sendRequest(
     route: string,
     method: string,
-    body: Record<string, any> | undefined = undefined
+    body: Record<string, unknown> | undefined = undefined
   ): Promise<ApiResponse | undefined> {
-    const opts: Record<string, any> = {
+    const opts: { method: string; headers: Record<string, string>; body?: string } = {
       method: method,
       headers: {
         Authorization: `Bearer ${this.getAuthToken()}`

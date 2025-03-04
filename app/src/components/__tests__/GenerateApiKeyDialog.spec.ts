@@ -1,3 +1,4 @@
+import ResizeObserver from 'resize-observer-polyfill'
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
@@ -9,7 +10,7 @@ import { FakeClipboard } from '@/utils/testing/fake-clipboard'
 
 describe('GenerateApiKeyDialog component', () => {
   const vuetify = createVuetify({ components, directives })
-  global.ResizeObserver = require('resize-observer-polyfill')
+  global.ResizeObserver = ResizeObserver
 
   it('is not rendered when not active', async () => {
     const wrapper = mount(GenerateApiKeyDialog, {

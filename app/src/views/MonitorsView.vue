@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getMonitors" />
+    <ApiAlert class="mx-4 mt-4" :error="syncError" :retry-enabled="true" @retried="getMonitors" />
     <ApiAlert class="mx-4 mt-4" :error="createError" @closed="createError = null" />
     <v-btn
       append-icon="mdi-plus"
@@ -18,11 +18,11 @@
         v-for="monitor in monitors"
         :key="monitor.monitor_id"
         :monitor="monitor"
-        :isNew="$cookies.isKey(monitor.monitor_id)"
+        :is-new="$cookies.isKey(monitor.monitor_id)"
       />
     </div>
     <SetupMonitorDialog
-      :dialogActive="dialogActive"
+      :dialog-active="dialogActive"
       @dialog-complete="dialogComplete"
       @dialog-aborted="closeDialog"
     />

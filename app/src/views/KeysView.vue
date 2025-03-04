@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ApiAlert class="mx-4 mt-4" :error="syncError" :retryEnabled="true" @retried="getApiKeys" />
+    <ApiAlert class="mx-4 mt-4" :error="syncError" :retry-enabled="true" @retried="getApiKeys" />
     <ApiAlert class="mx-4 mt-4" :error="revokeError" @closed="revokeError = null" />
     <v-card class="elevation-2 mx-6 mt-13">
       <v-card-title class="font-weight-black"> API Keys</v-card-title>
@@ -71,12 +71,12 @@
       </v-card-text>
     </v-card>
     <GenerateApiKeyDialog
-      :dialogActive="openGenerateKeyDialog"
+      :dialog-active="openGenerateKeyDialog"
       @dialog-aborted="generateDialogComplete"
       @dialog-complete="generateDialogComplete"
     />
     <ConfirmationDialog
-      :dialogActive="keyToRevoke !== null"
+      :dialog-active="keyToRevoke !== null"
       title="Revoke this API Key?"
       icon="mdi-key-remove"
       question="Are you sure you want to revoke this API key? It will not be usable anymore, and this cannot be undone."

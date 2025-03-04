@@ -1,5 +1,5 @@
 <template>
-  <v-btn density="comfortable" @click="toggleTheme" :icon="appliedTheme.icon"></v-btn>
+  <v-btn density="comfortable" :icon="appliedTheme.icon" @click="toggleTheme"></v-btn>
 </template>
 
 <script setup lang="ts">

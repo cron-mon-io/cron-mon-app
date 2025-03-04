@@ -24,7 +24,7 @@ export async function getAuthConfig(): Promise<AuthConfig> {
   return config
 }
 
-function validateAuthConfig(config: any): void {
+function validateAuthConfig(config: Record<string, unknown>): void {
   if (
     !(
       typeof config.url === 'string' &&

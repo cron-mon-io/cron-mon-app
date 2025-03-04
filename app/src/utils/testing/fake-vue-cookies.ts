@@ -1,7 +1,12 @@
 import type { VueCookies } from 'vue-cookies'
 
+interface Cookie {
+  value: unknown
+  expires?: string | number | Date
+}
+
 export class FakeVueCookies implements VueCookies {
-  private cookies: Record<string, any> = {}
+  private cookies: Record<string, Cookie> = {}
 
   config(
     _expires: string | number | Date,
@@ -14,7 +19,7 @@ export class FakeVueCookies implements VueCookies {
     throw new Error('Method not implemented.')
   }
 
-  get(keyName: string): any {
+  get(keyName: string): unknown {
     const cookie = this.cookies[keyName]
     return cookie === undefined ? null : cookie.value
   }
@@ -34,7 +39,7 @@ export class FakeVueCookies implements VueCookies {
 
   set(
     keyName: string,
-    value: any,
+    value: unknown,
     expires?: string | number | Date,
     _path?: string,
     _domain?: string,

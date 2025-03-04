@@ -1,7 +1,7 @@
 export class FakeLocalStorage {
-  private data: Record<string, any> = {}
+  private data: Record<string, unknown> = {}
 
-  constructor(data: Record<string, any> = {}) {
+  constructor(data: Record<string, unknown> = {}) {
     this.data = data
   }
 
@@ -9,7 +9,7 @@ export class FakeLocalStorage {
     return this.data[key]
   }
 
-  setItem(key: string, value: any) {
+  setItem(key: string, value: unknown) {
     this.data[key] = value
   }
 
