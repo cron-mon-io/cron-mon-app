@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import { defineComponent } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 
@@ -100,8 +100,8 @@ describe('useAuth composable when user not previously authenticated', () => {
   }
   afterEach(() => {
     mocks.Keycloak.mockRestore()
-    ;(mockKeycloak.init as any).mockClear()
-    ;(mockKeycloak.login as any).mockClear()
+    ;(mockKeycloak.init as Mock).mockClear()
+    ;(mockKeycloak.login as Mock).mockClear()
     mockKeycloak.authenticated = false
     mockKeycloak.tokenParsed = {
       given_name: null,
@@ -288,7 +288,7 @@ describe('useAuth composable when user is previously authenticated', () => {
     expect(newToken).toBeDefined()
     expect(newToken).not.toEqual(initialToken)
 
-    vi.useRealTimers
+    vi.useRealTimers()
   })
 
   it('handles refresh token failure', () => {
