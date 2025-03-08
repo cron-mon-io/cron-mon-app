@@ -21,10 +21,6 @@ export interface ApiKeyRepoInterface {
 }
 
 export class ApiKeyRepository extends ApiRepository implements ApiKeyRepoInterface {
-  constructor(getAuthToken: () => string) {
-    super(getAuthToken)
-  }
-
   async getKeys(): Promise<Array<ApiKey>> {
     const resp = await this.sendRequest(`/api/v1/keys`, 'GET')
     return (resp as ApiKeyList).data

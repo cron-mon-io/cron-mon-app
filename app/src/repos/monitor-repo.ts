@@ -21,10 +21,6 @@ type MonitorList = {
 }
 
 export class MonitorRepository extends ApiRepository implements MonitorRepoInterface {
-  constructor(getAuthToken: () => string) {
-    super(getAuthToken)
-  }
-
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
     const resp = await this.sendRequest(`/api/v1/monitors`, 'GET')
     return (resp as MonitorList).data
