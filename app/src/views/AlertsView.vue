@@ -21,13 +21,58 @@
           <v-tooltip activator="parent" location="top">Click to setup a new Alert</v-tooltip>
         </v-btn>
       </v-card-text>
+      <v-skeleton-loader v-if="loading" type="card" class="my-3 mx-auto w-50" elevation="4" />
+      <div v-else class="d-flex flex-column align-center">
+        <span v-for="alert in alertConfigs" :key="alert.alert_config_id">{{ alert.name }}</span>
+      </div>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, inject, onUnmounted, onMounted } from 'vue'
 
+import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
+import type { AlertConfig } from '@/types/alert-config'
+
+const FIVE_MINUTES_MS = 5 * 60 * 1000
+
+const getAlertConfigRepo = inject<() => Promise<AlertConfigRepoInterface>>(
+  '$getAlertConfigRepo'
+) as () => Promise<AlertConfigRepoInterface>
+
+// After we've unmounted the component we don't want to keep syncing the alert confgigs.
+let syncing = true
+onUnmounted(() => {
+  syncing = false
+})
+
+const loading = ref(true)
 const syncError = ref<string | null>(null)
+const alertConfigs = ref<AlertConfig[]>([])
 const createAlertDialogOpen = ref(false)
+
+async function getAlertConfigs() {
+  const alertConfigRepo = await getAlertConfigRepo()
+  try {
+    alertConfigs.value = await alertConfigRepo.getAlertConfigs()
+    // If we've successfully got the keys, we can clear any previous errors and set loading to false.
+    syncError.value = null
+    loading.value = false
+  } catch (e: unknown) {
+    syncError.value = (e as Error).message
+  }
+}
+
+async function syncAlertConfigs() {
+  if (!syncing) {
+    return
+  }
+
+  await getAlertConfigs()
+
+  setTimeout(async () => await syncAlertConfigs(), FIVE_MINUTES_MS)
+}
+
+onMounted(syncAlertConfigs)
 </script>
