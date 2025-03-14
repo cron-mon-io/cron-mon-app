@@ -4,6 +4,7 @@ import { HttpResponse, http, type StrictRequest, type JsonBodyType } from 'msw'
 import { v4 as uuidv4 } from 'uuid'
 
 import type { MonitorSummary } from '@/types/monitor'
+import type { AlertConfigSummary } from '@/types/alert-config'
 
 export function setupTestAPI(expectedToken: string): SetupServer {
   let monitors = [
@@ -123,6 +124,32 @@ export function setupTestAPI(expectedToken: string): SetupServer {
       masked: 'test************key2',
       created: '2024-03-30T10:30:00',
       last_used: null
+    }
+  ]
+
+  let alertConfigs = [
+    {
+      alert_config_id: 'eef240ae-a5b3-4971-b3c3-2603434d1ede',
+      name: 'Slack on late',
+      active: true,
+      on_late: true,
+      on_error: false,
+      type: {
+        Slack: {
+          token: 'fake-slack-bot-token',
+          channel: 'monitoring-alerts'
+        }
+      },
+      monitors: [
+        {
+          monitor_id: 'cfe88463-5c04-4b43-b10f-1f508963cc5d',
+          name: 'foo-backup.sh'
+        },
+        {
+          monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
+          name: 'analyse-bar.py'
+        }
+      ]
     }
   ]
 
@@ -345,6 +372,125 @@ export function setupTestAPI(expectedToken: string): SetupServer {
         }
 
         apiKeys = apiKeys.filter((key) => key.api_key_id !== keyId)
+
+        return new HttpResponse(null, { status: 200 })
+      }),
+      http.get('/api/v1/alert-configs', ({ request }) => {
+        return (
+          assertAuth(request) ||
+          HttpResponse.json({
+            data: alertConfigs,
+            paging: { total: alertConfigs.length }
+          })
+        )
+      }),
+      http.get('/api/v1/alert-configs/:alertConfigId', ({ request, params }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
+        const { alertConfigId } = params
+        const alertConfig = alertConfigs.find((ac) => ac.alert_config_id === alertConfigId)
+
+        if (!alertConfig) {
+          return HttpResponse.json(
+            {
+              error: {
+                code: 404,
+                reason: 'Not Found',
+                description: `Failed to find alert config with id '${alertConfigId}'`
+              }
+            },
+            { status: 404 }
+          )
+        }
+
+        return HttpResponse.json({
+          data: alertConfig
+        })
+      }),
+      http.post('/api/v1/alert-configs', async ({ request }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
+        const body = (await request.json()) as AlertConfigSummary
+        const alertConfig = {
+          alert_config_id: uuidv4(),
+          name: body.name,
+          active: body.active,
+          on_late: body.on_late,
+          on_error: body.on_error,
+          type: body.type,
+          monitors: []
+        }
+        alertConfigs.push(alertConfig)
+
+        return HttpResponse.json({
+          data: alertConfig
+        })
+      }),
+      http.patch('/api/v1/alert-configs/:alertConfigId', async ({ params, request }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
+        const { alertConfigId } = params
+        const alertConfig = alertConfigs.find((ac) => ac.alert_config_id === alertConfigId)
+
+        if (!alertConfig) {
+          return HttpResponse.json(
+            {
+              error: {
+                code: 404,
+                reason: 'Not Found',
+                description: 'The requested resource could not be found.'
+              }
+            },
+            { status: 404 }
+          )
+        }
+
+        const body = (await request.json()) as AlertConfigSummary
+
+        return HttpResponse.json({
+          data: {
+            alert_config_id: alertConfig.alert_config_id,
+            name: body.name,
+            active: body.active,
+            on_late: body.on_late,
+            on_error: body.on_error,
+            type: body.type,
+            monitors: alertConfig.monitors
+          }
+        })
+      }),
+      http.delete('/api/v1/alert-configs/:alertConfigId', ({ request, params }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+
+        const { alertConfigId } = params
+        const alertConfig = alertConfigs.find((ac) => ac.alert_config_id === alertConfigId)
+
+        if (!alertConfig) {
+          return HttpResponse.json(
+            {
+              error: {
+                code: 404,
+                reason: 'Not Found',
+                description: 'The requested resource could not be found.'
+              }
+            },
+            { status: 404 }
+          )
+        }
+
+        alertConfigs = alertConfigs.filter((ac) => ac.alert_config_id !== alertConfigId)
 
         return new HttpResponse(null, { status: 200 })
       })
