@@ -98,6 +98,7 @@ import ThemePicker from '@/components/ThemePicker.vue'
 import { useAuth } from '@/composables/auth'
 import { MonitorRepository } from '@/repos/monitor-repo'
 import { ApiKeyRepository } from './repos/api-key-repo'
+import { AlertConfigRepository } from './repos/alert-config-repo'
 
 import { ref, provide } from 'vue'
 
@@ -138,5 +139,9 @@ provide('$getMonitorRepo', async () => {
 provide('$getApiKeyRepo', async () => {
   await isReady()
   return new ApiKeyRepository(() => getToken() || '')
+})
+provide('$getAlertConfigRepo', async () => {
+  await isReady()
+  return new AlertConfigRepository(() => getToken() || '')
 })
 </script>
