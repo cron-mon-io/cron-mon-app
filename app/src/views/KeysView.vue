@@ -101,7 +101,7 @@ const getApiKeyRepo = inject<() => Promise<ApiKeyRepoInterface>>(
   '$getApiKeyRepo'
 ) as () => Promise<ApiKeyRepoInterface>
 
-// After we've unmounted the component we don't want to keep syncing the monitor.
+// After we've unmounted the component we don't want to keep syncing the keys.
 let syncing = true
 onUnmounted(() => {
   syncing = false
