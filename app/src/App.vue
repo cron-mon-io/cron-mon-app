@@ -110,7 +110,8 @@ const opened = ref(['docs'])
 const topLevelLinks = ref([{ icon: 'mdi-home', target: 'home', name: 'Home' }])
 const monitorLinks = ref([
   { icon: 'mdi-monitor-multiple', target: 'monitors', name: 'Monitors' },
-  { icon: 'mdi-key-variant', target: 'keys', name: 'API Keys' }
+  { icon: 'mdi-key-variant', target: 'keys', name: 'API Keys' },
+  { icon: 'mdi-bell-cog', target: 'alerts', name: 'Alerts' }
 ])
 const docLinks = ref([
   { icon: 'mdi-math-compass', target: 'docs-setup', name: 'Setup' },
@@ -126,7 +127,8 @@ function updateTheme(name: string, isDark: boolean): void {
 const { user, logout, openAccountManagement, getToken, isReady } = useAuth([
   'monitors',
   'monitor',
-  'keys'
+  'keys',
+  'alerts'
 ])
 console.log('User: ', user)
 provide('$getMonitorRepo', async () => {
