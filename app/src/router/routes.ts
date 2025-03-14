@@ -5,6 +5,7 @@ import SetupView from '@/views/docs/SetupView.vue'
 import HostingView from '@/views/docs/HostingView.vue'
 import IntegrationView from '@/views/docs/IntegrationView.vue'
 import KeysView from '@/views/KeysView.vue'
+import AlertsView from '@/views/AlertsView.vue'
 
 const routes = [
   {
@@ -62,6 +63,11 @@ const routes = [
         path: 'keys',
         name: 'keys',
         component: KeysView
+      },
+      {
+        path: 'alerts',
+        name: 'alerts',
+        component: AlertsView
       }
     ]
   },
