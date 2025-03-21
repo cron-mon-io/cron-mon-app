@@ -1,4 +1,4 @@
-export type AlertConfigSummary = {
+export type BasicAlertConfig = {
   name: string
   active: boolean
   on_late: boolean
@@ -6,7 +6,7 @@ export type AlertConfigSummary = {
   type: SlackAlertType
 }
 
-export type AlertConfigIdentity = AlertConfigSummary & {
+export type AlertConfigIdentity = BasicAlertConfig & {
   alert_config_id: string
 }
 

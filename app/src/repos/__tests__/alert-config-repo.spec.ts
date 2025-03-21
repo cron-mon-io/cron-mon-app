@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, it, expect } from 'vitest'
 import { HttpResponse, http } from 'msw'
 
 import { AlertConfigRepository } from '@/repos/alert-config-repo'
-import type { AlertConfigSummary } from '@/types/alert-config'
+import type { BasicAlertConfig } from '@/types/alert-config'
 
 import { setupTestAPI } from '@/utils/testing/test-api'
 
@@ -97,7 +97,7 @@ describe('AlertConfigRepository', () => {
   })
 
   it('addMonitor', async () => {
-    const newAlertConfig: AlertConfigSummary = {
+    const newAlertConfig: BasicAlertConfig = {
       name: 'New config',
       active: true,
       on_late: true,
