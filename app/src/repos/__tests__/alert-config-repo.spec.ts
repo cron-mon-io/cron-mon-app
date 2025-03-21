@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, it, expect } from 'vitest'
 import { HttpResponse, http } from 'msw'
 
 import { AlertConfigRepository } from '@/repos/alert-config-repo'
-import type { AlertConfigSummary } from '@/types/alert-config'
+import type { BasicAlertConfig } from '@/types/alert-config'
 
 import { setupTestAPI } from '@/utils/testing/test-api'
 
@@ -26,16 +26,7 @@ describe('AlertConfigRepository', () => {
       {
         active: true,
         alert_config_id: 'eef240ae-a5b3-4971-b3c3-2603434d1ede',
-        monitors: [
-          {
-            monitor_id: 'cfe88463-5c04-4b43-b10f-1f508963cc5d',
-            name: 'foo-backup.sh'
-          },
-          {
-            monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
-            name: 'analyse-bar.py'
-          }
-        ],
+        monitors: 2,
         name: 'Slack on late',
         on_error: false,
         on_late: true,
@@ -97,7 +88,7 @@ describe('AlertConfigRepository', () => {
   })
 
   it('addMonitor', async () => {
-    const newAlertConfig: AlertConfigSummary = {
+    const newAlertConfig: BasicAlertConfig = {
       name: 'New config',
       active: true,
       on_late: true,

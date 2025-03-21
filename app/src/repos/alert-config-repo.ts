@@ -1,8 +1,13 @@
-import type { AlertConfig, AlertConfigSummary, AlertConfigIdentity } from '@/types/alert-config'
+import type {
+  AlertConfig,
+  AlertConfigIdentity,
+  AlertConfigSummary,
+  BasicAlertConfig
+} from '@/types/alert-config'
 import { ApiRepository } from './api-repo'
 
 export interface AlertConfigRepoInterface {
-  getAlertConfigs(): Promise<Array<AlertConfig>>
+  getAlertConfigs(): Promise<Array<AlertConfigSummary>>
   getAlertConfig(alertConfigId: string): Promise<AlertConfig>
   addAlertConfig(alertConfig: AlertConfig): Promise<AlertConfig>
   updateAlertConfig(alertConfig: AlertConfig): Promise<AlertConfig>
@@ -14,14 +19,14 @@ type AlertConfigResp = {
 }
 
 type AlertConfigList = {
-  data: Array<AlertConfig>
+  data: Array<AlertConfigSummary>
   paging: {
     total: number
   }
 }
 
 export class AlertConfigRepository extends ApiRepository implements AlertConfigRepoInterface {
-  async getAlertConfigs(): Promise<Array<AlertConfig>> {
+  async getAlertConfigs(): Promise<Array<AlertConfigSummary>> {
     const resp = await this.sendRequest(`/api/v1/alert-configs`, 'GET')
     return (resp as AlertConfigList).data
   }
@@ -31,7 +36,7 @@ export class AlertConfigRepository extends ApiRepository implements AlertConfigR
     return (resp as AlertConfigResp).data
   }
 
-  async addAlertConfig(alertConfig: AlertConfigSummary): Promise<AlertConfig> {
+  async addAlertConfig(alertConfig: BasicAlertConfig): Promise<AlertConfig> {
     return await this.postAlertConfigInfo(`/api/v1/alert-configs`, 'POST', alertConfig)
   }
 
@@ -50,7 +55,7 @@ export class AlertConfigRepository extends ApiRepository implements AlertConfigR
   private async postAlertConfigInfo(
     route: string,
     method: string,
-    alertConfig: AlertConfigSummary
+    alertConfig: BasicAlertConfig
   ): Promise<AlertConfig> {
     const resp = await this.sendRequest(route, method, {
       name: alertConfig.name,

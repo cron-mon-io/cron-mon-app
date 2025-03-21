@@ -4,7 +4,7 @@ import { HttpResponse, http, type StrictRequest, type JsonBodyType } from 'msw'
 import { v4 as uuidv4 } from 'uuid'
 
 import type { MonitorSummary } from '@/types/monitor'
-import type { AlertConfigSummary } from '@/types/alert-config'
+import type { BasicAlertConfig } from '@/types/alert-config'
 
 export function setupTestAPI(expectedToken: string): SetupServer {
   let monitors = [
@@ -379,7 +379,17 @@ export function setupTestAPI(expectedToken: string): SetupServer {
         return (
           assertAuth(request) ||
           HttpResponse.json({
-            data: alertConfigs,
+            data: alertConfigs.map((ac) => {
+              return {
+                alert_config_id: ac.alert_config_id,
+                name: ac.name,
+                active: ac.active,
+                on_late: ac.on_late,
+                on_error: ac.on_error,
+                type: ac.type,
+                monitors: ac.monitors.length
+              }
+            }),
             paging: { total: alertConfigs.length }
           })
         )
@@ -416,7 +426,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
           return authErroResponse
         }
 
-        const body = (await request.json()) as AlertConfigSummary
+        const body = (await request.json()) as BasicAlertConfig
         const alertConfig = {
           alert_config_id: uuidv4(),
           name: body.name,
@@ -454,7 +464,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
           )
         }
 
-        const body = (await request.json()) as AlertConfigSummary
+        const body = (await request.json()) as BasicAlertConfig
 
         return HttpResponse.json({
           data: {
