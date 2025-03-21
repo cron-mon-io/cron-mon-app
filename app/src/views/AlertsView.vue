@@ -23,7 +23,7 @@
       </v-card-text>
       <v-skeleton-loader v-if="loading" type="card" class="my-3 mx-auto w-50" elevation="4" />
       <div v-else class="d-flex flex-column align-center">
-        <AlertConfigSummary
+        <AlertConfigInfo
           v-for="alertConfig in alertConfigs"
           :key="alertConfig.alert_config_id"
           :alert-config="alertConfig"
@@ -39,7 +39,7 @@ import { ref, inject, onUnmounted, onMounted } from 'vue'
 
 import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
 import type { AlertConfig } from '@/types/alert-config'
-import AlertConfigSummary from '@/components/AlertConfigSummary.vue'
+import AlertConfigInfo from '@/components/AlertConfigInfo.vue'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
