@@ -1,8 +1,8 @@
 <template>
-  <v-card class="elevation-4 ma-3 w-50">
+  <v-card class="elevation-4 mt-3 mb-6 w-50">
     <AlertConfigBrief :alert-config="alertConfig" :is-new="isNew">
       <template #extra-text>
-        <v-chip prepend-icon="mdi-eye-off-outline" color="teal-accent-4" density="compact" label>
+        <v-chip prepend-icon="mdi-monitor-eye" color="teal-accent-4" density="compact" label>
           Used by {{ alertConfig.monitors }} monitors
         </v-chip>
       </template>

@@ -8,24 +8,27 @@
   </v-card-title>
   <v-card-text>
     <v-chip
-      class="ma-2 font-weight-bold"
+      class="ma-1 font-weight-bold"
       color="info"
+      density="compact"
       :variant="alertConfig.active ? 'flat' : 'outlined'"
     >
       <v-icon icon="mdi-bell-ring" start></v-icon>
       Active
     </v-chip>
     <v-chip
-      class="ma-2 font-weight-bold"
+      class="ma-1 font-weight-bold"
       color="info"
+      density="compact"
       :variant="alertConfig.on_late ? 'flat' : 'outlined'"
     >
       <v-icon icon="mdi-timer-alert" start></v-icon>
       On late
     </v-chip>
     <v-chip
-      class="ma-2 font-weight-bold"
+      class="ma-1 font-weight-bold"
       color="info"
+      density="compact"
       :variant="alertConfig.on_error ? 'flat' : 'outlined'"
     >
       <v-icon icon="mdi-close-circle" start></v-icon>
