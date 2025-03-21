@@ -38,7 +38,7 @@
 import { ref, inject, onUnmounted, onMounted } from 'vue'
 
 import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
-import type { AlertConfig } from '@/types/alert-config'
+import type { AlertConfigSummary } from '@/types/alert-config'
 import AlertConfigInfo from '@/components/AlertConfigInfo.vue'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
@@ -55,7 +55,7 @@ onUnmounted(() => {
 
 const loading = ref(true)
 const syncError = ref<string | null>(null)
-const alertConfigs = ref<AlertConfig[]>([])
+const alertConfigs = ref<AlertConfigSummary[]>([])
 const createAlertDialogOpen = ref(false)
 
 async function getAlertConfigs() {

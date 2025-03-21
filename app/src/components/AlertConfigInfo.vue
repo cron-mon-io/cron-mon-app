@@ -1,6 +1,6 @@
 <template>
   <v-card class="elevation-4 ma-3 w-50">
-    <AlertConfigSummary :alert-config="alertConfig" :is-new="isNew">
+    <AlertConfigBrief :alert-config="alertConfig" :is-new="isNew">
       <template #extra-text>
         <v-chip prepend-icon="mdi-eye-off-outline" color="teal-accent-4" density="compact" label>
           Used by {{ alertConfig.monitors }} monitors
@@ -19,18 +19,18 @@
           </v-btn>
         </v-card-actions>
       </template>
-    </AlertConfigSummary>
+    </AlertConfigBrief>
   </v-card>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 
-import AlertConfigSummary from './AlertConfigSummary.vue'
-import type { AlertConfig } from '@/types/alert-config'
+import AlertConfigBrief from './AlertConfigBrief.vue'
+import type { AlertConfigSummary } from '@/types/alert-config'
 
 const props = defineProps<{
-  alertConfig: AlertConfig
+  alertConfig: AlertConfigSummary
   isNew: boolean
 }>()
 const router = useRouter()

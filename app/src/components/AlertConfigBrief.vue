@@ -37,11 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import type { AlertConfig } from '@/types/alert-config'
+import type { BasicAlertConfig } from '@/types/alert-config'
 import SlackIcon from '@/assets/slack-icon.svg'
 
 defineProps<{
-  alertConfig: AlertConfig
+  alertConfig: BasicAlertConfig
   isNew: boolean
 }>()
 </script>
