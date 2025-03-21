@@ -379,7 +379,17 @@ export function setupTestAPI(expectedToken: string): SetupServer {
         return (
           assertAuth(request) ||
           HttpResponse.json({
-            data: alertConfigs,
+            data: alertConfigs.map((ac) => {
+              return {
+                alert_config_id: ac.alert_config_id,
+                name: ac.name,
+                active: ac.active,
+                on_late: ac.on_late,
+                on_error: ac.on_error,
+                type: ac.type,
+                monitors: ac.monitors.length
+              }
+            }),
             paging: { total: alertConfigs.length }
           })
         )

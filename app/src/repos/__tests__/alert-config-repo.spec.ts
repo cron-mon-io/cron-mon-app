@@ -26,16 +26,7 @@ describe('AlertConfigRepository', () => {
       {
         active: true,
         alert_config_id: 'eef240ae-a5b3-4971-b3c3-2603434d1ede',
-        monitors: [
-          {
-            monitor_id: 'cfe88463-5c04-4b43-b10f-1f508963cc5d',
-            name: 'foo-backup.sh'
-          },
-          {
-            monitor_id: 'e534a01a-4efe-4b8e-9b04-44a3c76b0462',
-            name: 'analyse-bar.py'
-          }
-        ],
+        monitors: 2,
         name: 'Slack on late',
         on_error: false,
         on_late: true,
