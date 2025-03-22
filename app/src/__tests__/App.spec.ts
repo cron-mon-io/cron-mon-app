@@ -92,13 +92,14 @@ describe('The App', () => {
 
     // We should have a navigation drawer (1st item should be the CronMon logo, followed by 9 items)
     const navDrawerItems = wrapper.find('.v-navigation-drawer').findAll('.v-list-item')
-    expect(navDrawerItems).toHaveLength(10)
+    expect(navDrawerItems).toHaveLength(11)
     expect(navDrawerItems[0].find('img').attributes('src')).toBe('/src/assets/logo.svg')
-    expect(navDrawerItems.slice(1, 10).map((item) => item.text())).toEqual([
+    expect(navDrawerItems.slice(1, 11).map((item) => item.text())).toEqual([
       'Home',
       'Monitoring',
       'Monitors',
       'API Keys',
+      'Alerts',
       'Docs',
       'Setup',
       'Integration',
@@ -145,7 +146,7 @@ describe('The App', () => {
 
     // The navigation drawer should now have a smaller logo but the same number of items.
     const navDrawerItems = navDrawer.findAll('.v-list-item')
-    expect(navDrawerItems).toHaveLength(10)
+    expect(navDrawerItems).toHaveLength(11)
     expect(navDrawerItems[0].find('img').attributes('src')).toBe('/src/assets/icon.svg')
   })
 

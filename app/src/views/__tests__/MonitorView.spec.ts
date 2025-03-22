@@ -21,13 +21,6 @@ async function mountMonitorView(
   clipboard: FakeClipboard
   repo: FakeMonitorRepository
 }> {
-  // The MonitorView component uses an async setup, so we need to wrap it in a
-  // Suspense component to test it.
-  const TestComponent = defineComponent({
-    components: { MonitorView },
-    template: '<Suspense><MonitorView/></Suspense>'
-  })
-
   // The JobInfo component has its own tests, so we just want to stub it here so
   // we can test how we interact wit it.
   const FakeJobInfo = defineComponent({
@@ -149,7 +142,7 @@ async function mountMonitorView(
   const fakeCookies = new FakeVueCookies()
   const clipboard = new FakeClipboard()
   const repo = new FakeMonitorRepository([TEST_MONITOR_DATA], errors)
-  const wrapper = mount(TestComponent, {
+  const wrapper = mount(MonitorView, {
     global: {
       plugins: [createVuetify({ components, directives })],
       provide: {
