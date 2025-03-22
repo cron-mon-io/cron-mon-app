@@ -1,4 +1,3 @@
-/* eslint-disable vue/one-component-per-file */
 import { describe, it, expect, vi } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
@@ -17,14 +16,6 @@ async function mountMonitorsView(errors: string[] = []): Promise<{
   repo: FakeMonitorRepository
 }> {
   const vuetify = createVuetify({ components, directives })
-
-  // The MonitorsView component uses an async setup, so we need to wrap it in a
-  // Suspense component to test it.
-  const TestComponent = defineComponent({
-    components: { MonitorsView },
-    template: '<Suspense><MonitorsView/></Suspense>'
-  })
-
   const TestDialog = defineComponent({
     props: {
       dialogActive: {
@@ -109,7 +100,7 @@ async function mountMonitorsView(errors: string[] = []): Promise<{
 
   const cookies = new FakeVueCookies()
   const repo = new FakeMonitorRepository(TEST_MONITOR_DATA, errors)
-  const wrapper = mount(TestComponent, {
+  const wrapper = mount(MonitorsView, {
     global: {
       plugins: [vuetify],
       provide: {

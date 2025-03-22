@@ -44,13 +44,6 @@ async function mountKeysView(): Promise<{
 
   let TEST_API_KEY_DATA = getTestApiKeyData()
 
-  // The KeysView component uses an async setup, so we need to wrap it in a
-  // Suspense component to test it.
-  const TestComponent = defineComponent({
-    components: { KeysView },
-    template: '<Suspense><KeysView/></Suspense>'
-  })
-
   const TestGenerateDialog = defineComponent({
     props: {
       dialogActive: {
@@ -102,7 +95,7 @@ async function mountKeysView(): Promise<{
     generateKey: vi.fn()
   }
 
-  const wrapper = mount(TestComponent, {
+  const wrapper = mount(KeysView, {
     global: {
       plugins: [vuetify],
       provide: {
