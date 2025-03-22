@@ -36,7 +36,7 @@ const props = defineProps<{
 }>()
 const router = useRouter()
 
-// We should be able to use `:to={name: 'monitor', params: { id: monitor.monitor_id } }`
+// We should be able to use `:to={name: 'alerts', params: { id: alertConfig. alert_config_id } }`
 // on the v-btn using this function, but it made mocking the navigation in the tests
 // difficult so we're using the router directly.
 function navigateToAlertConfig() {
