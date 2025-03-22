@@ -1,5 +1,11 @@
 <template>
   <div>
+    <ApiAlert
+      class="mx-4 mt-4"
+      :error="syncError"
+      :retry-enabled="true"
+      @retried="getAlertConfigs"
+    />
     <v-card class="elevation-2 mx-6 mt-13">
       <v-card-title class="font-weight-black">Alerts</v-card-title>
       <v-card-text>
@@ -37,6 +43,7 @@
 <script setup lang="ts">
 import { ref, inject, onUnmounted, onMounted } from 'vue'
 
+import ApiAlert from '@/components/ApiAlert.vue'
 import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
 import type { AlertConfigSummary } from '@/types/alert-config'
 import AlertConfigInfo from '@/components/AlertConfigInfo.vue'
