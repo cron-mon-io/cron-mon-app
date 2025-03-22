@@ -3,7 +3,8 @@
     <AlertConfigBrief :alert-config="alertConfig" :is-new="isNew">
       <template #extra-text>
         <v-chip prepend-icon="mdi-monitor-eye" color="teal-accent-4" density="compact" label>
-          Used by {{ alertConfig.monitors }} monitors
+          Used by {{ alertConfig.monitors }}
+          {{ alertConfig.monitors === 1 ? 'monitor' : 'monitors' }}
         </v-chip>
       </template>
       <template #footer>

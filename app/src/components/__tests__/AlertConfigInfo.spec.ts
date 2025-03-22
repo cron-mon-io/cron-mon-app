@@ -17,7 +17,11 @@ describe('AlertConfigInfo component', () => {
     }))
   }))
 
-  it.each([true, false])('renders as expected', (isNew) => {
+  it.each([
+    { isNew: true, monitors: 1, usedByMessage: 'Used by 1 monitor' },
+    { isNew: false, monitors: 2, usedByMessage: 'Used by 2 monitors' },
+    { isNew: false, monitors: 0, usedByMessage: 'Used by 0 monitors' }
+  ])('renders as expected', ({ isNew, monitors, usedByMessage }) => {
     const wrapper = mount(AlertConfigInfo, {
       global: {
         plugins: [vuetify]
@@ -29,7 +33,7 @@ describe('AlertConfigInfo component', () => {
           active: true,
           on_late: true,
           on_error: false,
-          monitors: 2,
+          monitors: monitors,
           type: {
             Slack: {
               token: 'fake-slack-bot-token',
@@ -54,7 +58,7 @@ describe('AlertConfigInfo component', () => {
     // component, and so are covered in said components tests.
     const chips = wrapper.findAll('.v-card-text > .v-chip')
     expect(chips).toHaveLength(4)
-    expect(chips[3].text()).toBe('Used by 2 monitors')
+    expect(chips[3].text()).toBe(usedByMessage)
 
     // We should have a view button.
     const viewButton = wrapper.find('.v-card-actions > .v-btn')
