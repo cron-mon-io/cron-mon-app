@@ -5,6 +5,7 @@ import SetupView from '@/views/docs/SetupView.vue'
 import HostingView from '@/views/docs/HostingView.vue'
 import IntegrationView from '@/views/docs/IntegrationView.vue'
 import KeysView from '@/views/KeysView.vue'
+import AlertView from '@/views/AlertView.vue'
 import AlertsView from '@/views/AlertsView.vue'
 
 const routes = [
@@ -66,8 +67,18 @@ const routes = [
       },
       {
         path: 'alerts',
-        name: 'alerts',
-        component: AlertsView
+        children: [
+          {
+            path: '',
+            name: 'alerts',
+            component: AlertsView
+          },
+          {
+            path: ':id',
+            name: 'alert',
+            component: AlertView
+          }
+        ]
       }
     ]
   },
