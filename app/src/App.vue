@@ -99,6 +99,7 @@ import { useAuth } from '@/composables/auth'
 import { MonitorRepository } from '@/repos/monitor-repo'
 import { ApiKeyRepository } from './repos/api-key-repo'
 import { AlertConfigRepository } from './repos/alert-config-repo'
+import { AlertConfigService } from './services/alert-service'
 
 import { ref, provide } from 'vue'
 
@@ -129,7 +130,8 @@ const { user, logout, openAccountManagement, getToken, isReady } = useAuth([
   'monitors',
   'monitor',
   'keys',
-  'alerts'
+  'alerts',
+  'alert'
 ])
 console.log('User: ', user)
 provide('$getMonitorRepo', async () => {
@@ -143,5 +145,9 @@ provide('$getApiKeyRepo', async () => {
 provide('$getAlertConfigRepo', async () => {
   await isReady()
   return new AlertConfigRepository(() => getToken() || '')
+})
+provide('$getAlertConfigService', async () => {
+  await isReady()
+  return new AlertConfigService(() => getToken() || '')
 })
 </script>

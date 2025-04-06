@@ -6,6 +6,7 @@
       :retry-enabled="true"
       @retried="getAlertConfig"
     />
+    <ApiAlert class="mx-4 mt-4" :error="testAlertError" @closed="testAlertError = null" />
     <ApiAlert class="mx-4 mt-4" :error="deleteError" @closed="deleteError = null" />
     <v-skeleton-loader
       v-if="alertConfig === null"
@@ -36,7 +37,7 @@
             color="orange"
             class="ma-3"
             :disabled="syncError !== null"
-            @click="openEditDialog"
+            @click="sendTestAlert"
           >
             Test Alert
             <v-tooltip activator="parent" location="top">Click to send a test Alert</v-tooltip>
@@ -115,6 +116,7 @@ import AlertConfigBrief from '@/components/AlertConfigBrief.vue'
 import ApiAlert from '@/components/ApiAlert.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
+import type { AlertServiceInterface } from '@/services/alert-service'
 import type { AlertConfig } from '@/types/alert-config'
 
 const ONE_MINUTE_MS = 60 * 1000
@@ -124,6 +126,9 @@ const router = useRouter()
 const getAlertConfigRepo = inject<() => Promise<AlertConfigRepoInterface>>(
   '$getAlertConfigRepo'
 ) as () => Promise<AlertConfigRepoInterface>
+const getAlertConfigService = inject<() => Promise<AlertServiceInterface>>(
+  '$getAlertConfigService'
+) as () => Promise<AlertServiceInterface>
 
 // After we've unmounted the component we don't want to keep syncing the monitor.
 let syncing = true
@@ -134,12 +139,24 @@ onUnmounted(() => {
 const alertConfigId = route.params.id as string
 const alertConfig = ref<AlertConfig | null>(null)
 const syncError = ref<string | null>(null)
+const testAlertError = ref<string | null>(null)
 const deleteError = ref<string | null>(null)
 const editDialogActive = ref(false)
 const deleteDialogActive = ref(false)
 
 function openEditDialog() {
   editDialogActive.value = true
+}
+
+async function sendTestAlert() {
+  const alertService = await getAlertConfigService()
+  try {
+    await alertService.sendTestAlert(alertConfig.value as AlertConfig)
+    // If we've successfully sent the test alert, we can clear any previous errors.
+    testAlertError.value = null
+  } catch (e: unknown) {
+    testAlertError.value = (e as Error).message
+  }
 }
 
 async function deleteDialogComplete(confirmed: boolean) {
@@ -175,7 +192,7 @@ function closeDeleteDialog() {
 // on the v-btn using this function, but it made mocking the navigation in the tests
 // difficult so we're using the router directly.
 function navigateToMonitor(monitorId: string) {
-  router.push({ name: 'monitors', params: { id: monitorId } })
+  router.push({ name: 'monitor', params: { id: monitorId } })
 }
 
 async function getAlertConfig() {
