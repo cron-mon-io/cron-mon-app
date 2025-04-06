@@ -53,40 +53,48 @@
           </v-btn>
         </template>
       </AlertConfigBrief>
-      <v-card-text class="text-h5">
+      <v-card-text class="text-h6">
         Used by:
-        <v-table height="400px" style="width: 75%" fixed-header>
-          <tbody class="text-body-1">
-            <tr v-for="monitor in alertConfig.monitors" :key="monitor.monitor_id">
-              <td>
-                <v-chip class="text-body-1" color="teal-accent-4" variant="tonal" label>
-                  {{ monitor.name }}
-                </v-chip>
-              </td>
-              <td>
-                <v-btn
-                  color="primary"
-                  variant="elevated"
-                  append-icon="mdi-open-in-app"
-                  @click="navigateToMonitor(monitor.monitor_id)"
-                >
-                  View
-                </v-btn>
-                <v-btn
-                  append-icon="mdi-link-off"
-                  color="primary"
-                  class="ma-3"
-                  :disabled="syncError !== null"
-                >
-                  Unlink
-                  <v-tooltip activator="parent" location="top">
-                    Stop using this Alert for this Monitor
-                  </v-tooltip>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+        <div class="d-flex justify-center" style="width: 100%">
+          <v-table style="min-width: 70%" fixed-header>
+            <thead class="text-h5">
+              <tr>
+                <th width="60%">Monitor</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="text-body-1">
+              <tr v-for="monitor in alertConfig.monitors" :key="monitor.monitor_id">
+                <td>
+                  <v-chip class="text-body-1" color="teal-accent-4" variant="tonal" label>
+                    {{ monitor.name }}
+                  </v-chip>
+                </td>
+                <td>
+                  <v-btn
+                    color="primary"
+                    variant="elevated"
+                    append-icon="mdi-open-in-app"
+                    @click="navigateToMonitor(monitor.monitor_id)"
+                  >
+                    View
+                  </v-btn>
+                  <v-btn
+                    append-icon="mdi-link-off"
+                    color="primary"
+                    class="ma-3"
+                    :disabled="syncError !== null"
+                  >
+                    Unlink
+                    <v-tooltip activator="parent" location="top">
+                      Stop using this Alert for this Monitor
+                    </v-tooltip>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card-text>
     </v-card>
     <ConfirmationDialog
