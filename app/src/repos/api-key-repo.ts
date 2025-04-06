@@ -1,5 +1,5 @@
 import type { ApiKey } from '@/types/api-key'
-import { ApiRepository } from './api-repo'
+import { ApiClient } from '@/utils/client'
 
 type ApiKeyList = {
   data: Array<ApiKey>
@@ -20,7 +20,7 @@ export interface ApiKeyRepoInterface {
   revokeKey(key: ApiKey): Promise<void>
 }
 
-export class ApiKeyRepository extends ApiRepository implements ApiKeyRepoInterface {
+export class ApiKeyRepository extends ApiClient implements ApiKeyRepoInterface {
   async getKeys(): Promise<Array<ApiKey>> {
     const resp = await this.sendRequest(`/api/v1/keys`, 'GET')
     return (resp as ApiKeyList).data

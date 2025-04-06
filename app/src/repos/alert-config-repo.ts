@@ -4,7 +4,7 @@ import type {
   AlertConfigSummary,
   BasicAlertConfig
 } from '@/types/alert-config'
-import { ApiRepository } from './api-repo'
+import { ApiClient } from '@/utils/client'
 
 export interface AlertConfigRepoInterface {
   getAlertConfigs(): Promise<Array<AlertConfigSummary>>
@@ -25,7 +25,7 @@ type AlertConfigList = {
   }
 }
 
-export class AlertConfigRepository extends ApiRepository implements AlertConfigRepoInterface {
+export class AlertConfigRepository extends ApiClient implements AlertConfigRepoInterface {
   async getAlertConfigs(): Promise<Array<AlertConfigSummary>> {
     const resp = await this.sendRequest(`/api/v1/alert-configs`, 'GET')
     return (resp as AlertConfigList).data
