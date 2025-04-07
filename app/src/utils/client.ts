@@ -2,7 +2,7 @@ type ApiResponse = {
   data: unknown
 }
 
-export class ApiRepository {
+export class ApiClient {
   private readonly baseUrl = import.meta.env.VITE_API_HOST
   protected readonly getAuthToken: () => string
 

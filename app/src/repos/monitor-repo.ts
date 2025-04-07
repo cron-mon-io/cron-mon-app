@@ -1,5 +1,5 @@
 import type { MonitorSummary, MonitorIdentity, Monitor, MonitorInformation } from '@/types/monitor'
-import { ApiRepository } from './api-repo'
+import { ApiClient } from '@/utils/client'
 
 export interface MonitorRepoInterface {
   getMonitorInfos(): Promise<Array<MonitorInformation>>
@@ -20,7 +20,7 @@ type MonitorList = {
   }
 }
 
-export class MonitorRepository extends ApiRepository implements MonitorRepoInterface {
+export class MonitorRepository extends ApiClient implements MonitorRepoInterface {
   async getMonitorInfos(): Promise<Array<MonitorInformation>> {
     const resp = await this.sendRequest(`/api/v1/monitors`, 'GET')
     return (resp as MonitorList).data

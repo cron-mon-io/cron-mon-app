@@ -503,6 +503,27 @@ export function setupTestAPI(expectedToken: string): SetupServer {
         alertConfigs = alertConfigs.filter((ac) => ac.alert_config_id !== alertConfigId)
 
         return new HttpResponse(null, { status: 200 })
+      }),
+      http.post('/api/v1/alert-configs/:alertConfigId/test', ({ request, params }) => {
+        const authErroResponse = assertAuth(request)
+        if (authErroResponse) {
+          return authErroResponse
+        }
+        const { alertConfigId } = params
+        const alertConfig = alertConfigs.find((ac) => ac.alert_config_id === alertConfigId)
+        if (!alertConfig) {
+          return HttpResponse.json(
+            {
+              error: {
+                code: 404,
+                reason: 'Not Found',
+                description: 'The requested resource could not be found.'
+              }
+            },
+            { status: 404 }
+          )
+        }
+        return HttpResponse.json({}, { status: 201 })
       })
     ]
   )
