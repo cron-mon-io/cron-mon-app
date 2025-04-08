@@ -32,26 +32,28 @@
           </v-btn>
         </template>
         <template #footer>
-          <v-btn
-            append-icon="mdi-test-tube"
-            color="orange"
-            class="ma-3"
-            :disabled="syncError !== null"
-            @click="sendTestAlert"
-          >
-            Test Alert
-            <v-tooltip activator="parent" location="top">Click to send a test Alert</v-tooltip>
-          </v-btn>
-          <v-btn
-            append-icon="mdi-delete"
-            color="primary"
-            class="ma-3"
-            :disabled="syncError !== null"
-            @click="openDeleteDialog"
-          >
-            Delete Alert
-            <v-tooltip activator="parent" location="top">Click to delete this Alert</v-tooltip>
-          </v-btn>
+          <div data-test="footer-buttons">
+            <v-btn
+              append-icon="mdi-test-tube"
+              color="orange"
+              class="ma-3"
+              :disabled="syncError !== null"
+              @click="openTestAlertDialog"
+            >
+              Test Alert
+              <v-tooltip activator="parent" location="top">Click to send a test Alert</v-tooltip>
+            </v-btn>
+            <v-btn
+              append-icon="mdi-delete"
+              color="primary"
+              class="ma-3"
+              :disabled="syncError !== null"
+              @click="openDeleteDialog"
+            >
+              Delete Alert
+              <v-tooltip activator="parent" location="top">Click to delete this Alert</v-tooltip>
+            </v-btn>
+          </div>
         </template>
       </AlertConfigBrief>
       <v-card-text class="text-h6">
@@ -99,6 +101,13 @@
       </v-card-text>
     </v-card>
     <ConfirmationDialog
+      :dialog-active="testAlertDialogActive"
+      title="Send test alert?"
+      icon="mdi-delete"
+      question="This will send a test alert using the given configuration. Are you sure?"
+      @dialog-complete="testAlertDialogComplete"
+    />
+    <ConfirmationDialog
       :dialog-active="deleteDialogActive"
       title="Delete this Monitor?"
       icon="mdi-delete"
@@ -142,21 +151,26 @@ const syncError = ref<string | null>(null)
 const testAlertError = ref<string | null>(null)
 const deleteError = ref<string | null>(null)
 const editDialogActive = ref(false)
+const testAlertDialogActive = ref(false)
 const deleteDialogActive = ref(false)
 
 function openEditDialog() {
   editDialogActive.value = true
 }
 
-async function sendTestAlert() {
-  const alertService = await getAlertConfigService()
-  try {
-    await alertService.sendTestAlert(alertConfig.value as AlertConfig)
-    // If we've successfully sent the test alert, we can clear any previous errors.
-    testAlertError.value = null
-  } catch (e: unknown) {
-    testAlertError.value = (e as Error).message
+async function testAlertDialogComplete(confirmed: boolean) {
+  if (confirmed) {
+    const alertService = await getAlertConfigService()
+    try {
+      await alertService.sendTestAlert(alertConfig.value as AlertConfig)
+      // If we've successfully sent the test alert, we can clear any previous errors.
+      testAlertError.value = null
+    } catch (e: unknown) {
+      testAlertError.value = (e as Error).message
+    }
   }
+
+  closeTestAlertDialog()
 }
 
 async function deleteDialogComplete(confirmed: boolean) {
@@ -178,6 +192,14 @@ async function deleteDialogComplete(confirmed: boolean) {
   if (deleted) {
     router.push('/alerts')
   }
+}
+
+function openTestAlertDialog() {
+  testAlertDialogActive.value = true
+}
+
+function closeTestAlertDialog() {
+  testAlertDialogActive.value = false
 }
 
 function openDeleteDialog() {
