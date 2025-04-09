@@ -94,4 +94,8 @@ export class FakeAlertConfigRepo implements AlertConfigRepoInterface {
   addError(error: string) {
     this.errors.push(error)
   }
+  addMonitor(alertConfigId: string, monitorId: string, monitorName: string) {
+    const alertConfig = this.data[alertConfigId]
+    alertConfig.monitors.push({ monitor_id: monitorId, name: monitorName })
+  }
 }

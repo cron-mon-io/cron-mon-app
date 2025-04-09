@@ -319,6 +319,9 @@ describe('MonitorView view', () => {
     // Let the MonitorView component delete the monitor.
     await flushPromises()
 
+    // TODO: This test doesn't actually abort deletion, it just doesn't confirm it. The variable
+    // names are also missleading due to suspected copy/pasta. Fix this!
+
     // The monitor should not have been deleted.
     const monitor = await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e')
     expect(monitor).toBeDefined()

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, type Mock } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-// import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import AlertView from '@/views/AlertView.vue'
 
@@ -111,7 +111,6 @@ describe('AlertView view', () => {
     // We should have an 'Edit Alert' button after the 3 chips under the title. Note we have to go through
     // the card twice to get to the button. This is because the AlertConfigBrief component renders a
     // v-card, which is then wrapped in another v-card by the AlertView component.
-    // console.log(wrapper.find('.v-card').html())
     const editButton = wrapper.find('.v-card').find('.v-card-text').find('.v-btn')
     expect(editButton.text()).toBe('Edit Alert')
 
@@ -121,378 +120,402 @@ describe('AlertView view', () => {
     // We should have a table of monitors using this alert.
     const monitors = wrapper.find('.v-table').findAll('tbody tr')
     expect(monitors).toHaveLength(2)
-    expect(monitors[0].find('td').text()).toBe('Monitor 1')
-    expect(monitors[1].find('td').text()).toBe('Monitor 2')
 
-    // TODO - Ensure we have view and unlike buttons for each row.
+    // Each monitor using the alert should be displayed here, with a View and Unlink button.
+    expect(monitors.map((monitor) => monitor.findAll('td')[0].text())).toEqual([
+      'Monitor 1',
+      'Monitor 2'
+    ])
+    expect(
+      monitors[0]
+        .findAll('td')[1]
+        .findAll('.v-btn')
+        .map((button) => button.text())
+    ).toEqual(['View', 'Unlink'])
+    expect(
+      monitors[1]
+        .findAll('td')[1]
+        .findAll('.v-btn')
+        .map((button) => button.text())
+    ).toEqual(['View', 'Unlink'])
   })
 
-  //   it('detects new jobs', async () => {
-  //     vi.useFakeTimers()
+  it('detects newly linked monitors jobs', async () => {
+    vi.useFakeTimers()
 
-  //     const { wrapper, repo } = await mountMonitorView()
+    const { wrapper, repo } = await mountAlertView()
 
-  //     const numJobs = wrapper.findAll('.fake-job-info').length
+    const numMonitors = wrapper.find('.v-table').find('tbody').findAll('tr').length
 
-  //     // Add a new job to the monitor.
-  //     repo.addJob('547810d4-a636-4c1b-83e6-3e641391c84e', {
-  //       job_id: 'f7d2f35b-5f0a-4ce6-878a-4b29b11f7574',
-  //       start_time: '2021-09-01T12:00:00Z',
-  //       end_time: null,
-  //       in_progress: true,
-  //       duration: null,
-  //       late: false,
-  //       succeeded: null,
-  //       output: null
-  //     })
+    // Link another monitor to the alert.
+    repo.addMonitor(
+      '547810d4-a636-4c1b-83e6-3e641391c84e',
+      '394fa634-48e0-4a04-861d-be4bd354d8ab',
+      'New Monitor'
+    )
 
-  //     // Let the MonitorView component detect the new job.
-  //     vi.advanceTimersByTime(1 * 60 * 1000)
-  //     await flushPromises()
+    // Let the AlertView component detect the new monitor.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-  //     const jobs = wrapper.findAll('.fake-job-info')
-  //     expect(jobs).toHaveLength(numJobs + 1)
-  //     const newJob = jobs[jobs.length - 1]
-  //     expect(newJob.text()).toBe('f7d2f35b-5f0a-4ce6-878a-4b29b11f7574')
+    wrapper.vm.$nextTick()
+    await flushPromises()
 
-  //     vi.useRealTimers()
-  //   })
+    const monitors = wrapper.find('.v-table').find('tbody').findAll('tr')
+    expect(monitors).toHaveLength(numMonitors + 1)
+    const newMonitor = monitors[monitors.length - 1]
+    expect(newMonitor.findAll('td')[0].text()).toBe('New Monitor')
 
-  //   it('edits monitors as expected', async () => {
-  //     const { wrapper } = await mountMonitorView()
+    vi.useRealTimers()
+  })
 
-  //     // Dialog should not be open.
-  //     const dialog = wrapper.find('.fake-setup-monitor-dialog')
-  //     expect(dialog.find('.content').exists()).toBeFalsy()
+  it('edits monitors as expected', async () => {
+    // TODO
+  })
 
-  //     // Clicking the Edit button will trigger our test dialog.
-  //     const addButton = wrapper.findAll('.v-btn')[0]
-  //     await addButton.trigger('click')
-  //     await flushPromises()
+  it('deletes alerts as expected', async () => {
+    const push = vi.fn()
+    const mockUseRouter = useRouter as Mock // We've mocked this above.
+    mockUseRouter.mockImplementationOnce(() => ({
+      push
+    }))
 
-  //     // The dialog should now be open and should contain the ID of our monitor.
-  //     const dialogContent = dialog.find('.content')
-  //     expect(dialogContent.exists()).toBeTruthy()
-  //     expect(dialogContent.find('p').text()).toBe('547810d4-a636-4c1b-83e6-3e641391c84e')
+    const { wrapper, repo } = await mountAlertView()
 
-  //     // Clicking the dialog's button will close the dialog, at which point the
-  //     // MonitorView component will update the monitor.
-  //     await dialogContent.find('button').trigger('click')
-  //     await flushPromises()
+    // Dialog should not be open.
+    const dialog = wrapper.findAll('.fake-confirmation-dialog')[1]
+    expect(dialog.find('.content').exists()).toBeFalsy()
 
-  //     expect(dialog.find('.content').exists()).toBeFalsy()
+    // Clicking the Delete button will trigger our test dialog.
+    const deleteButton = wrapper
+      .find('.v-card')
+      .find('[data-test="footer-buttons"]')
+      .findAll('.v-btn')[1]
+    expect(deleteButton.text()).toBe('Delete Alert')
+    await deleteButton.trigger('click')
+    await flushPromises()
 
-  //     // The monitor should have been updated.
-  //     expect(wrapper.find('.v-card-title').text()).toBe('Monitor 1 with a new name')
-  //   })
+    // The dialog should now be open.
+    const dialogContent = dialog.find('.content')
+    expect(dialogContent.exists()).toBeTruthy()
 
-  //   it('deletes monitors as expected', async () => {
-  //     const push = vi.fn()
-  //     const mockUseRouter = useRouter as Mock // We've mocked this above.
-  //     mockUseRouter.mockImplementationOnce(() => ({
-  //       push
-  //     }))
+    // Clicking the dialog's button will close the dialog, at which point the
+    // AlertView should delete the alert.
+    await dialogContent.find('button').trigger('click')
+    await flushPromises()
 
-  //     const { wrapper, repo } = await mountMonitorView()
+    expect(dialog.find('.content').exists()).toBeFalsy()
 
-  //     // Dialog should not be open.
-  //     const dialog = wrapper.find('.fake-confirmation-dialog')
-  //     expect(dialog.find('.content').exists()).toBeFalsy()
+    // The alert should have been deleted.
+    await expect(
+      async () => await repo.getAlertConfig('547810d4-a636-4c1b-83e6-3e641391c84e')
+    ).rejects.toThrowError(
+      "Failed to find alert config with id '547810d4-a636-4c1b-83e6-3e641391c84e'"
+    )
 
-  //     // Clicking the Delete button will trigger our test dialog.
-  //     const deleteButton = wrapper.findAll('.v-btn')[1]
-  //     await deleteButton.trigger('click')
-  //     await flushPromises()
+    // We should have been redirected to the Monitors view.
+    expect(push).toHaveBeenCalledWith({ name: 'alerts' })
+  })
 
-  //     // The dialog should now be open and should contain the ID of our monitor.
-  //     const dialogContent = dialog.find('.content')
-  //     expect(dialogContent.exists()).toBeTruthy()
+  it('does not delete alerts when delete is aborted', async () => {
+    const push = vi.fn()
+    const mockUseRouter = useRouter as Mock // We've mocked this above.
+    mockUseRouter.mockImplementationOnce(() => ({
+      push
+    }))
 
-  //     // Clicking the dialog's button will close the dialog, at which point the
-  //     // MonitorView component should delete the monitor.
-  //     await dialogContent.find('button').trigger('click')
-  //     await flushPromises()
+    const { wrapper, repo } = await mountAlertView(false)
 
-  //     expect(dialog.find('.content').exists()).toBeFalsy()
+    // Clicking the Delete button will trigger our test dialog.
+    const deleteButton = wrapper
+      .find('.v-card')
+      .find('[data-test="footer-buttons"]')
+      .findAll('.v-btn')[1]
+    expect(deleteButton.text()).toBe('Delete Alert')
+    await deleteButton.trigger('click')
+    await flushPromises()
 
-  //     // The monitor should have been deleted.
-  //     await expect(
-  //       async () => await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e')
-  //     ).rejects.toThrowError("Failed to find monitor with id '547810d4-a636-4c1b-83e6-3e641391c84e'")
+    // Give the AlertView a chance to delete the alert if it was going too.
+    await flushPromises()
 
-  //     // We should have been redirected to the Monitors view.
-  //     expect(push).toHaveBeenCalledWith('/monitors')
-  //   })
+    // The alert should not have been deleted.
+    const alert = await repo.getAlertConfig('547810d4-a636-4c1b-83e6-3e641391c84e')
+    expect(alert).toBeDefined()
 
-  //   it('does not delete monitors when delete is aborted', async () => {
-  //     const push = vi.fn()
-  //     const mockUseRouter = useRouter as Mock // We've mocked this above.
-  //     mockUseRouter.mockImplementationOnce(() => ({
-  //       push
-  //     }))
+    // We should not have been redirected to the Alerts view.
+    expect(push).not.toHaveBeenCalled()
+  })
 
-  //     const { wrapper, repo } = await mountMonitorView(false)
+  it('stops syncing when the component is unmounted', async () => {
+    vi.useFakeTimers()
 
-  //     // Clicking the Delete button will trigger our test dialog, which will imediately
-  //     // complete with new Monitor info.
-  //     const addButton = wrapper.findAll('.v-btn')[1]
-  //     await addButton.trigger('click')
+    const { wrapper, repo } = await mountAlertView()
 
-  //     // Let the MonitorView component delete the monitor.
-  //     await flushPromises()
+    const spy = vi.spyOn(repo, 'getAlertConfig')
 
-  //     // The monitor should not have been deleted.
-  //     const monitor = await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e')
-  //     expect(monitor).toBeDefined()
+    // Let the AlertView sync.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-  //     // We should not have been redirected to the Monitors view.
-  //     expect(push).not.toHaveBeenCalled()
-  //   })
+    // Ensure the sync happened. This is a sanity check to ensure the spy is
+    // working and the test isn't evergreen.
+    expect(spy.mock.calls).toHaveLength(1)
 
-  //   it('stops syncing when the component is unmounted', async () => {
-  //     vi.useFakeTimers()
+    // Unmount the component then allow enough time for another sync to happen.
+    await wrapper.unmount()
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-  //     const { wrapper, repo } = await mountMonitorView()
+    // Ensure no more syncs happened.
+    expect(spy.mock.calls).toHaveLength(1)
 
-  //     const spy = vi.spyOn(repo, 'getMonitor')
-
-  //     // Let the MonitorView component sync.
-  //     vi.advanceTimersByTime(1 * 60 * 1000)
-  //     await flushPromises()
-
-  //     // Ensure the sync happened. This is a sanity check to ensure the spy is
-  //     // working and the test isn't evergreen.
-  //     expect(spy.mock.calls).toHaveLength(1)
-
-  //     // Unmount the component then allow enough time for another sync to happen.
-  //     await wrapper.unmount()
-  //     vi.advanceTimersByTime(1 * 60 * 1000)
-  //     await flushPromises()
-
-  //     // Ensure no more syncs happened.
-  //     expect(spy.mock.calls).toHaveLength(1)
-
-  //     vi.useRealTimers()
-  //   })
+    vi.useRealTimers()
+  })
 })
 
-// describe('MonitorView listing monitor and its jobs with errors', () => {
-//   it('does not show an error alert when the monitor repository has no errors', async () => {
-//     const { wrapper } = await mountMonitorView()
+describe('AlertView listing monitor and its jobs with errors', () => {
+  it('does not show an error alert when the alert config repository has no errors', async () => {
+    const { wrapper } = await mountAlertView()
 
-//     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
-//   })
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+  })
 
-//   it('shows an error alert when the monitor repository has errors', async () => {
-//     const { wrapper } = await mountMonitorView(true, ['Test error message'])
+  it('shows an error alert when the alert config repository has errors', async () => {
+    const { wrapper } = await mountAlertView(true, ['Test error message'])
 
-//     const alert = wrapper.find('.v-alert').find('.api-alert-content')
-//     expect(alert.find('span').text()).toBe('Test error message')
+    const alert = wrapper.find('.v-alert').find('.api-alert-content')
+    expect(alert.find('span').text()).toBe('Test error message')
 
-//     // The alert should have a Retry button.
-//     expect(alert.find('.v-btn').text()).toBe('Retry')
-//   })
+    // The alert should have a Retry button.
+    expect(alert.find('.v-btn').text()).toBe('Retry')
+  })
 
-//   it('clears the error alert when the retry button is clicked', async () => {
-//     const { wrapper } = await mountMonitorView(true, ['Test error message'])
+  it('clears the error alert when the retry button is clicked', async () => {
+    const { wrapper } = await mountAlertView(true, ['Test error message'])
 
-//     const alert = wrapper.find('.v-alert')
-//     await alert.find('.v-btn').trigger('click')
+    const alert = wrapper.find('.v-alert')
+    await alert.find('.v-btn').trigger('click')
 
-//     await flushPromises()
+    await flushPromises()
 
-//     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
-//   })
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+  })
 
-//   it('automatically clears the alert when next sync is successful', async () => {
-//     vi.useFakeTimers()
+  it('automatically clears the alert when next sync is successful', async () => {
+    vi.useFakeTimers()
 
-//     const { wrapper } = await mountMonitorView(true, ['Test error message'])
+    const { wrapper } = await mountAlertView(true, ['Test error message'])
 
-//     // Ensure the alert is visible.
-//     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+    // Ensure the alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeTruthy()
 
-//     // Let the MonitorView component sync again.
-//     vi.advanceTimersByTime(1 * 60 * 1000)
-//     await flushPromises()
+    // Let the AlertView sync again.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-//     // Ensure the alert is gone.
-//     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+    // Ensure the alert is gone.
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
 
-//     vi.useRealTimers()
-//   })
+    vi.useRealTimers()
+  })
 
-//   it('shows alert when error happens after successful sync', async () => {
-//     vi.useFakeTimers()
+  it('shows alert when error happens after successful sync', async () => {
+    vi.useFakeTimers()
 
-//     const { wrapper, repo } = await mountMonitorView()
+    const { wrapper, repo } = await mountAlertView()
 
-//     // Let the MonitorView component sync.
-//     vi.advanceTimersByTime(1 * 60 * 1000)
-//     await flushPromises()
+    // Let the AlertView sync.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-//     // Ensure no alert is visible.
-//     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+    // Ensure no alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
 
-//     // Add an error to the repo.
-//     repo.addError('Test error message')
+    // Add an error to the repo.
+    repo.addError('Test error message')
 
-//     // Let the MonitorView component sync again.
-//     vi.advanceTimersByTime(1 * 60 * 1000)
-//     await flushPromises()
+    // Let the AlertView sync again.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-//     // Ensure the alert is visible.
-//     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+    // Ensure the alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeTruthy()
 
-//     // editing and deleting monitors should be disabled whilst we're in a state of error.
-//     const buttons = wrapper.findAll('.v-btn')
-//     const editButton = buttons.find((button) => button.text() === 'Edit Monitor')
-//     const deleteButton = buttons.find((button) => button.text() === 'Delete Monitor')
-//     expect(editButton?.attributes('disabled')).toBeDefined()
-//     expect(deleteButton?.attributes('disabled')).toBeDefined()
+    // Editing, testing and deleting alerts should be disabled whilst we're in a state of error.
+    const editButton = wrapper.find('.v-card').find('.v-card-text').find('.v-btn')
+    const buttons = wrapper.find('.v-card').find('[data-test="footer-buttons"]').findAll('.v-btn')
+    const testButton = buttons.find((button) => button.text() === 'Test Alert')
+    const deleteButton = buttons.find((button) => button.text() === 'Delete Alert')
+    expect(editButton.attributes('disabled')).toBeDefined()
+    expect(testButton?.attributes('disabled')).toBeDefined()
+    expect(deleteButton?.attributes('disabled')).toBeDefined()
 
-//     vi.useRealTimers()
-//   })
+    vi.useRealTimers()
+  })
 
-//   it('shows alert when the monitor is deleted externally', async () => {
-//     vi.useFakeTimers()
+  it('shows alert when the alert is deleted externally', async () => {
+    vi.useFakeTimers()
 
-//     const { wrapper, repo } = await mountMonitorView()
+    const { wrapper, repo } = await mountAlertView()
 
-//     // Let the MonitorView component sync.
-//     vi.advanceTimersByTime(1 * 60 * 1000)
-//     await flushPromises()
+    // Let the AlertView sync.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-//     // Ensure no alert is visible.
-//     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+    // Ensure no alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
 
-//     // Delete the monitor outside of the component.
-//     await repo.deleteMonitor(await repo.getMonitor('547810d4-a636-4c1b-83e6-3e641391c84e'))
+    // Delete the alert outside of the component.
+    await repo.deleteAlertConfig(await repo.getAlertConfig('547810d4-a636-4c1b-83e6-3e641391c84e'))
 
-//     // Let the MonitorView component sync again.
-//     vi.advanceTimersByTime(1 * 60 * 1000)
-//     await flushPromises()
+    // Let the AlertView sync again.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-//     // Ensure the alert is visible.
-//     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+    // Ensure the alert is visible.
+    expect(wrapper.find('.v-alert').exists()).toBeTruthy()
 
-//     // editing and deleting monitors should be disabled whilst we're in a state of error.
-//     const buttons = wrapper.findAll('.v-btn')
-//     const editButton = buttons.find((button) => button.text() === 'Edit Monitor')
-//     const deleteButton = buttons.find((button) => button.text() === 'Delete Monitor')
-//     expect(editButton?.attributes('disabled')).toBeDefined()
-//     expect(deleteButton?.attributes('disabled')).toBeDefined()
+    // Editing, testing and deleting alerts should be disabled whilst we're in a state of error.
+    const editButton = wrapper.find('.v-card').find('.v-card-text').find('.v-btn')
+    const buttons = wrapper.find('.v-card').find('[data-test="footer-buttons"]').findAll('.v-btn')
+    const testButton = buttons.find((button) => button.text() === 'Test Alert')
+    const deleteButton = buttons.find((button) => button.text() === 'Delete Alert')
+    expect(editButton.attributes('disabled')).toBeDefined()
+    expect(testButton?.attributes('disabled')).toBeDefined()
+    expect(deleteButton?.attributes('disabled')).toBeDefined()
 
-//     vi.useRealTimers()
-//   })
-// })
+    vi.useRealTimers()
+  })
+})
 
-// describe('MonitorView editing and deleting monitors with errors', () => {
-//   it.each([
-//     { iconClass: '.mdi-pencil', dialogClass: '.fake-setup-monitor-dialog' },
-//     { iconClass: '.mdi-delete', dialogClass: '.fake-confirmation-dialog' }
-//   ])(
-//     'shows an error alert when the monitor cannot be editted/ deleted',
-//     async ({ iconClass, dialogClass }) => {
-//       const { wrapper, repo } = await mountMonitorView()
+describe('MonitorView editing and deleting monitors with errors', () => {
+  it.each([
+    // TODO: Uncomment this when the alerts can be edited.
+    // {
+    //   finder: (wrapper: VueWrapper) =>
+    //     return wrapper.find('.v-card').find('.v-card-text').find('.v-btn'),
+    //   dialogfinder: (wrapper: VueWrapper) => wrapper.find('.fake-setup-monitor-dialog')
+    // },
+    {
+      buttonFinder: (wrapper: VueWrapper) =>
+        wrapper.find('.v-card').find('[data-test="footer-buttons"]').findAll('.v-btn')[1],
+      dialogfinder: (wrapper: VueWrapper) => wrapper.findAll('.fake-confirmation-dialog')[1]
+    }
+  ])(
+    'shows an error alert when the alert cannot be editted/ deleted',
+    async ({ buttonFinder, dialogfinder }) => {
+      const { wrapper, repo } = await mountAlertView()
 
-//       repo.addError('Test error message')
+      repo.addError('Test error message')
 
-//       // Trigger an edit or deletion.
-//       const button = wrapper.find(iconClass)
-//       await button.trigger('click')
-//       await flushPromises()
-//       const dialogButton = wrapper.find(dialogClass).find('button')
-//       await dialogButton.trigger('click')
-//       await flushPromises()
+      // Trigger an edit or deletion.
+      const button = buttonFinder(wrapper)
+      await button.trigger('click')
+      await flushPromises()
+      const dialogButton = dialogfinder(wrapper).find('button')
+      await dialogButton.trigger('click')
+      await flushPromises()
 
-//       const alert = wrapper.find('.v-alert')
-//       expect(alert.find('.api-alert-content').find('span').text()).toBe('Test error message')
+      const alert = wrapper.find('.v-alert')
+      expect(alert.find('.api-alert-content').find('span').text()).toBe('Test error message')
 
-//       // The alert shouldn't have a Retry button, just a close button.
-//       const alertButton = alert.find('.v-btn')
-//       expect(alertButton.text()).not.toBe('Retry')
-//       expect(alertButton.find('.mdi').classes()).toContain('mdi-close')
+      // The alert shouldn't have a Retry button, just a close button.
+      const alertButton = alert.find('.v-btn')
+      expect(alertButton.text()).not.toBe('Retry')
+      expect(alertButton.find('.mdi').classes()).toContain('mdi-close')
 
-//       // Closing the alert should get rid of it, and nothing should be retried.
-//       repo.addError('We should not see this error message')
-//       await alertButton.trigger('click')
-//       await flushPromises()
-//       expect(wrapper.find('.v-alert').exists()).toBeFalsy()
-//     }
-//   )
+      // Closing the alert should get rid of it, and nothing should be retried.
+      repo.addError('We should not see this error message')
+      await alertButton.trigger('click')
+      await flushPromises()
+      expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+    }
+  )
 
-//   it('shows multiple error alerts if monitor cannot be editted, deleted, or resynced', async () => {
-//     const { wrapper, repo } = await mountMonitorView()
+  it('shows multiple errors if allert cannot be editted, deleted, or resynced', async () => {
+    const { wrapper, repo } = await mountAlertView()
 
-//     repo.addError('Failed to edit')
+    // TODO: Uncomment this when the alerts can be edited.
+    // repo.addError('Failed to edit')
 
-//     // Trigger an edit.
-//     const editButton = wrapper.find('.mdi-pencil')
-//     await editButton.trigger('click')
-//     await flushPromises()
-//     const editDialogButton = wrapper.find('.fake-setup-monitor-dialog').find('button')
-//     await editDialogButton.trigger('click')
-//     await flushPromises()
+    // Trigger an edit.
+    // const editButton = wrapper.find('.mdi-pencil')
+    // await editButton.trigger('click')
+    // await flushPromises()
+    // const editDialogButton = wrapper.find('.fake-setup-monitor-dialog').find('button')
+    // await editDialogButton.trigger('click')
+    // await flushPromises()
 
-//     let alerts = wrapper
-//       .findAll('.v-alert')
-//       .map((alert) => alert.find('.api-alert-content').find('span').text())
-//     expect(alerts).toHaveLength(1)
-//     expect(alerts).toEqual(['Failed to edit'])
+    // let alerts = wrapper
+    //   .findAll('.v-alert')
+    //   .map((alert) => alert.find('.api-alert-content').find('span').text())
+    // expect(alerts).toHaveLength(1)
+    // expect(alerts).toEqual(['Failed to edit'])
 
-//     repo.addError('Failed to delete')
+    repo.addError('Failed to delete')
 
-//     // Trigger a delete
-//     const deleteButton = wrapper.find('.mdi-delete')
-//     await deleteButton.trigger('click')
-//     await flushPromises()
-//     const deleteDialogButton = wrapper.find('.fake-confirmation-dialog').find('button')
-//     await deleteDialogButton.trigger('click')
-//     await flushPromises()
+    // Trigger a delete
+    const deleteButton = wrapper
+      .find('.v-card')
+      .find('[data-test="footer-buttons"]')
+      .findAll('.v-btn')[1]
+    await deleteButton.trigger('click')
+    await flushPromises()
+    const deleteDialogButton = wrapper.findAll('.fake-confirmation-dialog')[1].find('button')
+    await deleteDialogButton.trigger('click')
+    await flushPromises()
 
-//     alerts = wrapper
-//       .findAll('.v-alert')
-//       .map((alert) => alert.find('.api-alert-content').find('span').text())
-//     expect(alerts).toHaveLength(2)
-//     expect(alerts).toEqual(['Failed to edit', 'Failed to delete'])
-//   })
+    // TODO: Uncomment this when the alerts can be edited.
+    // alerts = wrapper
+    //   .findAll('.v-alert')
+    //   .map((alert) => alert.find('.api-alert-content').find('span').text())
+    // expect(alerts).toHaveLength(2)
+    // expect(alerts).toEqual(['Failed to edit', 'Failed to delete'])
 
-//   it('allows monitors to be editted after initial sync fails', async () => {
-//     // Regression test for error where the edit monitor dialog was rendered as if creating a new
-//     // monitor, rather than editing an existing one, if the first sync failed. This was caused by
-//     // the `SetupMonitorDialog` component checking if the monitor provided to it is `null` to know
-//     // whether to show the dialog for creating a new monitor or editing an existing one. This is
-//     // fixed by using a `v-if="monitor !== null"` on the `SetupMonitorDialog` component, so that it
-//     // doesn't get injected into the `MonitorView` until the monitor is available, meaning the dialog
-//     // is guaranteed to get a monitor and not `null`.
-//     vi.useFakeTimers()
+    // TODO: Delete this when allerts can be edited.
+    const alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toHaveLength(1)
+    expect(alerts).toEqual(['Failed to delete'])
+  })
 
-//     const { wrapper } = await mountMonitorView(true, ['Test error message'])
+  // TODO: Uncomment this when the alerts can be edited.
+  // it('allows monitors to be editted after initial sync fails', async () => {
+  //   // Regression test for error where the edit monitor dialog was rendered as if creating a new
+  //   // monitor, rather than editing an existing one, if the first sync failed. This was caused by
+  //   // the `SetupMonitorDialog` component checking if the monitor provided to it is `null` to know
+  //   // whether to show the dialog for creating a new monitor or editing an existing one. This is
+  //   // fixed by using a `v-if="monitor !== null"` on the `SetupMonitorDialog` component, so that it
+  //   // doesn't get injected into the `MonitorView` until the monitor is available, meaning the dialog
+  //   // is guaranteed to get a monitor and not `null`.
+  //   vi.useFakeTimers()
 
-//     // Since the first sync fails, the monitor should be `null` and we shouldn't
-//     // have any dialog at all.
-//     expect(wrapper.find('.fake-setup-monitor-dialog').exists()).toBeFalsy()
+  //   const { wrapper } = await mountMonitorView(true, ['Test error message'])
 
-//     // Let the MonitorView component sync again - which will succeed this time.
-//     vi.advanceTimersByTime(1 * 60 * 1000)
-//     await flushPromises()
+  //   // Since the first sync fails, the monitor should be `null` and we shouldn't
+  //   // have any dialog at all.
+  //   expect(wrapper.find('.fake-setup-monitor-dialog').exists()).toBeFalsy()
 
-//     // Now that we've synced the monitor and it's no longer `null`, we shoud have the
-//     // dialog container again.
-//     const editDialog = wrapper.find('.fake-setup-monitor-dialog')
-//     expect(editDialog.exists()).toBeTruthy()
+  //   // Let the MonitorView component sync again - which will succeed this time.
+  //   vi.advanceTimersByTime(1 * 60 * 1000)
+  //   await flushPromises()
 
-//     // Open the edit dialog.
-//     const button = wrapper.find('.mdi-pencil')
-//     await button.trigger('click')
-//     await flushPromises()
+  //   // Now that we've synced the monitor and it's no longer `null`, we shoud have the
+  //   // dialog container again.
+  //   const editDialog = wrapper.find('.fake-setup-monitor-dialog')
+  //   expect(editDialog.exists()).toBeTruthy()
 
-//     // The dialog should contain the monitor ID.
-//     expect(wrapper.find('.fake-setup-monitor-dialog').find('p').text()).toBe(
-//       '547810d4-a636-4c1b-83e6-3e641391c84e'
-//     )
+  //   // Open the edit dialog.
+  //   const button = wrapper.find('.mdi-pencil')
+  //   await button.trigger('click')
+  //   await flushPromises()
 
-//     vi.useRealTimers()
-//   })
-// })
+  //   // The dialog should contain the monitor ID.
+  //   expect(wrapper.find('.fake-setup-monitor-dialog').find('p').text()).toBe(
+  //     '547810d4-a636-4c1b-83e6-3e641391c84e'
+  //   )
+
+  //   vi.useRealTimers()
+  // })
+})
