@@ -1,22 +1,17 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, type Mock } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 import AlertsView from '../AlertsView.vue'
+import { type AlertConfig } from '@/types/alert-config'
+import { type AlertConfigRepoInterface } from '@/repos/alert-config-repo'
 
-import { FakeAlertConfigRepo } from '@/utils/testing/fake-alert-config-repo'
 import { FakeVueCookies } from '@/utils/testing/fake-vue-cookies'
 
-async function mountAlertsView(errors: string[] = []): Promise<{
-  wrapper: VueWrapper
-  cookies: FakeVueCookies
-  repo: FakeAlertConfigRepo
-}> {
-  const vuetify = createVuetify({ components, directives })
-
-  const TEST_ALERT_CONFIG_DATA = [
+function getTestAlertConfigData(): AlertConfig[] {
+  return [
     {
       alert_config_id: '547810d4-a636-4c1b-83e6-3e641391c84e',
       name: 'Alert Config 1',
@@ -56,9 +51,30 @@ async function mountAlertsView(errors: string[] = []): Promise<{
       }
     }
   ]
+}
+
+async function mountAlertsView(errors: string[] = []): Promise<{
+  wrapper: VueWrapper
+  cookies: FakeVueCookies
+  repo: AlertConfigRepoInterface
+}> {
+  const vuetify = createVuetify({ components, directives })
+
+  const testAlertConfigData = getTestAlertConfigData()
+  const repo = {
+    getAlertConfigs: vi.fn().mockImplementation((_) => {
+      if (errors.length > 0) {
+        return Promise.reject(new Error(errors.shift() as string))
+      }
+      return Promise.resolve(testAlertConfigData)
+    }),
+    getAlertConfig: vi.fn(),
+    addAlertConfig: vi.fn(),
+    updateAlertConfig: vi.fn(),
+    deleteAlertConfig: vi.fn()
+  }
 
   const cookies = new FakeVueCookies()
-  const repo = new FakeAlertConfigRepo(TEST_ALERT_CONFIG_DATA, errors)
   const wrapper = mount(AlertsView, {
     global: {
       plugins: [vuetify],
@@ -108,11 +124,14 @@ describe('AlertsView view', () => {
     const numAlertConfigs = wrapper.find('.v-card').findAll('.v-card').length
 
     // Add new alert config 'externally'
-    await repo.addAlertConfig({
+    const testAlertConfigs = getTestAlertConfigData()
+    testAlertConfigs.push({
+      alert_config_id: '5469ab0d-a32b-4a37-8b6b-db1ee479b95f',
       name: 'New alert config added externally',
       active: true,
       on_late: true,
       on_error: true,
+      monitors: [],
       type: {
         Slack: {
           token: 'fake-slack-bot-token',
@@ -120,6 +139,7 @@ describe('AlertsView view', () => {
         }
       }
     })
+    ;(repo.getAlertConfigs as Mock).mockResolvedValue(testAlertConfigs)
 
     // Let the AlertsView component detect the new alert config.
     vi.advanceTimersByTime(5 * 60 * 1000)
@@ -202,16 +222,21 @@ describe('AlertsView listing monitors with errors', () => {
   it('shows alert when error happens after successful sync', async () => {
     vi.useFakeTimers()
     const { wrapper, repo } = await mountAlertsView()
+
     // Let the AlertsView component sync.
     vi.advanceTimersByTime(5 * 60 * 1000)
     await flushPromises()
+
     // Ensure no alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+
     // Add an error to the repo.
-    repo.addError('Test error message')
+    ;(repo.getAlertConfigs as Mock).mockRejectedValue(new Error('Test error message'))
+
     // Let the AlertsView component sync again.
     vi.advanceTimersByTime(5 * 60 * 1000)
     await flushPromises()
+
     // Ensure the alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
     vi.useRealTimers()

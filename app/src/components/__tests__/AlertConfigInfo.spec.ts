@@ -99,7 +99,7 @@ describe('AlertConfigInfo component', () => {
 
     expect(push).toHaveBeenCalledOnce()
     expect(push).toHaveBeenCalledWith({
-      name: 'alerts',
+      name: 'alert',
       params: {
         id: '7230f35b-5f0a-4ce6-878a-4b29b11f7574'
       }
