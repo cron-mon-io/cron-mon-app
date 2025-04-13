@@ -67,7 +67,7 @@
               </tr>
             </thead>
             <tbody class="text-body-1">
-              <tr v-for="monitor in alertConfig.monitors" :key="monitor.monitor_id">
+              <tr v-for="monitor in alertConfig.monitors" :key="monitor.monitor_id + monitor.name">
                 <td>
                   <v-chip class="text-body-1" color="teal-accent-4" variant="tonal" label>
                     {{ monitor.name }}
