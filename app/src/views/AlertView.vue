@@ -158,6 +158,10 @@ function openEditDialog() {
   editDialogActive.value = true
 }
 
+function openTestAlertDialog() {
+  testAlertDialogActive.value = true
+}
+
 async function testAlertDialogComplete(confirmed: boolean) {
   if (confirmed) {
     const alertService = await getAlertConfigService()
@@ -171,6 +175,14 @@ async function testAlertDialogComplete(confirmed: boolean) {
   }
 
   closeTestAlertDialog()
+}
+
+function closeTestAlertDialog() {
+  testAlertDialogActive.value = false
+}
+
+function openDeleteDialog() {
+  deleteDialogActive.value = true
 }
 
 async function deleteDialogComplete(confirmed: boolean) {
@@ -190,20 +202,8 @@ async function deleteDialogComplete(confirmed: boolean) {
   // We want to close the dialog first before we navigate back to the alerts page,
   // just because it looks slightly better.
   if (deleted) {
-    router.push('/alerts')
+    router.push({ name: 'alerts' })
   }
-}
-
-function openTestAlertDialog() {
-  testAlertDialogActive.value = true
-}
-
-function closeTestAlertDialog() {
-  testAlertDialogActive.value = false
-}
-
-function openDeleteDialog() {
-  deleteDialogActive.value = true
 }
 
 function closeDeleteDialog() {
