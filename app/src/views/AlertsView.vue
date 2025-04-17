@@ -6,6 +6,7 @@
       :retry-enabled="true"
       @retried="getAlertConfigs"
     />
+    <ApiAlert class="mx-4 mt-4" :error="createError" :retry-enabled="false" />
     <v-card class="elevation-2 mx-6 mt-13">
       <v-card-title class="font-weight-black">Alerts</v-card-title>
       <v-card-text>
@@ -37,6 +38,11 @@
         />
       </div>
     </v-card>
+    <SetupAlertDialog
+      :dialog-active="createAlertDialogOpen"
+      @dialog-complete="addAlert"
+      @dialog-aborted="closeDialog"
+    />
   </div>
 </template>
 
@@ -45,8 +51,9 @@ import { ref, inject, onUnmounted, onMounted } from 'vue'
 
 import ApiAlert from '@/components/ApiAlert.vue'
 import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
-import type { AlertConfigSummary } from '@/types/alert-config'
+import type { AlertConfig, AlertConfigSummary, BasicAlertConfig } from '@/types/alert-config'
 import AlertConfigInfo from '@/components/AlertConfigInfo.vue'
+import SetupAlertDialog from '@/components/SetupAlertDialog.vue'
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000
 
@@ -62,8 +69,31 @@ onUnmounted(() => {
 
 const loading = ref(true)
 const syncError = ref<string | null>(null)
+const createError = ref<string | null>(null)
 const alertConfigs = ref<AlertConfigSummary[]>([])
 const createAlertDialogOpen = ref(false)
+
+async function addAlert(alertConfig: BasicAlertConfig) {
+  let alert: AlertConfig | null = null
+  const repo = await getAlertConfigRepo()
+  try {
+    alert = await repo.addAlertConfig(alertConfig)
+  } catch (e: unknown) {
+    createError.value = (e as Error).message
+  }
+
+  if (alert !== null) {
+    // We get the list of monitors again here, rather than just inserting the new monitor,
+    // so that the list is sorted by the API.
+    await getAlertConfigs()
+  }
+
+  closeDialog()
+}
+
+function closeDialog() {
+  createAlertDialogOpen.value = false
+}
 
 async function getAlertConfigs() {
   const alertConfigRepo = await getAlertConfigRepo()
