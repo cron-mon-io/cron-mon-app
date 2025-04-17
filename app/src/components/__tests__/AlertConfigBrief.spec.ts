@@ -43,7 +43,7 @@ describe('AlertConfigBrief component', () => {
           on_late: on_late,
           on_error: on_error,
           type: {
-            Slack: {
+            slack: {
               token: 'fake-slack-bot-token',
               channel: '#fake-channel'
             }

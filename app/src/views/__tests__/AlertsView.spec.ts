@@ -25,7 +25,7 @@ function getTestAlertConfigData(): AlertConfig[] {
         }
       ],
       type: {
-        Slack: {
+        slack: {
           token: 'fake-slack',
           channel: '#fake-channel'
         }
@@ -44,7 +44,7 @@ function getTestAlertConfigData(): AlertConfig[] {
         }
       ],
       type: {
-        Slack: {
+        slack: {
           token: 'fake-slack',
           channel: '#fake-channel'
         }
@@ -133,7 +133,7 @@ describe('AlertsView view', () => {
       on_error: true,
       monitors: [],
       type: {
-        Slack: {
+        slack: {
           token: 'fake-slack-bot-token',
           channel: '#fake-channel'
         }

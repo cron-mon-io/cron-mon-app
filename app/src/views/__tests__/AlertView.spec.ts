@@ -31,7 +31,7 @@ function getTestAlertConfigData(): AlertConfig {
       }
     ],
     type: {
-      Slack: {
+      slack: {
         token: 'fake-slack',
         channel: '#fake-channel'
       }
@@ -304,7 +304,7 @@ describe('AlertView view', () => {
         }
       ],
       type: {
-        Slack: {
+        slack: {
           channel: '#fake-channel',
           token: 'fake-slack'
         }

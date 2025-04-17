@@ -22,7 +22,7 @@ export type AlertConfig = AlertConfigIdentity & {
 }
 
 export type SlackAlertType = {
-  Slack: {
+  slack: {
     token: string
     channel: string
   }
