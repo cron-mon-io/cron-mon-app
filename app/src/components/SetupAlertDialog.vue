@@ -72,6 +72,7 @@
                 variant="outlined"
               ></v-text-field>
             </div>
+            <div v-else-if="alertType === 'Webhook'">Not supported yet</div>
           </div>
           <div v-else class="text-h6">
             Type:
