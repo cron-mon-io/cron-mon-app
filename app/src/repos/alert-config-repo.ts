@@ -9,8 +9,8 @@ import { ApiClient } from '@/utils/client'
 export interface AlertConfigRepoInterface {
   getAlertConfigs(): Promise<Array<AlertConfigSummary>>
   getAlertConfig(alertConfigId: string): Promise<AlertConfig>
-  addAlertConfig(alertConfig: AlertConfig): Promise<AlertConfig>
-  updateAlertConfig(alertConfig: AlertConfig): Promise<AlertConfig>
+  addAlertConfig(alertConfig: BasicAlertConfig): Promise<AlertConfig>
+  updateAlertConfig(alertConfig: AlertConfigIdentity): Promise<AlertConfig>
   deleteAlertConfig(alertConfig: AlertConfig): Promise<void>
 }
 

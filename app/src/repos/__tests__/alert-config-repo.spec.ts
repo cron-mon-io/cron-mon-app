@@ -31,7 +31,7 @@ describe('AlertConfigRepository', () => {
         on_error: false,
         on_late: true,
         type: {
-          Slack: {
+          slack: {
             channel: 'monitoring-alerts',
             token: 'fake-slack-bot-token'
           }
@@ -73,7 +73,7 @@ describe('AlertConfigRepository', () => {
       on_error: false,
       on_late: true,
       type: {
-        Slack: {
+        slack: {
           channel: 'monitoring-alerts',
           token: 'fake-slack-bot-token'
         }
@@ -94,7 +94,7 @@ describe('AlertConfigRepository', () => {
       on_late: true,
       on_error: true,
       type: {
-        Slack: {
+        slack: {
           token: 'fake-slack-bot-token',
           channel: 'C1234567890'
         }
@@ -169,7 +169,7 @@ describe('AlertConfigRepository when auth token is invalid', () => {
           on_late: true,
           on_error: true,
           type: {
-            Slack: {
+            slack: {
               token: 'fake-slack-bot-token',
               channel: 'C1234567890'
             }
@@ -188,7 +188,7 @@ describe('AlertConfigRepository when auth token is invalid', () => {
           on_late: true,
           on_error: true,
           type: {
-            Slack: {
+            slack: {
               token: 'fake-slack-bot-token',
               channel: 'C1234567890'
             }
@@ -207,7 +207,7 @@ describe('AlertConfigRepository when auth token is invalid', () => {
           on_late: true,
           on_error: true,
           type: {
-            Slack: {
+            slack: {
               token: 'fake-slack-bot-token',
               channel: 'C1234567890'
             }

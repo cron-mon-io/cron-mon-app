@@ -35,7 +35,7 @@ describe('AlertConfigInfo component', () => {
           on_error: false,
           monitors: monitors,
           type: {
-            Slack: {
+            slack: {
               token: 'fake-slack-bot-token',
               channel: '#fake-channel'
             }
@@ -84,7 +84,7 @@ describe('AlertConfigInfo component', () => {
           on_error: false,
           monitors: 2,
           type: {
-            Slack: {
+            slack: {
               token: 'fake-slack-bot-token',
               channel: '#fake-channel'
             }

@@ -135,7 +135,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
       on_late: true,
       on_error: false,
       type: {
-        Slack: {
+        slack: {
           token: 'fake-slack-bot-token',
           channel: 'monitoring-alerts'
         }

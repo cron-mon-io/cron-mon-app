@@ -1,6 +1,7 @@
 <template>
   <v-card-title class="text-h5" color="primary">
     <v-icon v-if="isNew" class="mr-3" color="primary">mdi-new-box</v-icon>
+    <!-- TODO: Make this dynamic -->
     <v-icon class="mr-3">
       <v-img :src="SlackIcon"></v-img>
     </v-icon>

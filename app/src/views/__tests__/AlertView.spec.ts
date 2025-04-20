@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file */
 import { describe, it, expect, vi, type Mock } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent } from 'vue'
@@ -31,7 +32,7 @@ function getTestAlertConfigData(): AlertConfig {
       }
     ],
     type: {
-      Slack: {
+      slack: {
         token: 'fake-slack',
         channel: '#fake-channel'
       }
@@ -47,6 +48,46 @@ async function mountAlertView(
   repo: AlertConfigRepoInterface
   service: AlertServiceInterface
 }> {
+  // The SetupAlertDialog component has its own tests, so we just want to
+  // stub it here so we can test how we interact wit it.
+  const FakeSetupAlertDialog = defineComponent({
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      },
+      alertConfig: {
+        type: Object,
+        default: () => null
+      }
+    },
+    emits: ['dialog-complete'],
+    methods: {
+      finish() {
+        this.$emit('dialog-complete', {
+          name: 'Test Alert with a new name',
+          active: true,
+          on_late: true,
+          on_error: false,
+          type: {
+            slack: {
+              channel: '#alerts',
+              token: 'fake-token'
+            }
+          }
+        })
+      }
+    },
+    template: `
+      <div class="fake-setup-alert-dialog">
+        <div v-if="dialogActive" class="content">
+          Test dialog
+          <p>{{ alertConfig ? alertConfig.alert_config_id : "" }}</p>
+          <button @click="finish" />
+        </div>
+      </div>`
+  })
+
   // The ConfirmationDialog component has its own tests, so we just want to
   // stub it here so we can test how we interact wit it.
   const FakeConfirmationDialog = defineComponent({
@@ -81,7 +122,7 @@ async function mountAlertView(
       return Promise.resolve(testAlertConfigData)
     }),
     addAlertConfig: vi.fn(),
-    updateAlertConfig: vi.fn(),
+    updateAlertConfig: vi.fn().mockImplementation((alertConfig) => alertConfig),
     deleteAlertConfig: vi.fn().mockImplementation((_) => {
       if (errors.length > 0) {
         return Promise.reject(new Error(errors.shift() as string))
@@ -108,7 +149,8 @@ async function mountAlertView(
       },
       stubs: {
         // We don't want to test the dialog itself as it has its own tests, just that it is opened.
-        ConfirmationDialog: FakeConfirmationDialog
+        ConfirmationDialog: FakeConfirmationDialog,
+        SetupAlertDialog: FakeSetupAlertDialog
       }
     }
   })
@@ -256,7 +298,31 @@ describe('AlertView view', () => {
   })
 
   it('edits alerts as expected', async () => {
-    // TODO
+    const { wrapper } = await mountAlertView()
+
+    // Dialog should not be open.
+    const dialog = wrapper.find('.fake-setup-alert-dialog')
+    expect(dialog.find('.content').exists()).toBeFalsy()
+
+    // Clicking the Edit button will trigger our test dialog.
+    const addButton = wrapper.findAll('.v-btn')[0]
+    await addButton.trigger('click')
+    await flushPromises()
+
+    // The dialog should now be open and should contain the ID of our monitor.
+    const dialogContent = dialog.find('.content')
+    expect(dialogContent.exists()).toBeTruthy()
+    expect(dialogContent.find('p').text()).toBe('547810d4-a636-4c1b-83e6-3e641391c84e')
+
+    // Clicking the dialog's button will close the dialog, at which point the
+    // AlertView component will update the monitor.
+    await dialogContent.find('button').trigger('click')
+    await flushPromises()
+
+    expect(dialog.find('.content').exists()).toBeFalsy()
+
+    // The monitor should have been updated.
+    expect(wrapper.find('.v-card-title').text()).toBe('Test Alert with a new name')
   })
 
   it('tests alerts as expected', async () => {
@@ -304,7 +370,7 @@ describe('AlertView view', () => {
         }
       ],
       type: {
-        Slack: {
+        slack: {
           channel: '#fake-channel',
           token: 'fake-slack'
         }
@@ -591,14 +657,13 @@ describe('AlertView listing monitor and its jobs with errors', () => {
   })
 })
 
-describe('AlertView editing and deleting monitors with errors', () => {
+describe('AlertView editing and deleting Alerts with errors', () => {
   it.each([
-    // TODO: Uncomment this when the alerts can be edited.
-    // {
-    //   finder: (wrapper: VueWrapper) =>
-    //     return wrapper.find('.v-card').find('.v-card-text').find('.v-btn'),
-    //   dialogfinder: (wrapper: VueWrapper) => wrapper.find('.fake-setup-monitor-dialog')
-    // },
+    {
+      buttonFinder: (wrapper: VueWrapper) =>
+        wrapper.find('.v-card').find('.v-card-text').find('.v-btn'),
+      dialogfinder: (wrapper: VueWrapper) => wrapper.find('.fake-setup-alert-dialog')
+    },
     {
       buttonFinder: (wrapper: VueWrapper) =>
         wrapper.find('.v-card').find('[data-test="footer-buttons"]').findAll('.v-btn')[1],
@@ -639,26 +704,23 @@ describe('AlertView editing and deleting monitors with errors', () => {
     }
   )
 
-  it('shows multiple errors if alert cannot be editted, deleted, or resynced', async () => {
+  it('shows multiple errors if alert cannot be editted or deleted', async () => {
     const { wrapper, repo } = await mountAlertView()
-
-    // TODO: Uncomment this when the alerts can be edited.
-    // ;(repo.updateAlertConfig as Mock).mockRejectedValue(new Error('Failed to edit'))
+    ;(repo.updateAlertConfig as Mock).mockRejectedValue(new Error('Failed to edit'))
 
     // Trigger an edit.
-    // const editButton = wrapper.find('.mdi-pencil')
-    // await editButton.trigger('click')
-    // await flushPromises()
-    // const editDialogButton = wrapper.find('.fake-setup-monitor-dialog').find('button')
-    // await editDialogButton.trigger('click')
-    // await flushPromises()
+    const editButton = wrapper.find('.mdi-pencil')
+    await editButton.trigger('click')
+    await flushPromises()
+    const editDialogButton = wrapper.find('.fake-setup-alert-dialog').find('button')
+    await editDialogButton.trigger('click')
+    await flushPromises()
 
-    // let alerts = wrapper
-    //   .findAll('.v-alert')
-    //   .map((alert) => alert.find('.api-alert-content').find('span').text())
-    // expect(alerts).toHaveLength(1)
-    // expect(alerts).toEqual(['Failed to edit'])
-
+    let alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toHaveLength(1)
+    expect(alerts).toEqual(['Failed to edit'])
     ;(repo.deleteAlertConfig as Mock).mockRejectedValue(new Error('Failed to delete'))
 
     // Trigger a delete
@@ -672,57 +734,48 @@ describe('AlertView editing and deleting monitors with errors', () => {
     await deleteDialogButton.trigger('click')
     await flushPromises()
 
-    // TODO: Uncomment this when the alerts can be edited.
-    // alerts = wrapper
-    //   .findAll('.v-alert')
-    //   .map((alert) => alert.find('.api-alert-content').find('span').text())
-    // expect(alerts).toHaveLength(2)
-    // expect(alerts).toEqual(['Failed to edit', 'Failed to delete'])
-
-    // TODO: Delete this when allerts can be edited.
-    const alerts = wrapper
+    alerts = wrapper
       .findAll('.v-alert')
       .map((alert) => alert.find('.api-alert-content').find('span').text())
-    expect(alerts).toHaveLength(1)
-    expect(alerts).toEqual(['Failed to delete'])
+    expect(alerts).toHaveLength(2)
+    expect(alerts).toEqual(['Failed to edit', 'Failed to delete'])
   })
 
-  // TODO: Uncomment this when the alerts can be edited.
-  // it('allows monitors to be editted after initial sync fails', async () => {
-  //   // Regression test for error where the edit monitor dialog was rendered as if creating a new
-  //   // monitor, rather than editing an existing one, if the first sync failed. This was caused by
-  //   // the `SetupMonitorDialog` component checking if the monitor provided to it is `null` to know
-  //   // whether to show the dialog for creating a new monitor or editing an existing one. This is
-  //   // fixed by using a `v-if="monitor !== null"` on the `SetupMonitorDialog` component, so that it
-  //   // doesn't get injected into the `AlertView` until the monitor is available, meaning the dialog
-  //   // is guaranteed to get a monitor and not `null`.
-  //   vi.useFakeTimers()
+  it('allows monitors to be editted after initial sync fails', async () => {
+    // Regression test for error where the edit monitor dialog was rendered as if creating a new
+    // monitor, rather than editing an existing one, if the first sync failed. This was caused by
+    // the `SetupAlertDialog` component checking if the monitor provided to it is `null` to know
+    // whether to show the dialog for creating a new monitor or editing an existing one. This is
+    // fixed by using a `v-if="monitor !== null"` on the `SetupAlertDialog` component, so that it
+    // doesn't get injected into the `AlertView` until the monitor is available, meaning the dialog
+    // is guaranteed to get a monitor and not `null`.
+    vi.useFakeTimers()
 
-  //   const { wrapper } = await mountAlertView(true, ['Test error message'])
+    const { wrapper } = await mountAlertView(true, ['Test error message'])
 
-  //   // Since the first sync fails, the monitor should be `null` and we shouldn't
-  //   // have any dialog at all.
-  //   expect(wrapper.find('.fake-setup-monitor-dialog').exists()).toBeFalsy()
+    // Since the first sync fails, the monitor should be `null` and we shouldn't
+    // have any dialog at all.
+    expect(wrapper.find('.fake-setup-alert-dialog').exists()).toBeFalsy()
 
-  //   // Let the AlertView component sync again - which will succeed this time.
-  //   vi.advanceTimersByTime(1 * 60 * 1000)
-  //   await flushPromises()
+    // Let the AlertView component sync again - which will succeed this time.
+    vi.advanceTimersByTime(1 * 60 * 1000)
+    await flushPromises()
 
-  //   // Now that we've synced the monitor and it's no longer `null`, we shoud have the
-  //   // dialog container again.
-  //   const editDialog = wrapper.find('.fake-setup-monitor-dialog')
-  //   expect(editDialog.exists()).toBeTruthy()
+    // Now that we've synced the monitor and it's no longer `null`, we shoud have the
+    // dialog container again.
+    const editDialog = wrapper.find('.fake-setup-alert-dialog')
+    expect(editDialog.exists()).toBeTruthy()
 
-  //   // Open the edit dialog.
-  //   const button = wrapper.find('.mdi-pencil')
-  //   await button.trigger('click')
-  //   await flushPromises()
+    // Open the edit dialog.
+    const button = wrapper.find('.mdi-pencil')
+    await button.trigger('click')
+    await flushPromises()
 
-  //   // The dialog should contain the monitor ID.
-  //   expect(wrapper.find('.fake-setup-monitor-dialog').find('p').text()).toBe(
-  //     '547810d4-a636-4c1b-83e6-3e641391c84e'
-  //   )
+    // The dialog should contain the monitor ID.
+    expect(wrapper.find('.fake-setup-alert-dialog').find('p').text()).toBe(
+      '547810d4-a636-4c1b-83e6-3e641391c84e'
+    )
 
-  //   vi.useRealTimers()
-  // })
+    vi.useRealTimers()
+  })
 })

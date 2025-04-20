@@ -6,6 +6,7 @@
       :retry-enabled="true"
       @retried="getAlertConfig"
     />
+    <ApiAlert class="mx-4 mt-4" :error="editError" @closed="editError = null" />
     <ApiAlert class="mx-4 mt-4" :error="testAlertError" @closed="testAlertError = null" />
     <ApiAlert class="mx-4 mt-4" :error="deleteError" @closed="deleteError = null" />
     <v-skeleton-loader
@@ -114,24 +115,34 @@
       question="This cannot be undone and will result in the jobs within this Monitor also being deleted. Are you sure?"
       @dialog-complete="deleteDialogComplete"
     />
+    <SetupAlertDialog
+      v-if="alertConfig !== null"
+      :dialog-active="editDialogActive"
+      :alert-config="alertConfig"
+      @dialog-complete="updateAlertConfig"
+      @dialog-aborted="editDialogActive = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, inject, onUnmounted, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import type { VueCookies } from 'vue-cookies'
 
 import AlertConfigBrief from '@/components/AlertConfigBrief.vue'
 import ApiAlert from '@/components/ApiAlert.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import SetupAlertDialog from '@/components/SetupAlertDialog.vue'
 import type { AlertConfigRepoInterface } from '@/repos/alert-config-repo'
 import type { AlertServiceInterface } from '@/services/alert-service'
-import type { AlertConfig } from '@/types/alert-config'
+import type { AlertConfig, AlertConfigIdentity, BasicAlertConfig } from '@/types/alert-config'
 
 const ONE_MINUTE_MS = 60 * 1000
 
 const route = useRoute()
 const router = useRouter()
+const cookies = inject<VueCookies>('$cookies') as VueCookies
 const getAlertConfigRepo = inject<() => Promise<AlertConfigRepoInterface>>(
   '$getAlertConfigRepo'
 ) as () => Promise<AlertConfigRepoInterface>
@@ -148,6 +159,7 @@ onUnmounted(() => {
 const alertConfigId = route.params.id as string
 const alertConfig = ref<AlertConfig | null>(null)
 const syncError = ref<string | null>(null)
+const editError = ref<string | null>(null)
 const testAlertError = ref<string | null>(null)
 const deleteError = ref<string | null>(null)
 const editDialogActive = ref(false)
@@ -156,6 +168,26 @@ const deleteDialogActive = ref(false)
 
 function openEditDialog() {
   editDialogActive.value = true
+}
+
+async function updateAlertConfig(alertConfigInfo: BasicAlertConfig) {
+  const newAlert = {
+    alert_config_id: alertConfigId,
+    ...alertConfigInfo
+  } as AlertConfigIdentity
+
+  const repo = await getAlertConfigRepo()
+  try {
+    alertConfig.value = await repo.updateAlertConfig(newAlert)
+    cookies.set(alertConfig.value.alert_config_id, 'new', '5min')
+  } catch (e: unknown) {
+    editError.value = (e as Error).message
+  }
+  closeEditDialog()
+}
+
+function closeEditDialog() {
+  editDialogActive.value = false
 }
 
 function openTestAlertDialog() {

@@ -28,7 +28,7 @@ describe('AlertConfigService', () => {
     on_error: false,
     monitors: [],
     type: {
-      Slack: {
+      slack: {
         channel: '#alerts',
         token: 'fake-token'
       }
