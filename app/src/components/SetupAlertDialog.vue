@@ -41,7 +41,7 @@
             ></v-checkbox>
           </span>
           <div v-if="typeSetup">
-            <v-combobox
+            <v-select
               v-model="alertType"
               :readonly="!typeSetup"
               :disabled="!typeSetup"
@@ -50,7 +50,6 @@
               hint="How do you want to be alerted?"
               persistent-hint
               label="Alert type"
-              clearable
               variant="outlined"
             />
             <div v-if="alertType === 'Slack'">
