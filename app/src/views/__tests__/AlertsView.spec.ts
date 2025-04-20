@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, type Mock } from 'vitest'
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -60,6 +61,35 @@ async function mountAlertsView(errors: string[] = []): Promise<{
 }> {
   const vuetify = createVuetify({ components, directives })
 
+  const TestDialog = defineComponent({
+    props: {
+      dialogActive: {
+        type: Boolean,
+        required: true
+      }
+    },
+    emits: ['dialog-complete'],
+    watch: {
+      dialogActive(active: boolean) {
+        if (active) {
+          this.$emit('dialog-complete', {
+            name: 'New Alert',
+            active: true,
+            on_late: true,
+            on_error: false,
+            type: {
+              slack: {
+                channel: '#alerts',
+                token: 'fake-token'
+              }
+            }
+          })
+        }
+      }
+    },
+    template: '<div>Test dialog</div>'
+  })
+
   const testAlertConfigData = getTestAlertConfigData()
   const repo = {
     getAlertConfigs: vi.fn().mockImplementation((_) => {
@@ -84,6 +114,10 @@ async function mountAlertsView(errors: string[] = []): Promise<{
       },
       mocks: {
         $cookies: cookies
+      },
+      stubs: {
+        // We don't want to test the dialog itself as it has its own tests, just that it is opened.
+        SetupAlertDialog: TestDialog
       }
     }
   })
@@ -114,6 +148,34 @@ describe('AlertsView view', () => {
       .findAll('.v-card')
       .map((card) => card.find('.v-card-title').text())
     expect(monitors).toEqual(['Alert Config 1', 'Alert Config 2'])
+  })
+
+  it('adds new alerts as expected', async () => {
+    const { wrapper, repo } = await mountAlertsView()
+
+    const spy = vi.spyOn(repo, 'addAlertConfig')
+
+    // Clicking the add button will trigger our test dialog, which will imediately complete with new Monitor info.
+    const addButton = wrapper.find('.v-btn')
+    await addButton.trigger('click')
+
+    // Let the AlertsView component add the new monitor.
+    await flushPromises()
+
+    // We should have added the alert via the repo.
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith({
+      name: 'New Alert',
+      active: true,
+      on_late: true,
+      on_error: false,
+      type: {
+        slack: {
+          channel: '#alerts',
+          token: 'fake-token'
+        }
+      }
+    })
   })
 
   it('detects new alert configs when they are added externally', async () => {
@@ -239,6 +301,62 @@ describe('AlertsView listing monitors with errors', () => {
 
     // Ensure the alert is visible.
     expect(wrapper.find('.v-alert').exists()).toBeTruthy()
+    vi.useRealTimers()
+  })
+})
+
+describe('AlertsView adding new alerts with errors', () => {
+  it('shows an error alert when the alert config repository has errors', async () => {
+    const { wrapper, repo } = await mountAlertsView()
+
+    ;(repo.addAlertConfig as Mock).mockRejectedValue(new Error('Failed to add new Alert'))
+
+    const addButton = wrapper.find('.v-btn')
+    await addButton.trigger('click')
+
+    await flushPromises()
+
+    const alert = wrapper.find('.v-alert')
+    expect(alert.find('.api-alert-content').find('span').text()).toBe('Failed to add new Alert')
+
+    // The alert should have a close button.
+    const closeButton = alert.find('.v-btn')
+    expect(closeButton.find('.mdi').classes()).toContain('mdi-close')
+
+    // Clicking the close button should clear the alert.
+    await closeButton.trigger('click')
+    expect(wrapper.find('.v-alert').exists()).toBeFalsy()
+  })
+
+  it('displays multiple alerts if following sync fails', async () => {
+    vi.useFakeTimers()
+
+    const { wrapper, repo } = await mountAlertsView()
+
+    ;(repo.addAlertConfig as Mock).mockRejectedValue(new Error('Failed to add new Alert'))
+    ;(repo.getAlertConfigs as Mock).mockRejectedValue(new Error('Could not retrieve Alerts'))
+
+    const addButton = wrapper.find('.v-btn')
+    await addButton.trigger('click')
+
+    await flushPromises()
+
+    // Ensure 1st alert is visible.
+    let alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toEqual(['Failed to add new Alert'])
+
+    // Let the AlertsView component sync again.
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    await flushPromises()
+
+    // Ensure the previous alert and the new alert are visible.
+    alerts = wrapper
+      .findAll('.v-alert')
+      .map((alert) => alert.find('.api-alert-content').find('span').text())
+    expect(alerts).toEqual(['Could not retrieve Alerts', 'Failed to add new Alert'])
+
     vi.useRealTimers()
   })
 })
