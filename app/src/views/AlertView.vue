@@ -6,6 +6,7 @@
       :retry-enabled="true"
       @retried="getAlertConfig"
     />
+    <ApiAlert class="mx-4 mt-4" :error="editError" @closed="editError = null" />
     <ApiAlert class="mx-4 mt-4" :error="testAlertError" @closed="testAlertError = null" />
     <ApiAlert class="mx-4 mt-4" :error="deleteError" @closed="deleteError = null" />
     <v-skeleton-loader
