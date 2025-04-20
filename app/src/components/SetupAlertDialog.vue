@@ -54,7 +54,7 @@
             />
             <div v-if="alertType === 'Slack'">
               <v-text-field
-                v-model="monitorInfo.type.slack.channel"
+                v-model="slackChannel"
                 class="mt-5"
                 hint="Slack channel to send alerts to"
                 persistent-hint
@@ -63,7 +63,7 @@
                 variant="outlined"
               ></v-text-field>
               <v-text-field
-                v-model="monitorInfo.type.slack.token"
+                v-model="slackToken"
                 class="mt-5"
                 hint="Bot user OAuth token for the Slack app"
                 persistent-hint
@@ -129,11 +129,29 @@ const isActive = ref(props.alertConfig ? props.alertConfig.active : false)
 const onError = ref(props.alertConfig ? props.alertConfig.on_error : false)
 const onLate = ref(props.alertConfig ? props.alertConfig.on_late : false)
 const alertType = ref('Slack')
+const slackChannel = ref(props.alertConfig ? props.alertConfig.type.slack.channel : '')
+const slackToken = ref(props.alertConfig ? props.alertConfig.type.slack.token : '')
 
 const formValid = ref(false)
 const loading = ref(false)
 const active = computed(() => props.dialogActive)
-const canSave = computed(() => formValid.value && name.value.length > 0)
+const canSave = computed(() => {
+  if (!formValid.value || name.value.length === 0) {
+    return false
+  }
+
+  // If we haven't been supplied with an alert config, we need to make sure the alert type
+  // is valid.
+  if (!props.alertConfig) {
+    if (alertType.value === 'Slack') {
+      if (slackChannel.value.length === 0 || slackToken.value.length === 0) {
+        return false
+      }
+    }
+  }
+
+  return true
+})
 const monitorInfo = computed(
   () =>
     ({
@@ -143,8 +161,8 @@ const monitorInfo = computed(
       on_error: onError.value,
       type: {
         slack: {
-          channel: '',
-          token: ''
+          channel: slackChannel.value,
+          token: slackToken.value
         }
       }
     }) as BasicAlertConfig
