@@ -74,7 +74,7 @@
             </div>
             <div v-else-if="alertType === 'Webhook'">Not supported yet</div>
           </div>
-          <div v-else class="text-h6">
+          <div v-else class="text-h6" data-test="alert-type">
             Type:
             <!-- TODO: Make this dynamic -->
             <v-icon>
