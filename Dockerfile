@@ -9,7 +9,7 @@ ENV PATH /usr/cron-mon/app/node_modules/.bin:$PATH
 
 RUN npm install && npm run build
 
-FROM public.ecr.aws/docker/library/caddy:2.9
+FROM public.ecr.aws/docker/library/caddy:2.10
 
 COPY ./entrypoint.sh /entrypoint.sh
 COPY --from=builder /usr/cron-mon/app/dist /srv
