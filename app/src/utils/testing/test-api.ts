@@ -153,7 +153,7 @@ export function setupTestAPI(expectedToken: string): SetupServer {
     }
   ]
 
-  function assertAuth(request: StrictRequest<JsonBodyType>): HttpResponse | void {
+  function assertAuth(request: StrictRequest<JsonBodyType>): HttpResponse<JsonBodyType> | void {
     const token = request.headers.get('Authorization')
     return token === `Bearer ${expectedToken}`
       ? undefined
